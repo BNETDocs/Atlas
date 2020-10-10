@@ -24,6 +24,7 @@ namespace Atlasd.Battlenet
         };
 
         public Flags ActiveFlags { get; protected set; }
+        protected List<GameState> BannedUsers { get; private set; }
         public int MaxUsers { get; protected set; }
         public string Name { get; protected set; }
         public string Topic { get; protected set; }
@@ -32,14 +33,39 @@ namespace Atlasd.Battlenet
         public Channel(string name, Flags flags, int maxUsers = -1, string topic = "")
         {
             ActiveFlags = flags;
+            BannedUsers = new List<GameState>();
             MaxUsers = maxUsers;
             Name = name;
             Topic = topic;
             Users = new List<GameState>();
         }
 
-        public void AcceptUser(GameState user)
+        public void AcceptUser(GameState user, bool ignoreLimits = false)
         {
+            if (!ignoreLimits)
+            {
+                if (Users.Count >= MaxUsers)
+                {
+                    WriteChatEvent(user.Client, SID_CHATEVENT.EventIds.EID_CHANNELFULL, 0, 0, "", Name);
+                    WriteChatEvent(user.Client, SID_CHATEVENT.EventIds.EID_ERROR, 0, 0, Name, "That channel is full.");
+                    return;
+                }
+
+                if (BannedUsers.Contains(user))
+                {
+                    WriteChatEvent(user.Client, SID_CHATEVENT.EventIds.EID_CHANNELRESTRICTED, 0, 0, "", Name);
+                    WriteChatEvent(user.Client, SID_CHATEVENT.EventIds.EID_ERROR, 0, 0, Name, "You are banned from that channel.");
+                    return;
+                }
+
+                if (ActiveFlags.HasFlag(Flags.Restricted))
+                {
+                    WriteChatEvent(user.Client, SID_CHATEVENT.EventIds.EID_CHANNELRESTRICTED, 0, 0, "", Name);
+                    WriteChatEvent(user.Client, SID_CHATEVENT.EventIds.EID_ERROR, 0, 0, Name, "That channel is restricted.");
+                    return;
+                }
+            }
+
             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Channel, "Accepting user [" + user.OnlineName + "] to [" + Name + "]");
 
             // Add this user to the channel:
