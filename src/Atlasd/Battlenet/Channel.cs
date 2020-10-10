@@ -25,6 +25,7 @@ namespace Atlasd.Battlenet
 
         public Flags ActiveFlags { get; protected set; }
         protected List<GameState> BannedUsers { get; private set; }
+        public int Count { get => Users.Count; }
         public int MaxUsers { get; protected set; }
         public string Name { get; protected set; }
         public string Topic { get; protected set; }
@@ -44,7 +45,7 @@ namespace Atlasd.Battlenet
         {
             if (!ignoreLimits)
             {
-                if (Users.Count >= MaxUsers)
+                if (MaxUsers > -1 && Users.Count >= MaxUsers)
                 {
                     WriteChatEvent(user.Client, SID_CHATEVENT.EventIds.EID_CHANNELFULL, 0, 0, "", Name);
                     WriteChatEvent(user.Client, SID_CHATEVENT.EventIds.EID_ERROR, 0, 0, Name, "That channel is full.");
@@ -66,22 +67,35 @@ namespace Atlasd.Battlenet
                 }
             }
 
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Channel, "Accepting user [" + user.OnlineName + "] to [" + Name + "]");
+            if (user.ActiveChannel != null) user.ActiveChannel.RemoveUser(user);
+            user.ActiveChannel = this;
 
-            // Add this user to the channel:
-            Users.Add(user);
-
-            // Tell this user they entered the channel:
-            WriteChatEvent(user.Client, SID_CHATEVENT.EventIds.EID_CHANNELJOIN, 0, 0, "", Name);
-
-            foreach (var subuser in Users)
+            lock (Users)
             {
-                // Tell this user about everyone in the channel:
-                WriteChatEvent(user.Client, SID_CHATEVENT.EventIds.EID_USERSHOW, 0, subuser.Ping, subuser.OnlineName, Encoding.ASCII.GetString(subuser.Statstring));
+                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Channel, "Accepting user [" + user.OnlineName + "] to [" + Name + "]");
 
-                // Tell everyone else about this user entering the channel:
-                if (subuser != user)
-                    WriteChatEvent(subuser.Client, SID_CHATEVENT.EventIds.EID_USERJOIN, 0, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring));
+                // Add this user to the channel:
+                Users.Add(user);
+
+                // Tell this user they entered the channel:
+                WriteChatEvent(user.Client, SID_CHATEVENT.EventIds.EID_CHANNELJOIN, 0, 0, "", Name);
+
+                if (!ActiveFlags.HasFlag(Flags.Silent))
+                {
+                    foreach (var subuser in Users)
+                    {
+                        // Tell this user about everyone in the channel:
+                        WriteChatEvent(user.Client, SID_CHATEVENT.EventIds.EID_USERSHOW, 0, subuser.Ping, subuser.OnlineName, Encoding.ASCII.GetString(subuser.Statstring));
+
+                        // Tell everyone else about this user entering the channel:
+                        if (subuser != user)
+                            WriteChatEvent(subuser.Client, SID_CHATEVENT.EventIds.EID_USERJOIN, 0, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring));
+                    }
+                }
+                else
+                {
+                    WriteChatEvent(user.Client, SID_CHATEVENT.EventIds.EID_INFO, 0, 0, "", "This channel does not have chat privileges.");
+                }
             }
 
             // Render the channel topic:
@@ -100,6 +114,11 @@ namespace Atlasd.Battlenet
                 WriteChatEvent(SID_CHATEVENT.EventIds.EID_INFO, 0, 0, "", line);
         }
 
+        public void Dispose()
+        {
+
+        }
+
         public static Channel GetChannelByName(string name)
         {
             return Common.ActiveChannels.TryGetValue(name, out Channel channel) ? channel : null;
@@ -107,12 +126,17 @@ namespace Atlasd.Battlenet
 
         public void RemoveUser(GameState user)
         {
-            if (Users.Contains(user)) Users.Remove(user);
+            if (!Users.Contains(user)) return;
 
-            foreach (var subuser in Users)
+            Users.Remove(user);
+
+            lock (user)
             {
-                // Tell everyone else about this user leaving the channel:
-                WriteChatEvent(subuser.Client, SID_CHATEVENT.EventIds.EID_USERLEAVE, 0, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring));
+                foreach (var subuser in Users)
+                {
+                    // Tell everyone else about this user leaving the channel:
+                    WriteChatEvent(subuser.Client, SID_CHATEVENT.EventIds.EID_USERLEAVE, 0, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring));
+                }
             }
         }
 
@@ -161,44 +185,47 @@ namespace Atlasd.Battlenet
             WriteChatEvent(SID_CHATEVENT.EventIds.EID_INFO, 0, 0, "", text);
         }
 
-        public static void WriteChatEvent(Sockets.ClientState client, SID_CHATEVENT.EventIds eventId, UInt32 flags, Int32 ping, string username, string text)
+        public static void WriteChatEvent(ClientState client, SID_CHATEVENT.EventIds eventId, UInt32 flags, Int32 ping, string username, string text)
         {
-            if (client.ClientStream == null || !client.ClientStream.CanWrite)
+            lock (client)
             {
-                client.Close();
-                return;
-            }
+                if (client.ClientStream == null || !client.ClientStream.CanWrite)
+                {
+                    client.Dispose();
+                    return;
+                }
 
-            var args = new Dictionary<string, object>
-            {
-                { "eventId", (UInt32)eventId },
-                { "flags", flags },
-                { "ping", ping },
-                { "username", username },
-                { "text", text }
-            };
+                var args = new Dictionary<string, object>
+                {
+                    { "eventId", (UInt32)eventId },
+                    { "flags", flags },
+                    { "ping", ping },
+                    { "username", username },
+                    { "text", text }
+                };
 
-            var chat_event = new SID_CHATEVENT();
-            chat_event.Invoke(new MessageContext(client, Protocols.MessageDirection.ServerToClient, args));
+                var chat_event = new SID_CHATEVENT();
+                chat_event.Invoke(new MessageContext(client, Protocols.MessageDirection.ServerToClient, args));
 
-            switch (client.ProtocolType)
-            {
-                case ProtocolType.Game:
-                    {
-                        client.Send(chat_event.ToByteArray());
-                        break;
-                    }
-                case ProtocolType.Chat:
-                case ProtocolType.Chat_Alt1:
-                case ProtocolType.Chat_Alt2:
-                    {
-                        client.Send(Encoding.ASCII.GetBytes(chat_event.ToString()));
-                        break;
-                    }
-                default:
-                    {
-                        throw new NotSupportedException("User is using an incompatible protocol for chat events");
-                    }
+                switch (client.ProtocolType)
+                {
+                    case ProtocolType.Game:
+                        {
+                            client.Send(chat_event.ToByteArray());
+                            break;
+                        }
+                    case ProtocolType.Chat:
+                    case ProtocolType.Chat_Alt1:
+                    case ProtocolType.Chat_Alt2:
+                        {
+                            client.Send(Encoding.ASCII.GetBytes(chat_event.ToString()));
+                            break;
+                        }
+                    default:
+                        {
+                            throw new NotSupportedException("User is using an incompatible protocol for chat events");
+                        }
+                }
             }
         }
 
@@ -217,26 +244,28 @@ namespace Atlasd.Battlenet
 
             foreach (var user in Users)
             {
-                chat_event.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
+                lock (user.Client) {
+                    chat_event.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
 
-                switch (user.Client.ProtocolType)
-                {
-                    case ProtocolType.Game:
-                        {
-                            user.Client.Send(chat_event.ToByteArray());
-                            break;
-                        }
-                    case ProtocolType.Chat:
-                    case ProtocolType.Chat_Alt1:
-                    case ProtocolType.Chat_Alt2:
-                        {
-                            user.Client.Send(Encoding.ASCII.GetBytes(chat_event.ToString()));
-                            break;
-                        }
-                    default:
-                        {
-                            throw new NotSupportedException("Invalid channel state, user in channel is using an incompatible protocol");
-                        }
+                    switch (user.Client.ProtocolType)
+                    {
+                        case ProtocolType.Game:
+                            {
+                                user.Client.Send(chat_event.ToByteArray());
+                                break;
+                            }
+                        case ProtocolType.Chat:
+                        case ProtocolType.Chat_Alt1:
+                        case ProtocolType.Chat_Alt2:
+                            {
+                                user.Client.Send(Encoding.ASCII.GetBytes(chat_event.ToString()));
+                                break;
+                            }
+                        default:
+                            {
+                                throw new NotSupportedException("Invalid channel state, user in channel is using an incompatible protocol");
+                            }
+                    }
                 }
             }
         }

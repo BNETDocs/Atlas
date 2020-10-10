@@ -23,37 +23,7 @@ namespace Atlasd
             while (true) // Infinitely loop main thread
             {
                 // Block until a connection is received ...
-                var clientState = new Battlenet.Sockets.ClientState(Common.Listener.AcceptTcpClient());
-
-                // Spawn a new thread to handle this connection ...
-                new Thread(() =>
-                {
-                    while (true) // Infinitely loop childSocketThread ...
-                    {
-                        var bCloseConnection = true;
-                        try
-                        {
-                            if (!clientState.Receive()) break; // ... unless Receive() or
-                            if (!clientState.Invoke()) break; // ... Invoke() return false
-                            bCloseConnection = false;
-                            continue;
-                        }
-                        /*catch (SocketException ex)
-                        {
-                            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, clientState.RemoteEndPoint, "TCP connection lost!" + (ex.Message.Length > 0 ? " " + ex.Message : ""));
-                        }
-                        catch (Exception ex)
-                        {
-                            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, clientState.RemoteEndPoint, ex.GetType().Name + " error encountered!" + (ex.Message.Length > 0 ? " " + ex.Message : ""));
-                        }*/
-                        finally
-                        {
-                            if (clientState != null && bCloseConnection)
-                                clientState.Close();
-                        }
-                        break;
-                    }
-                }).Start();
+                new ClientState(Common.Listener.AcceptTcpClient());
             }
         }
     }

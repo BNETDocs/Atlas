@@ -7,6 +7,7 @@ namespace Atlasd.Battlenet
     {
         public const string AccountCreatedKey = "System\\Account Created";
         public const string FlagsKey = "System\\Flags";
+        public const string FriendsKey = "System\\Friends";
         public const string IPAddressKey = "System\\IP";
         public const string LastLogoffKey = "System\\Last Logoff";
         public const string LastLogonKey = "System\\Last Logon";

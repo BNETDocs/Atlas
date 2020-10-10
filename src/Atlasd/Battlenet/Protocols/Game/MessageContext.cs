@@ -1,5 +1,4 @@
-﻿using Atlasd.Battlenet.Sockets;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Atlasd.Battlenet.Protocols.Game
 {

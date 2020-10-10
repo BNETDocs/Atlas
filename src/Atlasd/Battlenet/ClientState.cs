@@ -3,8 +3,9 @@ using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Daemon;
 using System;
 using System.Net.Sockets;
+using System.Threading;
 
-namespace Atlasd.Battlenet.Sockets
+namespace Atlasd.Battlenet
 {
     class ClientState
     {
@@ -22,37 +23,35 @@ namespace Atlasd.Battlenet.Sockets
         public ClientState(TcpClient client)
         {
             Initialize(client);
+            ThreadMain();
         }
 
-        public void Close()
+        public void Dispose()
         {
-            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection forcefully closed by server");
-            if (Client != null) Client.Close();
-            if (GameState == null) return;
+            lock (this) {
+                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection forcefully closed by server");
+                if (Client != null) Client.Close();
 
-            if (GameState.ActiveAccount != null)
-            {
-                lock (GameState.ActiveAccount) {
-                    GameState.ActiveAccount.Set(Account.LastLogoffKey, DateTime.Now);
+                Common.ActiveClients.Remove(this);
 
-                    var timeLogged = (UInt32)GameState.ActiveAccount.Get(Account.TimeLoggedKey);
-                    var diff = DateTime.Now - GameState.ConnectedTimestamp;
-                    timeLogged += (UInt32)Math.Round(diff.TotalSeconds);
-                    GameState.ActiveAccount.Set(Account.TimeLoggedKey, timeLogged);
-
-                    var username = (string)GameState.ActiveAccount.Get(Account.UsernameKey);
-                    if (Common.ActiveAccounts.ContainsKey(username)) Common.ActiveAccounts.Remove(username);
+                if (ClientStream != null)
+                {
+                    ClientStream.Dispose();
+                    ClientStream = null;
                 }
-            }
 
-            if (GameState.ActiveChannel != null)
-            {
-                GameState.ActiveChannel.RemoveUser(GameState);
+                if (GameState != null)
+                {
+                    GameState.Dispose();
+                    GameState = null;
+                }
             }
         }
 
         protected void Initialize(TcpClient client)
         {
+            Common.ActiveClients.Add(this);
+
             Client = client;
             ClientStream = client.GetStream();
             RemoteEndPoint = client.Client.RemoteEndPoint;
@@ -77,7 +76,7 @@ namespace Atlasd.Battlenet.Sockets
 
         public bool Invoke()
         {
-            if (!Client.Connected || !Client.Client.Poll(0, System.Net.Sockets.SelectMode.SelectWrite))
+            if (!Client.Connected || ClientStream == null || !ClientStream.CanWrite)
             {
                 Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection lost");
                 return false;
@@ -87,8 +86,7 @@ namespace Atlasd.Battlenet.Sockets
             {
                 while (BattlenetGameFrame.Messages.Count > 0)
                 {
-                    var message = BattlenetGameFrame.Messages.Pop();
-                    if (!message.Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer))) return false;
+                    if (!BattlenetGameFrame.Messages.Dequeue().Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer))) return false;
                 }
             }
             catch (ProtocolViolationException ex)
@@ -112,7 +110,7 @@ namespace Atlasd.Battlenet.Sockets
 
         public bool Receive()
         {
-            if (!Client.Connected)
+            if (!Client.Connected || ClientStream == null || !ClientStream.CanRead)
             {
                 Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection lost");
                 return false;
@@ -184,7 +182,7 @@ namespace Atlasd.Battlenet.Sockets
 
                             if (message is Message)
                             {
-                                BattlenetGameFrame.Messages.Push(message);
+                                BattlenetGameFrame.Messages.Enqueue(message);
                                 continue;
                             } else
                             {
@@ -216,12 +214,44 @@ namespace Atlasd.Battlenet.Sockets
         {
             if (ClientStream == null || !ClientStream.CanWrite)
             {
-                Close();
+                Dispose();
                 return false;
             }
 
             ClientStream.Write(buffer);
             return true;
+        }
+
+        public void ThreadMain()
+        {
+            // Spawn a new thread to handle this connection ...
+            new Thread(() =>
+            {
+                while (true) // Infinitely loop childSocketThread ...
+                {
+                    var bCloseConnection = true;
+                    try
+                    {
+                        if (!Receive()) break; // ... unless Receive() or
+                        if (!Invoke()) break; // ... Invoke() return false
+                        bCloseConnection = false;
+                        continue;
+                    }
+                    catch (SocketException ex)
+                    {
+                        Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection lost!" + (ex.Message.Length > 0 ? " " + ex.Message : ""));
+                    }
+                    catch (Exception ex)
+                    {
+                        Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, ex.GetType().Name + " error encountered!" + (ex.Message.Length > 0 ? " " + ex.Message : ""));
+                    }
+                    finally
+                    {
+                        if (bCloseConnection) Dispose();
+                    }
+                    break;
+                }
+            }).Start();
         }
     }
 }

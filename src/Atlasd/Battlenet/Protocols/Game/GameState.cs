@@ -1,5 +1,4 @@
-﻿using Atlasd.Battlenet.Sockets;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 
@@ -69,6 +68,36 @@ namespace Atlasd.Battlenet.Protocols.Game
             TimezoneBias = 0;
             UDPToken = (uint)r.Next(0, 0x7FFFFFFF);
             Username = null;
+        }
+
+        public void Dispose()
+        {
+            if (ActiveAccount != null)
+            {
+                lock (ActiveAccount)
+                {
+                    ActiveAccount.Set(Account.LastLogoffKey, DateTime.Now);
+
+                    var timeLogged = (UInt32)ActiveAccount.Get(Account.TimeLoggedKey);
+                    var diff = DateTime.Now - ConnectedTimestamp;
+                    timeLogged += (UInt32)Math.Round(diff.TotalSeconds);
+                    ActiveAccount.Set(Account.TimeLoggedKey, timeLogged);
+
+                    var username = (string)ActiveAccount.Get(Account.UsernameKey);
+                    if (Battlenet.Common.ActiveAccounts.ContainsKey(username))
+                        Battlenet.Common.ActiveAccounts.Remove(username);
+                }
+            }
+
+            if (ActiveChannel != null)
+            {
+                lock (ActiveChannel)
+                {
+                    ActiveChannel.RemoveUser(this);
+                    if (ActiveChannel.Count == 0) ActiveChannel.Dispose();
+                    ActiveChannel = null;
+                }
+            }
         }
     }
 }

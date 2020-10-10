@@ -12,6 +12,7 @@ namespace Atlasd.Battlenet
         public static Dictionary<string, Account> AccountsDb;
         public static Dictionary<string, Account> ActiveAccounts;
         public static Dictionary<string, Channel> ActiveChannels;
+        public static List<ClientState> ActiveClients;
         public static IPAddress DefaultInterface { get; private set; }
         public static int DefaultPort { get; private set; }
         public static TcpListener Listener;
@@ -21,6 +22,7 @@ namespace Atlasd.Battlenet
             AccountsDb = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveAccounts = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
+            ActiveClients = new List<ClientState>();
 
             ActiveChannels.Append(new KeyValuePair<string, Channel>("The Void", new Channel("The Void", Channel.Flags.Public | Channel.Flags.Silent, -1, "This channel does not have chat privileges.")));
             ActiveChannels.Append(new KeyValuePair<string, Channel>("Backstage", new Channel("Backstage", Channel.Flags.Public | Channel.Flags.Restricted, -1, "Abandon hope, all ye who enter here...")));

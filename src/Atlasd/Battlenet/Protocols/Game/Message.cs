@@ -35,6 +35,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_CREATEACCOUNT2 => new Messages.SID_CREATEACCOUNT2(buffer),
                 MessageIds.SID_AUTH_INFO => new Messages.SID_AUTH_INFO(buffer),
                 MessageIds.SID_AUTH_CHECK => new Messages.SID_AUTH_CHECK(buffer),
+                MessageIds.SID_FRIENDSLIST => new Messages.SID_FRIENDSLIST(buffer),
                 _ => null,
             };
         }
