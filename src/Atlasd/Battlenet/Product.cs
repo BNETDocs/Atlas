@@ -1,8 +1,10 @@
-﻿namespace Atlasd.Battlenet
+﻿using System;
+
+namespace Atlasd.Battlenet
 {
     public class Product
     {
-        public enum ProductCode
+        public enum ProductCode : UInt32
         {
             None = 0, // None/Zero/Null
 

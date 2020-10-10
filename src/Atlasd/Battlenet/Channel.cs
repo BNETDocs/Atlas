@@ -9,7 +9,7 @@ namespace Atlasd.Battlenet
 {
     class Channel
     {
-        public enum Flags
+        public enum Flags : UInt32
         {
             Public          = 0x00001,
             Moderated       = 0x00002,
@@ -135,7 +135,7 @@ namespace Atlasd.Battlenet
             WriteChatEvent(SID_CHATEVENT.EventIds.EID_INFO, 0, 0, "", text);
         }
 
-        public static void WriteChatEvent(Sockets.TcpClient client, SID_CHATEVENT.EventIds eventId, UInt32 flags, Int32 ping, string username, string text)
+        public static void WriteChatEvent(Sockets.ClientState client, SID_CHATEVENT.EventIds eventId, UInt32 flags, Int32 ping, string username, string text)
         {
             if (client == null) throw new NullReferenceException();
             if (client.Client == null) throw new NullReferenceException();

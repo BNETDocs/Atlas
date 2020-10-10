@@ -7,14 +7,14 @@ namespace Atlasd.Battlenet.Protocols.Game
 {
     class State
     {
-        public enum LogonTypes
+        public enum LogonTypes : UInt32
         {
             OLS = 0,
             NLSBeta = 1,
             NLS = 2,
         };
 
-        public TcpClient Client { get; protected set; }
+        public ClientState Client { get; protected set; }
 
         public Account ActiveAccount;
         public Channel ActiveChannel;
@@ -40,7 +40,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public UInt32 UDPToken;
         public string Username;
 
-        public State(TcpClient client)
+        public State(ClientState client)
         {
             var r = new Random();
 

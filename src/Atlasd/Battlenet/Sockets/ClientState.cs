@@ -2,12 +2,11 @@
 using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Daemon;
 using System;
-using System.IO;
 using System.Net.Sockets;
 
 namespace Atlasd.Battlenet.Sockets
 {
-    class TcpClient
+    class ClientState
     {
         public System.Net.Sockets.TcpClient Client { get; private set; }
         public ProtocolType ProtocolType = ProtocolType.None;
@@ -20,12 +19,9 @@ namespace Atlasd.Battlenet.Sockets
 
         protected Frame BattlenetGameFrame = new Frame();
 
-        public TcpClient(System.Net.Sockets.TcpClient client)
+        public ClientState(System.Net.Sockets.TcpClient client)
         {
-            Client = client;
-            Stream = client.GetStream();
-            RemoteEndPoint = client.Client.RemoteEndPoint;
-            State = new State(this);
+            Initialize(client);
         }
 
         public void Close()
@@ -52,6 +48,30 @@ namespace Atlasd.Battlenet.Sockets
             if (State.ActiveChannel != null)
             {
                 State.ActiveChannel.RemoveUser(State);
+            }
+        }
+
+        protected void Initialize(System.Net.Sockets.TcpClient client)
+        {
+            Client = client;
+            Stream = client.GetStream();
+            RemoteEndPoint = client.Client.RemoteEndPoint;
+            State = new State(this);
+
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, "TCP connection established");
+
+            client.Client.NoDelay = true;
+
+            if (client.Client.ReceiveBufferSize < 0xFFFF)
+            {
+                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client, RemoteEndPoint, "Setting ReceiveBufferSize to [0xFFFF]");
+                client.Client.ReceiveBufferSize = 0xFFFF;
+            }
+
+            if (client.Client.SendBufferSize < 0xFFFF)
+            {
+                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client, RemoteEndPoint, "Setting SendBufferSize to [0xFFFF]");
+                client.Client.SendBufferSize = 0xFFFF;
             }
         }
 

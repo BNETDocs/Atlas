@@ -5,7 +5,7 @@ namespace Atlasd.Battlenet.Protocols.Game
 {
     class GameKey
     {
-        public enum ProductValues
+        public enum ProductValues : UInt32
         {
             Starcraft_A = 0x01,
             Starcraft_B = 0x02,
@@ -45,7 +45,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             if (!(keyLength == 13 || keyLength == 16 || keyLength == 26))
                 throw new ProtocolViolationException(ProtocolType.Game, "Invalid game key length");
 
-            if (!IsValidProductValue(productValue))
+            if (!IsValidProductValue((ProductValues)productValue))
                 throw new ProtocolViolationException(ProtocolType.Game, "Invalid game key product value");
 
             SetProductValue(productValue);
@@ -62,54 +62,32 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public bool IsValidProductValue()
         {
-            return ProductValue switch
-            {
-                (UInt32)ProductValues.DiabloIIBeta => true,
-                (UInt32)ProductValues.DiabloIILordOfDestruction_A => true,
-                (UInt32)ProductValues.DiabloIILordOfDestruction_B => true,
-                (UInt32)ProductValues.DiabloIILordOfDestruction_Beta => true,
-                (UInt32)ProductValues.DiabloIILordOfDestruction_DigitalDownload => true,
-                (UInt32)ProductValues.DiabloIIStressTest => true,
-                (UInt32)ProductValues.DiabloII_A => true,
-                (UInt32)ProductValues.DiabloII_B => true,
-                (UInt32)ProductValues.DiabloII_DigitalDownload => true,
-                (UInt32)ProductValues.Starcraft_A => true,
-                (UInt32)ProductValues.Starcraft_B => true,
-                (UInt32)ProductValues.Starcraft_DigitalDownload => true,
-                (UInt32)ProductValues.WarcraftII => true,
-                (UInt32)ProductValues.WarcraftIIIBeta => true,
-                (UInt32)ProductValues.WarcraftIIIFrozenThroneBeta => true,
-                (UInt32)ProductValues.WarcraftIIIFrozenThrone_A => true,
-                (UInt32)ProductValues.WarcraftIIIFrozenThrone_B => true,
-                (UInt32)ProductValues.WarcraftIIIReignOfChaos_A => true,
-                (UInt32)ProductValues.WarcraftIIIReignOfChaos_B => true,
-                _ => false,
-            };
+            return GameKey.IsValidProductValue((ProductValues)ProductValue);
         }
 
-        public static bool IsValidProductValue(UInt32 productValue)
+        public static bool IsValidProductValue(ProductValues productValue)
         {
             return productValue switch
             {
-                (UInt32)ProductValues.DiabloIIBeta => true,
-                (UInt32)ProductValues.DiabloIILordOfDestruction_A => true,
-                (UInt32)ProductValues.DiabloIILordOfDestruction_B => true,
-                (UInt32)ProductValues.DiabloIILordOfDestruction_Beta => true,
-                (UInt32)ProductValues.DiabloIILordOfDestruction_DigitalDownload => true,
-                (UInt32)ProductValues.DiabloIIStressTest => true,
-                (UInt32)ProductValues.DiabloII_A => true,
-                (UInt32)ProductValues.DiabloII_B => true,
-                (UInt32)ProductValues.DiabloII_DigitalDownload => true,
-                (UInt32)ProductValues.Starcraft_A => true,
-                (UInt32)ProductValues.Starcraft_B => true,
-                (UInt32)ProductValues.Starcraft_DigitalDownload => true,
-                (UInt32)ProductValues.WarcraftII => true,
-                (UInt32)ProductValues.WarcraftIIIBeta => true,
-                (UInt32)ProductValues.WarcraftIIIFrozenThroneBeta => true,
-                (UInt32)ProductValues.WarcraftIIIFrozenThrone_A => true,
-                (UInt32)ProductValues.WarcraftIIIFrozenThrone_B => true,
-                (UInt32)ProductValues.WarcraftIIIReignOfChaos_A => true,
-                (UInt32)ProductValues.WarcraftIIIReignOfChaos_B => true,
+                ProductValues.DiabloIIBeta => true,
+                ProductValues.DiabloIILordOfDestruction_A => true,
+                ProductValues.DiabloIILordOfDestruction_B => true,
+                ProductValues.DiabloIILordOfDestruction_Beta => true,
+                ProductValues.DiabloIILordOfDestruction_DigitalDownload => true,
+                ProductValues.DiabloIIStressTest => true,
+                ProductValues.DiabloII_A => true,
+                ProductValues.DiabloII_B => true,
+                ProductValues.DiabloII_DigitalDownload => true,
+                ProductValues.Starcraft_A => true,
+                ProductValues.Starcraft_B => true,
+                ProductValues.Starcraft_DigitalDownload => true,
+                ProductValues.WarcraftII => true,
+                ProductValues.WarcraftIIIBeta => true,
+                ProductValues.WarcraftIIIFrozenThroneBeta => true,
+                ProductValues.WarcraftIIIFrozenThrone_A => true,
+                ProductValues.WarcraftIIIFrozenThrone_B => true,
+                ProductValues.WarcraftIIIReignOfChaos_A => true,
+                ProductValues.WarcraftIIIReignOfChaos_B => true,
                 _ => false,
             };
         }

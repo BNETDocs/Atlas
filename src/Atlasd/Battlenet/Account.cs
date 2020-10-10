@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Atlasd.Battlenet
 {
@@ -18,7 +19,7 @@ namespace Atlasd.Battlenet
         public const string TimeLoggedKey = "System\\Time Logged";
         public const string UsernameKey = "System\\Username";
 
-        public enum Flags
+        public enum Flags : UInt32
         {
             Employee = 0x01,
             ChannelOp = 0x02,

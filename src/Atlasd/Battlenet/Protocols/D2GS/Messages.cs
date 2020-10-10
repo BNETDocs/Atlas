@@ -1,6 +1,6 @@
 ﻿namespace Atlasd.Battlenet.Protocols.D2GS
 {
-    enum Messages
+    enum Messages : byte
     {
         D2GS_WALKTOLOCATION = 0x01,
         D2GS_WALKTOENTITY = 0x02,

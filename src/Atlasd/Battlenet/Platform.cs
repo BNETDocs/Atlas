@@ -5,7 +5,7 @@ namespace Atlasd.Battlenet
 
     public class Platform
     {
-        public enum PlatformCode
+        public enum PlatformCode : UInt32
         {
             None = 0, // None/Zero/Null
             MacOSClassic = 0x504D4143, // PMAC
