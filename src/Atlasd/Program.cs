@@ -1,9 +1,7 @@
 ﻿using Atlasd.Battlenet;
 using Atlasd.Daemon;
 using System;
-using System.Net.Sockets;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Atlasd
@@ -24,25 +22,10 @@ namespace Atlasd
 
             while (true) // Infinitely loop main thread
             {
-                var client = new Battlenet.Sockets.TcpClient(Common.Listener.AcceptTcpClient()); // Block until a connection is received
+                // Block until a connection is received ...
+                var client = new Battlenet.Sockets.ClientState(Common.Listener.AcceptTcpClient());
 
-                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, client.Client.Client.RemoteEndPoint, "TCP connection established");
-
-                client.Client.NoDelay = true;
-
-                if (client.Client.ReceiveBufferSize < 0xFFFF)
-                {
-                    Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client, client.Client.Client.RemoteEndPoint, "Setting ReceiveBufferSize to [0xFFFF]");
-                    client.Client.ReceiveBufferSize = 0xFFFF;
-                }
-
-                if (client.Client.SendBufferSize < 0xFFFF)
-                {
-                    Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client, client.Client.Client.RemoteEndPoint, "Setting SendBufferSize to [0xFFFF]");
-                    client.Client.SendBufferSize = 0xFFFF;
-                }
-
-                // Spawn a new thread to handle this connection
+                // Spawn a new thread to handle this connection ...
                 (new Thread(() =>
                 {
                     while (true) // Infinitely loop childSocketThread ...
