@@ -7,7 +7,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
     class SID_CHATEVENT : Message
     {
-        public enum EventIds
+        public enum EventIds : UInt32
         {
             EID_USERSHOW = 0x01,
             EID_USERJOIN = 0x02,

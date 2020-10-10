@@ -1,12 +1,13 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
+using System;
 using System.IO;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
     class SID_JOINCHANNEL : Message
     {
-        public enum Flags
+        public enum Flags : UInt32
         {
             NoCreate = 0,
             First = 1,
@@ -63,7 +64,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             if (channel == null && flags == Flags.NoCreate)
             {
-                Channel.WriteChatEvent(context.Client, SID_CHATEVENT.EventIds.EID_CHANNELNOTFOUND, 0, 0, context.Client.State.OnlineName, channelName);
+                Channel.WriteChatEvent(context.Client, SID_CHATEVENT.EventIds.EID_CHANNELNOTFOUND, 0, 0, context.Client.GameState.OnlineName, channelName);
                 return true;
             }
 
@@ -73,7 +74,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 Battlenet.Common.ActiveChannels.Add(channelName, channel);
             }
 
-            channel.AcceptUser(context.Client.State);
+            channel.AcceptUser(context.Client.GameState);
             return true;
         }
     }

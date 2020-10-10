@@ -39,8 +39,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var m = new MemoryStream(Buffer);
                         var r = new BinaryReader(m);
 
-                        context.Client.State.OnlineName = r.ReadString();
-                        context.Client.State.Statstring = Encoding.ASCII.GetBytes(r.ReadString());
+                        context.Client.GameState.OnlineName = r.ReadString();
+                        context.Client.GameState.Statstring = Encoding.ASCII.GetBytes(r.ReadString());
 
                         r.Close();
                         m.Close();
@@ -55,14 +55,14 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (STRING) Account name
                          */
 
-                        Buffer = new byte[3 + context.Client.State.OnlineName.Length + context.Client.State.Statstring.Length + context.Client.State.Username.Length];
+                        Buffer = new byte[3 + context.Client.GameState.OnlineName.Length + context.Client.GameState.Statstring.Length + context.Client.GameState.Username.Length];
 
                         var m = new MemoryStream(Buffer);
                         var w = new BinaryWriter(m);
 
-                        w.Write((string)context.Client.State.OnlineName);
-                        w.Write((string)Encoding.ASCII.GetString(context.Client.State.Statstring));
-                        w.Write((string)context.Client.State.Username);
+                        w.Write((string)context.Client.GameState.OnlineName);
+                        w.Write((string)Encoding.ASCII.GetString(context.Client.GameState.Statstring));
+                        w.Write((string)context.Client.GameState.Username);
 
                         w.Close();
                         m.Close();

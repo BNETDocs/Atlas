@@ -23,39 +23,38 @@ namespace Atlasd
             while (true) // Infinitely loop main thread
             {
                 // Block until a connection is received ...
-                var client = new Battlenet.Sockets.ClientState(Common.Listener.AcceptTcpClient());
+                var clientState = new Battlenet.Sockets.ClientState(Common.Listener.AcceptTcpClient());
 
                 // Spawn a new thread to handle this connection ...
-                (new Thread(() =>
+                new Thread(() =>
                 {
                     while (true) // Infinitely loop childSocketThread ...
                     {
                         var bCloseConnection = true;
                         try
                         {
-                            if (!client.Receive()) break; // ... unless Receive() or
-                            if (!client.Invoke()) break; // ... Invoke() return false
+                            if (!clientState.Receive()) break; // ... unless Receive() or
+                            if (!clientState.Invoke()) break; // ... Invoke() return false
                             bCloseConnection = false;
                             continue;
                         }
                         /*catch (SocketException ex)
                         {
-                            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, client.RemoteEndPoint, "TCP connection lost!" + (ex.Message.Length > 0 ? " " + ex.Message : ""));
+                            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, clientState.RemoteEndPoint, "TCP connection lost!" + (ex.Message.Length > 0 ? " " + ex.Message : ""));
                         }
                         catch (Exception ex)
                         {
-                            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, client.RemoteEndPoint, ex.GetType().Name + " error encountered!" + (ex.Message.Length > 0 ? " " + ex.Message : ""));
+                            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, clientState.RemoteEndPoint, ex.GetType().Name + " error encountered!" + (ex.Message.Length > 0 ? " " + ex.Message : ""));
                         }*/
                         finally
                         {
-                            if (client != null && bCloseConnection)
-                                client.Close();
+                            if (clientState != null && bCloseConnection)
+                                clientState.Close();
                         }
                         break;
                     }
-                })).Start();
+                }).Start();
             }
-            
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
     class SID_LOGONRESPONSE2 : Message
     {
-        protected enum Statuses
+        protected enum Statuses : UInt32
         {
             None = 0x7fffffff,
             Success = 0,
@@ -53,12 +53,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var clientToken = r.ReadUInt32();
                         var serverToken = r.ReadUInt32();
                         var passwordHash = r.ReadBytes(20);
-                        context.Client.State.Username = r.ReadString();
+                        context.Client.GameState.Username = r.ReadString();
 
                         Account account;
                         Statuses status = Statuses.None;
 
-                        Battlenet.Common.AccountsDb.TryGetValue(context.Client.State.Username, out account);
+                        Battlenet.Common.AccountsDb.TryGetValue(context.Client.GameState.Username, out account);
 
                         if (status == Statuses.None && account == null)
                             status = Statuses.AccountNotFound;
@@ -78,12 +78,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         
                         if (status == Statuses.None)
                         {
-                            context.Client.State.ActiveAccount = account;
-                            context.Client.State.OnlineName = context.Client.State.Username;
+                            context.Client.GameState.ActiveAccount = account;
+                            context.Client.GameState.OnlineName = context.Client.GameState.Username;
 
-                            context.Client.State.ActiveAccount.Set(Account.IPAddressKey, context.Client.RemoteEndPoint.ToString().Split(":")[0]);
-                            context.Client.State.ActiveAccount.Set(Account.LastLogonKey, DateTime.Now);
-                            context.Client.State.ActiveAccount.Set(Account.PortKey, context.Client.RemoteEndPoint.ToString().Split(":")[1]);
+                            context.Client.GameState.ActiveAccount.Set(Account.IPAddressKey, context.Client.RemoteEndPoint.ToString().Split(":")[0]);
+                            context.Client.GameState.ActiveAccount.Set(Account.LastLogonKey, DateTime.Now);
+                            context.Client.GameState.ActiveAccount.Set(Account.PortKey, context.Client.RemoteEndPoint.ToString().Split(":")[1]);
 
                             status = Statuses.Success;
                         }

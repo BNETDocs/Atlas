@@ -8,7 +8,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
     class SID_CREATEACCOUNT2 : Message
     {
-        protected enum Statuses
+        protected enum Statuses : UInt32
         {
             None = 0x7fffffff,
             AccountCreated = 0,
