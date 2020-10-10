@@ -8,18 +8,18 @@ namespace Atlasd.Battlenet.Sockets
 {
     class ClientState
     {
-        public System.Net.Sockets.TcpClient Client { get; private set; }
+        public TcpClient Client { get; private set; }
+        public NetworkStream ClientStream { get; private set; }
+        public GameState GameState = null;
         public ProtocolType ProtocolType = ProtocolType.None;
         public System.Net.EndPoint RemoteEndPoint { get; private set; }
-        public State State = null;
-        public NetworkStream Stream = null;
 
         protected byte[] ReceiveBuffer = new byte[0];
         protected byte[] SendBuffer = new byte[0];
 
         protected Frame BattlenetGameFrame = new Frame();
 
-        public ClientState(System.Net.Sockets.TcpClient client)
+        public ClientState(TcpClient client)
         {
             Initialize(client);
         }
@@ -28,35 +28,35 @@ namespace Atlasd.Battlenet.Sockets
         {
             Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection forcefully closed by server");
             if (Client != null) Client.Close();
-            if (State == null) return;
+            if (GameState == null) return;
 
-            if (State.ActiveAccount != null)
+            if (GameState.ActiveAccount != null)
             {
-                lock (State.ActiveAccount) {
-                    State.ActiveAccount.Set(Account.LastLogoffKey, DateTime.Now);
+                lock (GameState.ActiveAccount) {
+                    GameState.ActiveAccount.Set(Account.LastLogoffKey, DateTime.Now);
 
-                    var timeLogged = (UInt32)State.ActiveAccount.Get(Account.TimeLoggedKey);
-                    var diff = DateTime.Now - State.ConnectedTimestamp;
+                    var timeLogged = (UInt32)GameState.ActiveAccount.Get(Account.TimeLoggedKey);
+                    var diff = DateTime.Now - GameState.ConnectedTimestamp;
                     timeLogged += (UInt32)Math.Round(diff.TotalSeconds);
-                    State.ActiveAccount.Set(Account.TimeLoggedKey, timeLogged);
+                    GameState.ActiveAccount.Set(Account.TimeLoggedKey, timeLogged);
 
-                    var username = (string)State.ActiveAccount.Get(Account.UsernameKey);
+                    var username = (string)GameState.ActiveAccount.Get(Account.UsernameKey);
                     if (Common.ActiveAccounts.ContainsKey(username)) Common.ActiveAccounts.Remove(username);
                 }
             }
 
-            if (State.ActiveChannel != null)
+            if (GameState.ActiveChannel != null)
             {
-                State.ActiveChannel.RemoveUser(State);
+                GameState.ActiveChannel.RemoveUser(GameState);
             }
         }
 
-        protected void Initialize(System.Net.Sockets.TcpClient client)
+        protected void Initialize(TcpClient client)
         {
             Client = client;
-            Stream = client.GetStream();
+            ClientStream = client.GetStream();
             RemoteEndPoint = client.Client.RemoteEndPoint;
-            State = new State(this);
+            GameState = new GameState(this);
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, "TCP connection established");
 
@@ -121,7 +121,7 @@ namespace Atlasd.Battlenet.Sockets
             if (ProtocolType == ProtocolType.None)
             {
                 byte[] data = new byte[1];
-                int size = Client.GetStream().Read(data);
+                int size = ClientStream.Read(data);
                 if (size == 0) return false;
 
                 ProtocolType = (ProtocolType)data[0];
@@ -141,10 +141,10 @@ namespace Atlasd.Battlenet.Sockets
                     {
                         byte[] newBuffer;
 
-                        while (Client.GetStream().DataAvailable)
+                        while (ClientStream.DataAvailable)
                         {
                             byte[] data = new byte[0xFFFF];
-                            int size = Client.GetStream().Read(data);
+                            int size = ClientStream.Read(data);
 
                             // Append received data to previously received data
                             if (size > 0)
@@ -210,6 +210,18 @@ namespace Atlasd.Battlenet.Sockets
                         return false;
                     }
             }
+        }
+
+        public bool Send(byte[] buffer)
+        {
+            if (ClientStream == null || !ClientStream.CanWrite)
+            {
+                Close();
+                return false;
+            }
+
+            ClientStream.Write(buffer);
+            return true;
         }
     }
 }

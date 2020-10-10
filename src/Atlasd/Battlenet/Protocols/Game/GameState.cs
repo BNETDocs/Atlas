@@ -5,7 +5,7 @@ using System.Net;
 
 namespace Atlasd.Battlenet.Protocols.Game
 {
-    class State
+    class GameState
     {
         public enum LogonTypes : UInt32
         {
@@ -40,7 +40,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public UInt32 UDPToken;
         public string Username;
 
-        public State(ClientState client)
+        public GameState(ClientState client)
         {
             var r = new Random();
 

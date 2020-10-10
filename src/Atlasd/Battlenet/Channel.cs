@@ -27,7 +27,7 @@ namespace Atlasd.Battlenet
         public int MaxUsers { get; protected set; }
         public string Name { get; protected set; }
         public string Topic { get; protected set; }
-        protected List<State> Users { get; private set; }
+        protected List<GameState> Users { get; private set; }
     
         public Channel(string name, Flags flags, int maxUsers = -1, string topic = "")
         {
@@ -35,10 +35,10 @@ namespace Atlasd.Battlenet
             MaxUsers = maxUsers;
             Name = name;
             Topic = topic;
-            Users = new List<State>();
+            Users = new List<GameState>();
         }
 
-        public void AcceptUser(State user)
+        public void AcceptUser(GameState user)
         {
             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Channel, "Accepting user [" + user.OnlineName + "] to [" + Name + "]");
 
@@ -79,7 +79,7 @@ namespace Atlasd.Battlenet
             return Common.ActiveChannels.TryGetValue(name, out Channel channel) ? channel : null;
         }
 
-        public void RemoveUser(State user)
+        public void RemoveUser(GameState user)
         {
             if (Users.Contains(user)) Users.Remove(user);
 
@@ -119,7 +119,7 @@ namespace Atlasd.Battlenet
             WriteChatInfo(newTopic);
         }
 
-        public void TryAcceptUser(State user)
+        public void TryAcceptUser(GameState user)
         {
             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Server, "[TODO] Channel.TryAcceptUser()");
             AcceptUser(user);
@@ -137,10 +137,11 @@ namespace Atlasd.Battlenet
 
         public static void WriteChatEvent(Sockets.ClientState client, SID_CHATEVENT.EventIds eventId, UInt32 flags, Int32 ping, string username, string text)
         {
-            if (client == null) throw new NullReferenceException();
-            if (client.Client == null) throw new NullReferenceException();
-
-            if (client.Client.GetStream() == null) throw new NullReferenceException();
+            if (client.ClientStream == null || !client.ClientStream.CanWrite)
+            {
+                client.Close();
+                return;
+            }
 
             var args = new Dictionary<string, object>
             {
@@ -158,14 +159,14 @@ namespace Atlasd.Battlenet
             {
                 case ProtocolType.Game:
                     {
-                        client.Client.GetStream().Write(chat_event.ToByteArray());
+                        client.Send(chat_event.ToByteArray());
                         break;
                     }
                 case ProtocolType.Chat:
                 case ProtocolType.Chat_Alt1:
                 case ProtocolType.Chat_Alt2:
                     {
-                        client.Client.Client.Send(Encoding.ASCII.GetBytes(chat_event.ToString()));
+                        client.Send(Encoding.ASCII.GetBytes(chat_event.ToString()));
                         break;
                     }
                 default:
@@ -196,14 +197,14 @@ namespace Atlasd.Battlenet
                 {
                     case ProtocolType.Game:
                         {
-                            user.Client.Client.GetStream().Write(chat_event.ToByteArray());
+                            user.Client.Send(chat_event.ToByteArray());
                             break;
                         }
                     case ProtocolType.Chat:
                     case ProtocolType.Chat_Alt1:
                     case ProtocolType.Chat_Alt2:
                         {
-                            user.Client.Client.Client.Send(Encoding.ASCII.GetBytes(chat_event.ToString()));
+                            user.Client.Send(Encoding.ASCII.GetBytes(chat_event.ToString()));
                             break;
                         }
                     default:

@@ -46,17 +46,17 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var m = new MemoryStream(Buffer);
                         var r = new BinaryReader(m);
 
-                        context.Client.State.ProtocolId = r.ReadUInt32();
-                        context.Client.State.Platform = (Platform.PlatformCode)r.ReadUInt32();
-                        context.Client.State.Product = (Product.ProductCode)r.ReadUInt32();
-                        context.Client.State.Version.VersionByte = r.ReadUInt32();
-                        context.Client.State.Locale.LanguageCode = r.ReadUInt32();
-                        context.Client.State.LocalIPAddress = IPAddress.Parse(r.ReadUInt32().ToString());
-                        context.Client.State.TimezoneBias = r.ReadInt32();
-                        context.Client.State.Locale.UserLocaleId = r.ReadUInt32();
-                        context.Client.State.Locale.UserLanguageId = r.ReadUInt32();
-                        context.Client.State.Locale.CountryNameAbbreviated = r.ReadString();
-                        context.Client.State.Locale.CountryName = r.ReadString();
+                        context.Client.GameState.ProtocolId = r.ReadUInt32();
+                        context.Client.GameState.Platform = (Platform.PlatformCode)r.ReadUInt32();
+                        context.Client.GameState.Product = (Product.ProductCode)r.ReadUInt32();
+                        context.Client.GameState.Version.VersionByte = r.ReadUInt32();
+                        context.Client.GameState.Locale.LanguageCode = r.ReadUInt32();
+                        context.Client.GameState.LocalIPAddress = IPAddress.Parse(r.ReadUInt32().ToString());
+                        context.Client.GameState.TimezoneBias = r.ReadInt32();
+                        context.Client.GameState.Locale.UserLocaleId = r.ReadUInt32();
+                        context.Client.GameState.Locale.UserLanguageId = r.ReadUInt32();
+                        context.Client.GameState.Locale.CountryNameAbbreviated = r.ReadString();
+                        context.Client.GameState.Locale.CountryName = r.ReadString();
 
                         r.Close();
                         m.Close();
@@ -81,19 +81,19 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var MPQFilename = "ver-IX86-1.mpq";
                         var Formula = "A=3845581634 B=880823580 C=1363937103 4 A=A-S B=B-C C=C-A A=A-B";
 
-                        Buffer = new byte[22 + MPQFilename.Length + Formula.Length + (Product.IsWarcraftIII(context.Client.State.Product) ? 128 : 0)];
+                        Buffer = new byte[22 + MPQFilename.Length + Formula.Length + (Product.IsWarcraftIII(context.Client.GameState.Product) ? 128 : 0)];
 
                         var m = new MemoryStream(Buffer);
                         var w = new BinaryWriter(m);
 
-                        w.Write((UInt32)context.Client.State.LogonType);
-                        w.Write((UInt32)context.Client.State.ServerToken);
-                        w.Write((UInt32)context.Client.State.UDPToken);
+                        w.Write((UInt32)context.Client.GameState.LogonType);
+                        w.Write((UInt32)context.Client.GameState.ServerToken);
+                        w.Write((UInt32)context.Client.GameState.UDPToken);
                         w.Write(MPQFiletime);
                         w.Write(MPQFilename);
                         w.Write(Formula);
                         
-                        if (Product.IsWarcraftIII(context.Client.State.Product))
+                        if (Product.IsWarcraftIII(context.Client.GameState.Product))
                             w.Write(new byte[128]);
 
                         w.Close();

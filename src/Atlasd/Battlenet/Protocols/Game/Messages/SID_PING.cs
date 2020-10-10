@@ -27,10 +27,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             var token = (UInt32)((Buffer[3] << 24) + (Buffer[2] << 16) + (Buffer[1] << 8) + Buffer[0]);
 
-            var delta = DateTime.Now - context.Client.State.PingDelta;
-            context.Client.State.Ping = (int)Math.Round(delta.TotalMilliseconds);
+            var delta = DateTime.Now - context.Client.GameState.PingDelta;
+            context.Client.GameState.Ping = (int)Math.Round(delta.TotalMilliseconds);
 
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_PING Token: [0x" + token.ToString("X8") + "] Ping: " + context.Client.State.Ping + "ms");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_PING Token: [0x" + token.ToString("X8") + "] Ping: " + context.Client.GameState.Ping + "ms");
 
             return true;
         }

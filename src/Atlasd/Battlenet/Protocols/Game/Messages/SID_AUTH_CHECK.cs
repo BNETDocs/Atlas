@@ -50,12 +50,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var m = new MemoryStream(Buffer);
                         var r = new BinaryReader(m);
 
-                        context.Client.State.ClientToken = r.ReadUInt32();
-                        context.Client.State.Version.EXERevision = r.ReadUInt32();
-                        context.Client.State.Version.EXEChecksum = r.ReadUInt32();
+                        context.Client.GameState.ClientToken = r.ReadUInt32();
+                        context.Client.GameState.Version.EXERevision = r.ReadUInt32();
+                        context.Client.GameState.Version.EXEChecksum = r.ReadUInt32();
 
                         var numKeys = r.ReadUInt32();
-                        context.Client.State.SpawnKey = (r.ReadUInt32() == 1);
+                        context.Client.GameState.SpawnKey = (r.ReadUInt32() == 1);
 
                         // Read each key:
                         for (int i = 0; i < numKeys; i++)
@@ -70,11 +70,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                                 throw new Exceptions.ProtocolViolationException(ProtocolType.Game, "Invalid game key unknown value");
 
                             var gameKey = new GameKey(keyLength, productValue, publicValue, hashedKeyData);
-                            context.Client.State.GameKeys.Append(gameKey);
+                            context.Client.GameState.GameKeys.Append(gameKey);
                         }
 
-                        context.Client.State.Version.EXEInformation = r.ReadString();
-                        context.Client.State.KeyOwner = r.ReadString();
+                        context.Client.GameState.Version.EXEInformation = r.ReadString();
+                        context.Client.GameState.KeyOwner = r.ReadString();
 
                         r.Close();
                         m.Close();
