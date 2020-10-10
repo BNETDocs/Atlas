@@ -1,0 +1,12 @@
+<summary>
+    <para>
+        The <b>MBNCSUtil.Net</b> namespace contains the classes necessary to connect to the Battle.net
+        proprietary FTP service.
+    </para>
+    <para>
+        For down-level products including Starcraft, Starcraft: Brood War, Diablo II, Diablo II: Lord of
+        Destruction, and Warcraft II: Battle.net Edition, use the <see cref="MBNCSUtil.Net.BnFtpVersion1Request">BnFtpVersion1Request</see>
+        class.  For Warcraft III (both products), use the <see cref="MBNCSUtil.Net.BnFtpVersion2Request">BnFtpVersion2Request</see>
+        class.
+    </para>
+</summary>

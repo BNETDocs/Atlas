@@ -1,0 +1,107 @@
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/70/branches/mbncsutil/trunk/MBNCSUtil
+END
+DataBuffer.cs
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/DataBuffer.cs
+END
+MBNCSUtil.csproj.user
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/69/branches/mbncsutil/trunk/MBNCSUtil/MBNCSUtil.csproj.user
+END
+BncsReader.cs
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/BncsReader.cs
+END
+Resources.Designer.cs
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/69/branches/mbncsutil/trunk/MBNCSUtil/Resources.Designer.cs
+END
+BncsPacket.cs
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/BncsPacket.cs
+END
+XSha1.cs
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/XSha1.cs
+END
+Resources.resx
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/9/branches/mbncsutil/trunk/MBNCSUtil/Resources.resx
+END
+MBNCSUtil.csproj
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/69/branches/mbncsutil/trunk/MBNCSUtil/MBNCSUtil.csproj
+END
+NLS.cs
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/NLS.cs
+END
+DataReader.cs
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/14/branches/mbncsutil/trunk/MBNCSUtil/DataReader.cs
+END
+LICENSE.txt
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/9/branches/mbncsutil/trunk/MBNCSUtil/LICENSE.txt
+END
+CheckRevision.cs
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/CheckRevision.cs
+END
+DataFormatter.cs
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/DataFormatter.cs
+END
+NamespaceComments.xml
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/NamespaceComments.xml
+END
+GlobalSuppressions.cs
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/GlobalSuppressions.cs
+END
+CdKey.cs
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/CdKey.cs
+END
+OldAuth.cs
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/9/branches/mbncsutil/trunk/MBNCSUtil/OldAuth.cs
+END

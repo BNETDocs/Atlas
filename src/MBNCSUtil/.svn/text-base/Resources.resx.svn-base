@@ -1,0 +1,340 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="bnftp_filenotfound" xml:space="preserve">
+    <value>The specified file was not found by Battle.net.</value>
+  </data>
+  <data name="bnftp_ver1invalidProduct" xml:space="preserve">
+    <value>Only Starcraft, Starcraft: Brood War, Diablo II Retail, Diablo II: the Lord of Destruction, and Warcraft II: Battle.net Edition (STAR, SEXP, D2DV, D2XP, and W2BN, respectively) can use BnFTP version 1.</value>
+  </data>
+  <data name="bnftp_ver2invalidProduct" xml:space="preserve">
+    <value>Only Warcraft III: the Reign of Chaos, and Warcraft III: the Frozen Throne (WAR3 and W3XP, respectively) can use BnFTP version 2.</value>
+  </data>
+  <data name="cdKeyArgNull" xml:space="preserve">
+    <value>The value specified for the CD key is null.</value>
+    <comment>CdKey.cs - .ctor</comment>
+  </data>
+  <data name="crevExtrMpqNum_NoLockdown" xml:space="preserve">
+    <value>Extraction of MPQ number is not supported on Lockdown MPQs.  The entire Lockdown DLL file must be passed into the Lockdown CheckRevision function.  See the CheckRevision class documentation for more information.</value>
+  </data>
+  <data name="crExeFileNull" xml:space="preserve">
+    <value>The file name cannot be null.</value>
+    <comment>CheckRevision.cs - GetExeInfo</comment>
+  </data>
+  <data name="crFileListInvalid" xml:space="preserve">
+    <value>You must specify a list of exactly three files for the revision check.</value>
+    <comment>CheckRevision.cs - DoCheckRevision</comment>
+  </data>
+  <data name="crFileListNull" xml:space="preserve">
+    <value>You must specify a 3-file list for the revision check.</value>
+    <comment>CheckRevision.cs - DoCheckRevision</comment>
+  </data>
+  <data name="crMpqNameArgShort" xml:space="preserve">
+    <value>The name of the MPQ version file must be greater than 7 characters long.</value>
+    <comment>CheckRevision.cs - ExtractMPQNumber</comment>
+  </data>
+  <data name="crMpqNameNull" xml:space="preserve">
+    <value>The MPQ name parameter cannot be null.</value>
+    <comment>CheckRevision.cs - ExtractMPQNumber</comment>
+  </data>
+  <data name="crValstringNull" xml:space="preserve">
+    <value>The value string parameter cannot be null for a revision check.</value>
+    <comment>CheckRevision.cs - DoCheckRevision</comment>
+  </data>
+  <data name="d2dv" xml:space="preserve">
+    <value>D2DV</value>
+  </data>
+  <data name="d2xp" xml:space="preserve">
+    <value>D2XP</value>
+  </data>
+  <data name="dataNull" xml:space="preserve">
+    <value>The specified data buffer was null.</value>
+    <comment>DataReader.cs</comment>
+  </data>
+  <data name="encNull" xml:space="preserve">
+    <value>The specified encoding parameter was null.</value>
+    <comment>DataBuffer.cs</comment>
+  </data>
+  <data name="exeInfoFmt" xml:space="preserve">
+    <value>{0} {1:d1}/{2:d2}/{3:d2} {4:d2}:{5:d2}:{6:d2} {7}</value>
+    <comment>CheckRevision.cs - GetExeInfo</comment>
+  </data>
+  <data name="fileNotFound" xml:space="preserve">
+    <value>The specified file was not found.</value>
+  </data>
+  <data name="fileNull" xml:space="preserve">
+    <value>The specified value for the local file name was null.</value>
+  </data>
+  <data name="invalidCdKeyGeneral" xml:space="preserve">
+    <value>The CD key must be a valid 13-, 16-, or 26-character key.</value>
+    <comment>CdKey.cs - .ctor</comment>
+  </data>
+  <data name="invalidCdKeyHashed" xml:space="preserve">
+    <value>You cannot calculate the key hash on an invalid key.</value>
+    <comment>CdKey.cs - calculateHash</comment>
+  </data>
+  <data name="invalidCdKeySc" xml:space="preserve">
+    <value>The CD key specified is not a valid Starcraft CD key.</value>
+    <comment>CdKey.cs - .ctor</comment>
+  </data>
+  <data name="invalidCdKeyWar2" xml:space="preserve">
+    <value>The CD key specified is not a valid Warcraft II/Diablo II/Lord of Destruction CD key.</value>
+    <comment>CdKey.cs - .ctor</comment>
+  </data>
+  <data name="invalidCdKeyWar3" xml:space="preserve">
+    <value>The CD key specified is not a valid Warcraft III/Frozen Throne CD key.</value>
+    <comment>CdKey.cs - .ctor</comment>
+  </data>
+  <data name="mpq_badOpenMode" xml:space="preserve">
+    <value>The MPQ file was not able to be opened in the specified mode.</value>
+  </data>
+  <data name="mpq_fileNotFound" xml:space="preserve">
+    <value>The specified file could not be found in the MPQ archive.</value>
+  </data>
+  <data name="mpq_mpqArchiveCorrupt" xml:space="preserve">
+    <value>The MPQ file is corrupt.</value>
+  </data>
+  <data name="mpq_UnknownErrorType" xml:space="preserve">
+    <value>Unknown MPQ API error: {0}</value>
+  </data>
+  <data name="mpqFilePathArgNull" xml:space="preserve">
+    <value>The path to the MPQ file cannot be null.</value>
+  </data>
+  <data name="nlsAcctCreateSpace" xml:space="preserve">
+    <value>There is insufficient space in the data buffer for the account creation packet.</value>
+    <comment>NLS.cs - CreateAccount</comment>
+  </data>
+  <data name="nlsAcctLoginSpace" xml:space="preserve">
+    <value>There is insufficient space in the data buffer for the account login packet.</value>
+    <comment>NLS.cs - LoginAccount</comment>
+  </data>
+  <data name="nlsLoginProofSpace" xml:space="preserve">
+    <value>There is insufficient space in the data buffer for the account login proof packet.</value>
+    <comment>NLS.cs - LoginProof</comment>
+  </data>
+  <data name="nlsSalt32" xml:space="preserve">
+    <value>The salt value was not 32 bytes.</value>
+    <comment>NLS.cs - LoginProof</comment>
+  </data>
+  <data name="nlsServerKey32" xml:space="preserve">
+    <value>The server key was not 32 bytes.</value>
+    <comment>NLS.cs - LoginProof</comment>
+  </data>
+  <data name="nlsServerProof20" xml:space="preserve">
+    <value>The server proof value must be exactly 20 bytes.</value>
+    <comment>NLS.cs - VerifyServerProof</comment>
+  </data>
+  <data name="nlsSrvSig128" xml:space="preserve">
+    <value>The server signature must be exactly 128 bytes.</value>
+    <comment>NLS.cs - VerifyServerSignature</comment>
+  </data>
+  <data name="notInitialized" xml:space="preserve">
+    <value>The object you attempted to access has not yet been initialized.  You must call the Initialize method on the object before it can be used.</value>
+    <comment>Used in NLS.cs and CdKey.cs.</comment>
+  </data>
+  <data name="objAlreadyInited" xml:space="preserve">
+    <value>An object was already initiated at the call for initiation.</value>
+    <comment>DataReader.cs</comment>
+  </data>
+  <data name="objNotInited" xml:space="preserve">
+    <value>An object was not initialized prior to use.</value>
+    <comment>DataReader.cs</comment>
+  </data>
+  <data name="param_cdKey" xml:space="preserve">
+    <value>cdKey</value>
+    <comment>cdkey.cs</comment>
+  </data>
+  <data name="param_data" xml:space="preserve">
+    <value>data</value>
+    <comment>DataReader.cs</comment>
+  </data>
+  <data name="param_enc" xml:space="preserve">
+    <value>enc</value>
+    <comment>DataBuffer.cs</comment>
+  </data>
+  <data name="param_fileName" xml:space="preserve">
+    <value>fileName</value>
+    <comment>various code files</comment>
+  </data>
+  <data name="param_len" xml:space="preserve">
+    <value>len</value>
+  </data>
+  <data name="param_mpqFilePath" xml:space="preserve">
+    <value>mpqFilePath</value>
+  </data>
+  <data name="param_productId" xml:space="preserve">
+    <value>productId</value>
+  </data>
+  <data name="param_salt" xml:space="preserve">
+    <value>salt</value>
+    <comment>NLS.cs</comment>
+  </data>
+  <data name="param_serverKey" xml:space="preserve">
+    <value>serverKey</value>
+  </data>
+  <data name="param_str" xml:space="preserve">
+    <value>str</value>
+    <comment>DataBuffer.cs</comment>
+  </data>
+  <data name="param_value" xml:space="preserve">
+    <value>value</value>
+  </data>
+  <data name="sexp" xml:space="preserve">
+    <value>SEXP</value>
+  </data>
+  <data name="star" xml:space="preserve">
+    <value>STAR</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="StormLib32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\StormLib.dll;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="StormLib64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\StormLib64.dll;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="streamNull" xml:space="preserve">
+    <value>The specified stream is null.</value>
+    <comment>DataReader.cs</comment>
+  </data>
+  <data name="strNull" xml:space="preserve">
+    <value>The specified string is null.</value>
+    <comment>DataBuffer.cs</comment>
+  </data>
+  <data name="strTooLongFmt" xml:space="preserve">
+    <value>String length was too long; max length {0}.</value>
+    <comment>DataBuffer.cs</comment>
+  </data>
+  <data name="valMustBeGTZero" xml:space="preserve">
+    <value>The specified parameter must be greater than zero (0).</value>
+    <comment>DataReader.cs</comment>
+  </data>
+  <data name="w2bn" xml:space="preserve">
+    <value>W2BN</value>
+  </data>
+  <data name="w3xp" xml:space="preserve">
+    <value>W3XP</value>
+  </data>
+  <data name="war3" xml:space="preserve">
+    <value>WAR3</value>
+  </data>
+  <data name="xshaMaxHash1024" xml:space="preserve">
+    <value>Cannot hash more than 1024 bytes.</value>
+    <comment>XSha1.cs - UnsafeHash</comment>
+  </data>
+</root>

@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/Util
+END
+LockdownSha1.cs
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/Util/LockdownSha1.cs
+END
+LockdownHeap.cs
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/Util/LockdownHeap.cs
+END
+BigInteger.cs
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/Util/BigInteger.cs
+END
+LockdownCrev.cs
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/Util/LockdownCrev.cs
+END
+HeapPtr.cs
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/Util/HeapPtr.cs
+END
+Native.cs
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/Util/Native.cs
+END
+PeFileReader.cs
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/Util/PeFileReader.cs
+END
+PeFileLoader.cs
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/10/branches/mbncsutil/trunk/MBNCSUtil/Util/PeFileLoader.cs
+END
