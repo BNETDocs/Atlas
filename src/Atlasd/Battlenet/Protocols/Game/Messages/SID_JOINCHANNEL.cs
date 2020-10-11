@@ -32,7 +32,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (context.Direction == MessageDirection.ServerToClient)
                 throw new ProtocolViolationException(ProtocolType.Game, "Server isn't allowed to send SID_JOINCHANNEL");
 
-            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_JOINCHANNEL (" + (4 + Buffer.Length) + " bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_JOINCHANNEL (" + (4 + Buffer.Length) + " bytes)");
 
             if (Buffer.Length < 5)
                 throw new ProtocolViolationException(context.Client.ProtocolType, "SID_JOINCHANNEL buffer must be at least 5 bytes");
@@ -60,21 +60,33 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 if ((uint)c < 31) throw new ProtocolViolationException(context.Client.ProtocolType, "Channel name must not have ASCII control characters");
             }
 
+            var userFlags = (Account.Flags)context.Client.GameState.ActiveAccount.Get(Account.FlagsKey);
+            var ignoreLimits = userFlags.HasFlag(Account.Flags.Employee);
+
             var channel = Channel.GetChannelByName(channelName);
 
             if (channel == null && flags == Flags.NoCreate)
             {
-                Channel.WriteChatEvent(context.Client, SID_CHATEVENT.EventIds.EID_CHANNELNOTFOUND, 0, 0, context.Client.GameState.OnlineName, channelName);
+                Channel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_CHANNELFULL, Channel.Flags.None, context.Client.GameState.Ping, context.Client.GameState.OnlineName, channelName), context.Client);
                 return true;
             }
 
-            if (channel == null)
+            if (channel == null) channel = new Channel(channelName, 0);
+            channel.AcceptUser(context.Client.GameState, ignoreLimits);
+
+            if (flags == Flags.First || flags == Flags.First_D2)
             {
-                channel = new Channel(channelName, 0);
-                Battlenet.Common.ActiveChannels.Add(channelName, channel);
+                var strGame = Product.ProductName(context.Client.GameState.Product, true);
+                var numGameOnline = Battlenet.Common.ActiveAccounts.Count;
+                var numGameAdvertisements = 0;
+                var numTotalOnline = Battlenet.Common.ActiveAccounts.Count;
+                var numTotalAdvertisements = 0;
+
+                Channel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, "Welcome to Battle.net!"), context.Client);
+                Channel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, "This server is hosted by BNETDocs."), context.Client);
+                Channel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, string.Format("There are currently {0:D} users playing {1:D} games of {2}, and {3:D} users playing {4:D} games on Battle.net.", numGameOnline, numGameAdvertisements, strGame, numTotalOnline, numTotalAdvertisements)), context.Client);
             }
 
-            channel.AcceptUser(context.Client.GameState);
             return true;
         }
     }

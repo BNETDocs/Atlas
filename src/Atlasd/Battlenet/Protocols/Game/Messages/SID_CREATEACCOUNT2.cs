@@ -40,7 +40,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_CREATEACCOUNT2 (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_CREATEACCOUNT2 (" + (4 + Buffer.Length) + " bytes)");
 
                         if (Buffer.Length < 5)
                             throw new ProtocolViolationException(context.Client.ProtocolType, "SID_CREATEACCOUNT2 buffer must be at least 5 bytes");
@@ -148,7 +148,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Close();
                         m.Close();
 
-                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_CREATEACCOUNT2 (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_CREATEACCOUNT2 (" + (4 + Buffer.Length) + " bytes)");
                         context.Client.Client.Client.Send(ToByteArray());
                         return true;
                     }

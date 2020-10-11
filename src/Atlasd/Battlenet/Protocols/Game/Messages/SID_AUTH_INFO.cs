@@ -1,5 +1,6 @@
 ﻿using Atlasd.Daemon;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 
@@ -25,7 +26,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_AUTH_INFO (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_AUTH_INFO (" + (4 + Buffer.Length) + " bytes)");
 
                         if (Buffer.Length < 38)
                             throw new Exceptions.ProtocolViolationException(context.Client.ProtocolType, "SID_AUTH_INFO must be at least 38 bytes");
@@ -61,7 +62,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         r.Close();
                         m.Close();
 
-                        return new SID_AUTH_INFO().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
+                        var _ping = new SID_PING().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object>() {{ "token", context.Client.GameState.PingToken }} ));
+
+                        var _auth_info = new SID_AUTH_INFO().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
+
+                        return _ping && _auth_info;
                     }
                 case MessageDirection.ServerToClient:
                     {
@@ -99,7 +104,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Close();
                         m.Close();
 
-                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_AUTH_INFO (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_AUTH_INFO (" + (4 + Buffer.Length) + " bytes)");
                         context.Client.Client.Client.Send(ToByteArray());
                         return true;
                     }

@@ -24,9 +24,9 @@ namespace Atlasd.Battlenet
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClients = new List<ClientState>();
 
-            ActiveChannels.Append(new KeyValuePair<string, Channel>("The Void", new Channel("The Void", Channel.Flags.Public | Channel.Flags.Silent, -1, "This channel does not have chat privileges.")));
-            ActiveChannels.Append(new KeyValuePair<string, Channel>("Backstage", new Channel("Backstage", Channel.Flags.Public | Channel.Flags.Restricted, -1, "Abandon hope, all ye who enter here...")));
-            ActiveChannels.Append(new KeyValuePair<string, Channel>("Town Square", new Channel("Town Square", Channel.Flags.Public, 200, "Welcome and enjoy your stay!")));
+            new Channel("The Void", Channel.Flags.Public | Channel.Flags.Silent, -1);
+            new Channel("Backstage", Channel.Flags.Public | Channel.Flags.Restricted, -1, "Abandon hope, all ye who enter here...");
+            new Channel("Town Square", Channel.Flags.Public, 200, "Welcome and enjoy your stay!");
 
             DefaultInterface = IPAddress.Any;
             DefaultPort = 6112;

@@ -2,6 +2,7 @@
 using Atlasd.Daemon;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -26,7 +27,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_FRIENDSLIST (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_FRIENDSLIST (" + (4 + Buffer.Length) + " bytes)");
 
                         if (Buffer.Length != 0)
                             throw new ProtocolViolationException(context.Client.ProtocolType, "SID_FRIENDSLIST buffer must be 0 bytes");
@@ -34,7 +35,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (context.Client.GameState == null || context.Client.GameState.ActiveAccount == null)
                             throw new ProtocolViolationException(context.Client.ProtocolType, "SID_FRIENDSLIST cannot be processed without an active login");
 
-                        return new SID_GETCHANNELLIST().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
+                        return new SID_FRIENDSLIST().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
                     }
                 case MessageDirection.ServerToClient:
                     {
@@ -50,10 +51,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          */
 
                         var size = (uint)0;
-                        var friends = (List<string>)context.Client.GameState.ActiveAccount.Get(Account.FriendsKey) ?? null;
+                        var friends = new List<string>();
+
+                        if (context.Client.GameState.ActiveAccount.ContainsKey(Account.FriendsKey))
+                            friends = (List<string>)context.Client.GameState.ActiveAccount.Get(Account.FriendsKey);
 
                         foreach (var friend in friends)
-                            size += (uint)(1 + friend.Length);
+                            size += (uint)(1 + Encoding.ASCII.GetByteCount(friend));
 
                         Buffer = new byte[size];
 
@@ -66,7 +70,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Close();
                         m.Close();
 
-                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_FRIENDSLIST (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_FRIENDSLIST (" + (4 + Buffer.Length) + " bytes)");
                         context.Client.Client.Client.Send(ToByteArray());
                         return true;
                     }

@@ -22,10 +22,13 @@ namespace Atlasd.Battlenet
 
         public enum Flags : UInt32
         {
+            None = 0x00,
             Employee = 0x01,
             ChannelOp = 0x02,
             Speaker = 0x04,
             Admin = 0x08,
+            NoUDP = 0x10,
+            Squelched = 0x20,
             Guest = 0x40,
             Closed = 0x80,
         };

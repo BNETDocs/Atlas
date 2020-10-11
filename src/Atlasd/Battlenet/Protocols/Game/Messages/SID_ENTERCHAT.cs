@@ -1,5 +1,6 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
+using System;
 using System.IO;
 using System.Text;
 
@@ -26,7 +27,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_ENTERCHAT (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_ENTERCHAT (" + (4 + Buffer.Length) + " bytes)");
 
                         if (Buffer.Length < 2)
                             throw new ProtocolViolationException(context.Client.ProtocolType, "SID_ENTERCHAT buffer must be at least 2 bytes");
@@ -41,6 +42,36 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         context.Client.GameState.OnlineName = r.ReadString();
                         context.Client.GameState.Statstring = Encoding.ASCII.GetBytes(r.ReadString());
+
+                        var productId = (UInt32)context.Client.GameState.Product;
+
+                        if (context.Client.GameState.Statstring.Length == 0)
+                        {
+                            context.Client.GameState.Statstring = new byte[4];
+
+                            var _m = new MemoryStream(context.Client.GameState.Statstring);
+                            var _w = new BinaryWriter(_m);
+
+                            _w.Write(productId);
+
+                            _w.Close();
+                            _m.Close();
+                        }
+
+                        if (context.Client.GameState.Statstring.Length < 4)
+                            throw new ProtocolViolationException(context.Client.ProtocolType, "Client sent invalid statstring in SID_ENTERCHAT");
+
+                        if (context.Client.GameState.Statstring.Length >= 4)
+                        {
+                            var _m = new MemoryStream(context.Client.GameState.Statstring);
+                            var _r = new BinaryReader(_m);
+
+                            if (_r.ReadUInt32() != productId)
+                                throw new ProtocolViolationException(context.Client.ProtocolType, "Client attempted to set different product id in statstring");
+
+                            _m.Close();
+                            _r.Close();
+                        }
 
                         r.Close();
                         m.Close();
@@ -67,7 +98,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Close();
                         m.Close();
 
-                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_ENTERCHAT (" + (4 + Buffer.Length) + " bytes)");
+                        lock (context.Client.GameState)
+                        {
+                            context.Client.GameState.ChannelFlags = (Account.Flags)context.Client.GameState.ActiveAccount.Get(Account.FlagsKey);
+                        }
+
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_ENTERCHAT (" + (4 + Buffer.Length) + " bytes)");
                         context.Client.Client.Client.Send(ToByteArray());
                         return true;
                     }

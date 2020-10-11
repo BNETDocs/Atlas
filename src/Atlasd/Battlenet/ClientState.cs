@@ -2,6 +2,7 @@
 using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Daemon;
 using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -28,24 +29,32 @@ namespace Atlasd.Battlenet
 
         public void Dispose()
         {
-            lock (this) {
-                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection forcefully closed by server");
-                if (Client != null) Client.Close();
+            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection forcefully closed by server");
+            if (Client != null) Client.Close();
 
-                Common.ActiveClients.Remove(this);
+            lock (Common.ActiveClients) Common.ActiveClients.Remove(this);
 
-                if (ClientStream != null)
+            try
+            {
+                lock (ClientStream)
                 {
-                    ClientStream.Dispose();
-                    ClientStream = null;
+                    if (ClientStream != null)
+                    {
+                        ClientStream.Dispose();
+                        ClientStream = null;
+                    }
                 }
 
-                if (GameState != null)
+                lock (GameState)
                 {
-                    GameState.Dispose();
-                    GameState = null;
+                    if (GameState != null)
+                    {
+                        GameState.Dispose();
+                        GameState = null;
+                    }
                 }
             }
+            catch (ArgumentNullException) { }
         }
 
         protected void Initialize(TcpClient client)
@@ -218,7 +227,19 @@ namespace Atlasd.Battlenet
                 return false;
             }
 
-            ClientStream.Write(buffer);
+            lock (ClientStream)
+            {
+                try
+                {
+                    ClientStream.Write(buffer);
+                }
+                catch (IOException ex)
+                {
+                    Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, ex.GetType().Name + " error encountered!" + (ex.Message.Length > 0 ? " " + ex.Message : ""));
+                    Dispose();
+                    return false;
+                }
+            }
             return true;
         }
 

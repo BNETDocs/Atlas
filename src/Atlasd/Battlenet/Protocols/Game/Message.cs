@@ -27,10 +27,12 @@ namespace Atlasd.Battlenet.Protocols.Game
             return ((MessageIds)id) switch
             {
                 MessageIds.SID_NULL => new Messages.SID_NULL(buffer),
+                MessageIds.SID_CHATCOMMAND => new Messages.SID_CHATCOMMAND(buffer),
                 MessageIds.SID_ENTERCHAT => new Messages.SID_ENTERCHAT(buffer),
                 MessageIds.SID_GETCHANNELLIST => new Messages.SID_GETCHANNELLIST(buffer),
                 MessageIds.SID_JOINCHANNEL => new Messages.SID_JOINCHANNEL(buffer),
                 MessageIds.SID_PING => new Messages.SID_PING(buffer),
+                MessageIds.SID_READUSERDATA => new Messages.SID_READUSERDATA(buffer),
                 MessageIds.SID_LOGONRESPONSE2 => new Messages.SID_LOGONRESPONSE2(buffer),
                 MessageIds.SID_CREATEACCOUNT2 => new Messages.SID_CREATEACCOUNT2(buffer),
                 MessageIds.SID_AUTH_INFO => new Messages.SID_AUTH_INFO(buffer),

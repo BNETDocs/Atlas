@@ -2,6 +2,7 @@
 using Atlasd.Daemon;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -26,7 +27,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_GETCHANNELLIST (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_GETCHANNELLIST (" + (4 + Buffer.Length) + " bytes)");
 
                         if (Buffer.Length != 4)
                             throw new ProtocolViolationException(context.Client.ProtocolType, "SID_GETCHANNELLIST buffer must be 4 bytes");
@@ -53,11 +54,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (STRING) [] Channel name
                          */
 
-                        var channels = (List<Channel>)context.Arguments["channels"];
-                        var size = (uint)0;
+                        var channels = (List<string>)context.Arguments["channels"];
+                        var size = (uint)1;
 
                         foreach (var channel in channels)
-                            size += (uint)(1 + channel.Name.Length);
+                            size += (uint)(1 + Encoding.ASCII.GetByteCount(channel));
 
                         Buffer = new byte[size];
 
@@ -65,14 +66,14 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var w = new BinaryWriter(m);
 
                         foreach (var channel in channels)
-                            w.Write((string)channel.Name);
+                            w.Write((string)channel);
 
-                        w.Write((string)""); // Official Blizzard servers end list with an empty string.
+                        w.Write((byte)0); // Official Blizzard servers end list with an empty string.
 
                         w.Close();
                         m.Close();
 
-                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_GETCHANNELLIST (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_GETCHANNELLIST (" + (4 + Buffer.Length) + " bytes)");
                         context.Client.Client.Client.Send(ToByteArray());
                         return true;
                     }

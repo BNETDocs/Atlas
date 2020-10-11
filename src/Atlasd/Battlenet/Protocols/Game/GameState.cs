@@ -17,6 +17,7 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public Account ActiveAccount;
         public Channel ActiveChannel;
+        public Account.Flags ChannelFlags;
         public DateTime ConnectedTimestamp;
         public List<GameKey> GameKeys;
         public IPAddress LocalIPAddress;
@@ -31,6 +32,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public string KeyOwner;
         public string OnlineName;
         public Int32 Ping;
+        public UInt32 PingToken;
         public UInt32 ProtocolId;
         public UInt32 ServerToken;
         public bool SpawnKey;
@@ -47,6 +49,7 @@ namespace Atlasd.Battlenet.Protocols.Game
 
             ActiveAccount = null;
             ActiveChannel = null;
+            ChannelFlags = Account.Flags.None;
             ConnectedTimestamp = DateTime.Now;
             GameKeys = new List<GameKey>();
             LocalIPAddress = null;
@@ -61,6 +64,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             KeyOwner = null;
             OnlineName = null;
             Ping = -1;
+            PingToken = (uint)r.Next(0, 0x7FFFFFFF);
             ProtocolId = 0;
             ServerToken = (uint)r.Next(0, 0x7FFFFFFF);
             SpawnKey = false;
@@ -91,12 +95,8 @@ namespace Atlasd.Battlenet.Protocols.Game
 
             if (ActiveChannel != null)
             {
-                lock (ActiveChannel)
-                {
-                    ActiveChannel.RemoveUser(this);
-                    if (ActiveChannel.Count == 0) ActiveChannel.Dispose();
-                    ActiveChannel = null;
-                }
+                lock (ActiveChannel) ActiveChannel.RemoveUser(this);
+                ActiveChannel = null;
             }
         }
     }
