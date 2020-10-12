@@ -117,7 +117,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             account.Set(Account.LastLogonKey, null);
                             account.Set(Account.TimeLoggedKey, (uint)0);
 
-                            Battlenet.Common.AccountsDb.Add(username, account);
+                            lock (Battlenet.Common.AccountsDb) Battlenet.Common.AccountsDb.Add(username, account);
                             status = Statuses.AccountCreated;
                         }
 
