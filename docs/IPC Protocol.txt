@@ -1,0 +1,150 @@
+# IPC
+**Inter-Process Communication** (**IPC**) is a standard data serialization model and messaging queue made compatible between two or more processes.
+
+For our purpose, it is a standard protocol used for communication between two or more custom Classic Battle.net&trade; servers. It is not compatible with official Blizzard servers.
+
+The following custom server software is recognized in use of this protocol:
+
+| Project | Author |
+| ------- | ------ |
+| Atlasd | [@carlbennett](https://github.com/carlbennett) |
+| *Untitled* | [@Davnit](https://github.com/Davnit) |
+
+## Protocol Specification
+
+### Summary
+
+This protocol documents a Layer 7 (application) Internet protocol. This protocol is encapsulated via TCP/IP and requires an established TCP stream for communication channels.
+
+This protocol uses TCP port 6112. Clients must connect to the server at this port. A server must listen for clients at this port.
+
+### Data Types
+
+The smallest unit of data this protocol uses is 1-byte (8-bits).
+
+| Class   | Type     | Bytes | Description |
+| ------- | -------- | ----- | ----------- |
+| Binary  |   `Void` |     N | Raw binary data stream, may be zero length, must be accompanied by a length descriptor |
+| Boolean |   `Bool` |     1 | False (0) or True (1) |
+| Numeric |   `Int8` |     1 | Signed 8-bit integer |
+| Numeric |  `Int16` |     2 | Signed 16-bit integer |
+| Numeric |  `Int32` |     3 | Signed 32-bit integer |
+| Numeric |  `Int64` |     4 | Signed 64-bit integer |
+| Numeric |  `UInt8` |     1 | Unsigned 8-bit integer |
+| Numeric | `UInt16` |     2 | Unsigned 16-bit integer |
+| Numeric | `UInt32` |     3 | Unsigned 32-bit integer |
+| Numeric | `UInt64` |     4 | Unsigned 64-bit integer |
+| Text    | `String` |   N+1 | A series of characters, null-terminated |
+
+A **length descriptor** is any unsigned integer that counts the number of bytes in another field.
+
+All text should be UTF-8 encoded unless otherwise noted.
+
+### Handshake
+
+A client begins the handshake when it opens a TCP stream to a server. The client must first send a protocol identifier byte. There are a variety of protocol identifiers, however the only identifier in use by this protocol is `0x80`.
+
+1. Client establishes TCP stream to server.
+2. Client sends one `UInt8` with `0x80` value (protocol identifier byte).
+3. Server sends one `UInt32` with a randomized value (server token).
+4. Client sends one `UInt32` with a randomized value (client token).
+
+After sharing tokens, both client and server must calculate a SHA-1 digest with both tokens and a preshared secret key concatenated.
+
+The client must calculate the SHA-1 digest as follows:
+
+```
+Digest = SHA1(ClientToken, ServerToken, PresharedKey)
+```
+
+The server must calculate the SHA-1 digest as follows:
+
+```
+Digest = SHA1(PresharedKey, ServerToken, ClientToken)
+```
+
+1. Server sends its 20-byte SHA-1 digest to client for verification.
+2. Client sends its 20-byte SHA-1 digest to server for verification.
+
+If verification fails for either client or server, the TCP stream should be closed. No further communication should occur.
+
+If verification succeeds, then the handshake was a success, and standard messages may now be transmitted between client and server. The server should welcome the client by sending a welcome message.
+
+### Message Header
+
+| Type | Field |
+| ---- | ----- |
+| `UInt32` | Length of message header plus payload |
+| `UInt8` | Message id |
+| `Void` | Message payload |
+
+### Messages
+
+#### IPC_NULL
+**Id:** `0x00`
+
+May be used for checking connection. There is no payload. It should be sent at regular intervals by both client and server.
+
+#### IPC_WELCOME
+**Id:** `0x01`
+
+Sent by the server to the client to establish that the server is ready for standard communication.
+
+The client should send this back with the following fields.
+
+```
+(String) Hostname
+(UInt16) Port
+```
+
+Using the information, the server will tell other clients to connect to this endpoint.
+
+#### IPC_CLUSTER_MEMBER_JOIN
+**Id:** `0x02`
+
+A server sends this to all of its clients when another client is welcomed and joins the cluster. The clients should attempt to connect to this cluster member.
+
+```
+(String) Hostname
+(UInt16) Port
+```
+
+#### IPC_CLUSTER_MEMBER_LEAVE
+**Id:** `0x03`
+
+A client should send this to all of its servers when it wishes to leave the cluster. This instructs all other servers not to attempt to re-establish this stream.
+
+#### IPC_CHANNEL_QUERY
+**Id:** `0x04`
+
+##### Client
+A client sends this message to ask servers for channel information.
+```
+(UInt32) Cookie
+(String) Channel name
+```
+
+##### Server
+A server responds to this query with the following information.
+```
+(UInt32) Cookie
+(Bool) Exists (if False, the rest below is omitted)
+
+(UInt32) Channel flags
+(String) Channel topic
+(UInt32) Maximum accounts allowed
+(UInt32) Accounts in channel from all servers
+(UInt32) Accounts in channel from this server
+```
+
+#### IPC_CHANNEL_CREATED
+**Id:** `0x05`
+
+A client sends this to all of its servers when it creates a channel.
+
+#### IPC_CHANNEL_DESTROYED
+**Id:** `0x06`
+
+A client sends this to all of its servers when it destroys a channel.
+
+#### IPC_
