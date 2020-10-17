@@ -42,6 +42,7 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public GameKey(UInt32 keyLength, UInt32 productValue, UInt32 publicValue, byte[] hashedKeyData)
         {
+            // This broke joe)x86('s 16 year-old JavaOp2 bot on Fri, Oct 16 2020 :)  -Carl
             if (!(keyLength == 13 || keyLength == 16 || keyLength == 26))
                 throw new GameProtocolViolationException(null, "Invalid game key length");
 
