@@ -22,9 +22,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (context.Direction == MessageDirection.ClientToServer)
                 throw new GameProtocolViolationException(context.Client, "Client is not allowed to send SID_CHATEVENT");
 
-            Buffer = ((ChatEvent)context.Arguments["chatEvent"]).ToByteArray();
+            var chatEvent = (ChatEvent)context.Arguments["chatEvent"];
 
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_CHATEVENT (" + (4 + Buffer.Length) + " bytes)");
+            Buffer = chatEvent.ToByteArray();
+
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, string.Format("[{0}] SID_CHATEVENT: {1} ({2:D} bytes)", Common.DirectionToString(context.Direction), ChatEvent.EventIdToString(chatEvent.EventId), 4 + Buffer.Length));
 
             return true;
         }

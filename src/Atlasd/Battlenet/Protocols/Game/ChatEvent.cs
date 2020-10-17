@@ -46,6 +46,28 @@ namespace Atlasd.Battlenet.Protocols.Game
             Initialize(eventId, (UInt32)flags, ping, username, text);
         }
 
+        public static string EventIdToString(EventIds eventId)
+        {
+            return eventId switch {
+                EventIds.EID_USERSHOW => "EID_USERSHOW",
+                EventIds.EID_USERJOIN => "EID_USERJOIN",
+                EventIds.EID_USERLEAVE => "EID_USERLEAVE",
+                EventIds.EID_WHISPERFROM => "EID_WHISPERFROM",
+                EventIds.EID_TALK => "EID_TALK",
+                EventIds.EID_BROADCAST => "EID_BROADCAST",
+                EventIds.EID_CHANNELJOIN => "EID_CHANNELJOIN",
+                EventIds.EID_USERUPDATE => "EID_USERUPDATE",
+                EventIds.EID_WHISPERTO => "EID_WHISPERTO",
+                EventIds.EID_CHANNELFULL => "EID_CHANNELFULL",
+                EventIds.EID_CHANNELNOTFOUND => "EID_CHANNELNOTFOUND",
+                EventIds.EID_CHANNELRESTRICTED => "EID_CHANNELRESTRICTED",
+                EventIds.EID_INFO => "EID_INFO",
+                EventIds.EID_ERROR => "EID_ERROR",
+                EventIds.EID_EMOTE => "EID_EMOTE",
+                _ => throw new ArgumentOutOfRangeException(string.Format("Unknown Event Id [0x{0:X8}]", eventId)),
+            };
+        }
+
         protected void Initialize(EventIds eventId, UInt32 flags, Int32 ping, string username, string text)
         {
             EventId = eventId;
