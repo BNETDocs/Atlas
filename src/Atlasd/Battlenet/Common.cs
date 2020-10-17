@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Atlasd.Daemon;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -42,7 +43,11 @@ namespace Atlasd.Battlenet
             Listener.ExclusiveAddressUse = false;
             Listener.Server.NoDelay = true;
             Listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true); // SO_KEEPALIVE
-            Listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
+            try {
+                Listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
+            } catch (SocketException ex) {
+                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Server, $"Unable to set linger option on listening socket: {ex.Message}");
+            }
         }
         
         public static uint GetActiveClientCountByProduct(Product.ProductCode productCode)
