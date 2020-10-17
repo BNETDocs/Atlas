@@ -3,10 +3,27 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Description>Atlas is cross-platform software that emulates Classic Battle.net in a compatible model for Diablo, StarCraft, and WarCraft.</Description>
+    <Copyright>© 2020 Carl Bennett &lt;carl@carlbennett.me&gt;</Copyright>
+    <Company>BNETDocs</Company>
+    <Product>Atlas</Product>
+    <Authors>Carl Bennett &lt;carl@carlbennett.me&gt;</Authors>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/BNETDocs/Atlas</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/BNETDocs/Atlas</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>Atlas, Battle.net, Blizzard, Classic, Diablo, Emulation, Linux, StarCraft, WarCraft, Windows</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MBNCSUtil\MBNCSUtil.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
