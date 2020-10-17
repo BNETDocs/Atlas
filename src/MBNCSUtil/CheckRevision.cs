@@ -39,7 +39,7 @@ namespace MBNCSUtil
     /// including file checksumming and EXE version information.
     /// </remarks>
     /// <threadsafety>This type is safe for multithreaded operations.</threadsafety>
-    [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
+    //[PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
     public static class CheckRevision
     {
         /** These are the hashcodes for the various .mpq files. */
