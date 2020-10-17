@@ -1,8 +1,10 @@
 ﻿using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net;
+using System.Threading;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -61,6 +63,9 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         r.Close();
                         m.Close();
+
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] Setting client locale...");
+                        Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo((int)context.Client.GameState.Locale.UserLocaleId);
 
                         var _ping = new SID_PING().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object>() {{ "token", context.Client.GameState.PingToken }} ));
 

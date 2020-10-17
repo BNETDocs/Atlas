@@ -6,6 +6,7 @@ namespace Atlasd.Battlenet
     class Account
     {
         public const string AccountCreatedKey = "System\\Account Created";
+        public const string FailedLogonsKey = "System\\Total Failed Logons";
         public const string FlagsKey = "System\\Flags";
         public const string FriendsKey = "System\\Friends";
         public const string IPAddressKey = "System\\IP";
@@ -33,11 +34,11 @@ namespace Atlasd.Battlenet
             Closed = 0x80,
         };
 
-        public Dictionary<string, object> Userdata { get; protected set; }
+        public Dictionary<string, dynamic> Userdata { get; protected set; }
 
         public Account()
         {
-            Userdata = new Dictionary<string, object>();
+            Userdata = new Dictionary<string, dynamic>();
         }
 
         public bool ContainsKey(string key)
@@ -45,12 +46,15 @@ namespace Atlasd.Battlenet
             return Userdata.ContainsKey(key);
         }
 
-        public object Get(string key)
+        public dynamic Get(string key, dynamic defaultValue = null)
         {
-            return Userdata[key];
+            if (!Userdata.TryGetValue(key, out dynamic value))
+                return defaultValue;
+
+            return value ?? defaultValue;
         }
 
-        public void Set(string key, object value)
+        public void Set(string key, dynamic value)
         {
             Userdata[key] = value;
         }

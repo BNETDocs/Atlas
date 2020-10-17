@@ -13,31 +13,37 @@ namespace Atlasd.Battlenet.Protocols.Game
             Arguments = arguments;
         }
 
-        public bool CanInvoke(ChatCommandContext context)
+        public virtual bool CanInvoke(ChatCommandContext context)
         {
-            //return context != null && context.GameState != null && context.GameState.ActiveAccount != null;
             return false;
         }
 
-        public void Invoke(ChatCommandContext context)
+        public virtual void Invoke(ChatCommandContext context)
         {
             throw new NotSupportedException("Base ChatCommand class does not Invoke()");
         }
 
         public static ChatCommand FromString(string text)
         {
-            if (text[0] != '/')
-                return new ChatCommand(new List<string>() { text });
+            var args = new List<string>(text.Split(' '));
 
-            var args = text[1..].Split(' ');
+            var cmd = args[0];
+            args.RemoveAt(0);
 
-            switch (args[0])
+            switch (cmd)
             {
-                case "help": case "?":
-                    return new HelpCommand(new List<string>(args));
+                case "channel":
+                case "join":
+                case "j":
+                    return new JoinCommand(args);
+                case "help":
+                case "?":
+                    return new HelpCommand(args);
+                case "whoami":
+                    return new WhoAmICommand(args);
+                default:
+                    return new InvalidCommand(args);
             }
-
-            return new InvalidCommand(new List<string>(args));
         }
     }
 }

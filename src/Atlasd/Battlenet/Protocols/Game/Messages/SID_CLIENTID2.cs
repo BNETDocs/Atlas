@@ -27,7 +27,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 throw new GameProtocolViolationException(context.Client, "SID_CLIENTID2 must be sent from client to server");
 
             /**
-             * (UINT32) Server vVersion
+             * (UINT32) Server version
              * 
              * For server version 0:
              *   (UINT32) Registration authority
@@ -46,13 +46,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length < 22)
                 throw new GameProtocolViolationException(context.Client, "SID_CLIENTID2 buffer must be at least 22 bytes");
 
-            /*var m = new MemoryStream(Buffer);
+            var m = new MemoryStream(Buffer);
             var r = new BinaryReader(m);
                         
             var serverVersion = r.ReadUInt32();
-                        
-            UInt32 registrationVersion = r.ReadUInt32();
-            UInt32 registrationAuthority = r.ReadUInt32();
+
+            UInt32 registrationAuthority;
+            UInt32 registrationVersion;
 
             switch (serverVersion)
             {
@@ -67,7 +67,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     break;
                 }
                 default:
-                    throw new GameProtocolViolationException(context.Client, string.Format("SID_CLIENTID2 has invalid server version field [{0:d}]", serverVersion));
+                    throw new GameProtocolViolationException(context.Client, string.Format("SID_CLIENTID2 has invalid server version [{0:d}]", serverVersion));
             }
 
             var accountNumber = r.ReadUInt32();
@@ -76,9 +76,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             var pcUserName = r.ReadString();
 
             r.Close();
-            m.Close();*/
+            m.Close();
 
-            return new SID_CLIENTID().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
+            return new SID_CLIENTID().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient)) &&
+                new SID_LOGONCHALLENGEEX().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
         }
     }
 }

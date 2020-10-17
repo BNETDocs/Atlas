@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Atlasd.Battlenet.Protocols.Game.Messages;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game
@@ -79,7 +82,7 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public byte[] ToByteArray()
         {
-            var buf = new byte[26 + Encoding.ASCII.GetByteCount(Username) + Encoding.ASCII.GetByteCount(Text)];
+            var buf = new byte[26 + Encoding.ASCII.GetByteCount(Username) + Encoding.UTF8.GetByteCount(Text)];
             var m = new MemoryStream(buf);
             var w = new BinaryWriter(m);
 
@@ -90,12 +93,45 @@ namespace Atlasd.Battlenet.Protocols.Game
             w.Write((UInt32)0xBAADF00D); // Account number (Defunct)
             w.Write((UInt32)0xDEADBEEF); // Registration authority (Defunct)
             w.Write((string)Username);
-            w.Write((string)Text);
+
+            w.Write(Encoding.UTF8.GetBytes(Text)); // UTF-8 is needed for localization reasons
+            w.Write((byte)0);
 
             w.Close();
             m.Close();
 
             return buf;
+        }
+
+        public void WriteTo(ClientState receiver)
+        {
+            WriteTo(this, receiver);
+        }
+
+        public static void WriteTo(ChatEvent chatEvent, ClientState receiver)
+        {
+            var args = new Dictionary<string, object> {{ "chatEvent", chatEvent }};
+            var msg = new SID_CHATEVENT();
+
+            msg.Invoke(new MessageContext(receiver, MessageDirection.ServerToClient, args));
+
+            switch (receiver.ProtocolType)
+            {
+                case ProtocolType.Game:
+                    {
+                        receiver.Send(msg.ToByteArray());
+                        break;
+                    }
+                case ProtocolType.Chat:
+                case ProtocolType.Chat_Alt1:
+                case ProtocolType.Chat_Alt2:
+                    {
+                        receiver.Send(Encoding.UTF8.GetBytes(msg.ToString()));
+                        break;
+                    }
+                default:
+                    throw new NotSupportedException("Invalid channel state, user in channel is using an incompatible protocol");
+            }
         }
     }
 }

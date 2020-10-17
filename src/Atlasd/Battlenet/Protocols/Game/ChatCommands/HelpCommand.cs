@@ -7,20 +7,22 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
     {
         public HelpCommand(List<string> arguments) : base(arguments) { }
 
-        public new bool CanInvoke(ChatCommandContext context) /* from IChatCommand */
+        public override bool CanInvoke(ChatCommandContext context)
         {
             return context != null && context.GameState != null && context.GameState.ActiveAccount != null;
         }
 
-        public new void Invoke(ChatCommandContext context) /* from IChatCommand */
+        public override void Invoke(ChatCommandContext context)
         {
-            var lines = new List<string>();
-
-            lines.Add("Battle.net help topics:");
-            lines.Add("TODO");
+            var lines = new List<string>
+            {
+                "Battle.net help topics:",
+                "commands  aliases  advanced",
+                "Type /help TOPIC for information about a specific topic.",
+            };
 
             foreach (var line in lines)
-                Channel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line), context.GameState.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
         }
     }
 }

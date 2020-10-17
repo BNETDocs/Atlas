@@ -55,10 +55,9 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var passwordHash = r.ReadBytes(20);
                         context.Client.GameState.Username = r.ReadString();
 
-                        Account account;
                         Statuses status = Statuses.None;
 
-                        Battlenet.Common.AccountsDb.TryGetValue(context.Client.GameState.Username, out account);
+                        Battlenet.Common.AccountsDb.TryGetValue(context.Client.GameState.Username, out Account account);
 
                         if (status == Statuses.None && account == null)
                             status = Statuses.AccountNotFound;
@@ -79,11 +78,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (status == Statuses.None)
                         {
                             context.Client.GameState.ActiveAccount = account;
+                            context.Client.GameState.LastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
                             context.Client.GameState.OnlineName = context.Client.GameState.Username;
+                            context.Client.GameState.Username = (string)account.Get(Account.UsernameKey, context.Client.GameState.Username);
 
-                            context.Client.GameState.ActiveAccount.Set(Account.IPAddressKey, context.Client.RemoteEndPoint.ToString().Split(":")[0]);
-                            context.Client.GameState.ActiveAccount.Set(Account.LastLogonKey, DateTime.Now);
-                            context.Client.GameState.ActiveAccount.Set(Account.PortKey, context.Client.RemoteEndPoint.ToString().Split(":")[1]);
+                            account.Set(Account.IPAddressKey, context.Client.RemoteEndPoint.ToString().Split(":")[0]);
+                            account.Set(Account.LastLogonKey, DateTime.Now);
+                            account.Set(Account.PortKey, context.Client.RemoteEndPoint.ToString().Split(":")[1]);
 
                             lock (Battlenet.Common.ActiveAccounts) Battlenet.Common.ActiveAccounts.Add(context.Client.GameState.Username, account);
 

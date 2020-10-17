@@ -1,6 +1,7 @@
 ﻿using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Daemon;
+using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -49,16 +50,16 @@ namespace Atlasd.Battlenet
         {
             if (!ignoreLimits)
             {
-                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Channel, string.Format("[{0}] Evaluating limits for user [{1}]", Name, user.OnlineName));
+                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Channel, $"[{Name}] Evaluating limits for user [{user.OnlineName}]");
 
                 if (MaxUsers > -1 && Users.Count >= MaxUsers)
                 {
-                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Channel, string.Format("[{0}] Rejecting user [{1}] for reason [{2}]", Name, user.OnlineName, "full"));
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Channel, $"[{Name}] Rejecting user [{user.OnlineName}] for reason [Full]");
 
                     if (extendedErrors)
-                        WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_CHANNELFULL, ActiveFlags, 0, "", Name), user.Client);
+                        new ChatEvent(ChatEvent.EventIds.EID_CHANNELFULL, ActiveFlags, 0, "", Name).WriteTo(user.Client);
                     else
-                        WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, "That channel is full."), user.Client);
+                        new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, Resources.ChannelIsFull).WriteTo(user.Client);
 
                     return;
                 }
@@ -67,12 +68,12 @@ namespace Atlasd.Battlenet
                 {
                     if (BannedUsers.Contains(user))
                     {
-                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Channel, string.Format("[{0}] Rejecting user [{1}] for reason [{2}]", Name, user.OnlineName, "banned"));
+                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Channel, $"[{Name}] Rejecting user [{user.OnlineName}] for reason [Banned]");
 
                         if (extendedErrors)
-                            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_CHANNELRESTRICTED, ActiveFlags, 0, "", Name), user.Client);
+                            new ChatEvent(ChatEvent.EventIds.EID_CHANNELRESTRICTED, ActiveFlags, 0, "", Name).WriteTo(user.Client);
                         else
-                            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, "You are banned from that channel."));
+                            new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, Resources.YouAreBannedFromThatChannel).WriteTo(user.Client);
 
                         return;
                     }
@@ -80,12 +81,12 @@ namespace Atlasd.Battlenet
 
                 if (ActiveFlags.HasFlag(Flags.Restricted))
                 {
-                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Channel, string.Format("[{0}] Rejecting user [{1}] for reason [{2}]", Name, user.OnlineName, "restricted"));
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Channel, $"[{Name}] Rejecting user [{user.OnlineName}] for reason [Restricted]");
 
                     if (extendedErrors)
-                        WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_CHANNELRESTRICTED, ActiveFlags, 0, "", Name), user.Client);
+                        new ChatEvent(ChatEvent.EventIds.EID_CHANNELRESTRICTED, ActiveFlags, 0, "", Name).WriteTo(user.Client);
                     else
-                        WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, "That channel is restricted."), user.Client);
+                        new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, Resources.ChannelIsRestricted).WriteTo(user.Client);
 
                     return;
                 }
@@ -100,7 +101,7 @@ namespace Atlasd.Battlenet
             lock (Users) Users.Add(user);
 
             // Tell this user they entered the channel:
-            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_CHANNELJOIN, ActiveFlags, 0, "", Name), user.Client);
+            new ChatEvent(ChatEvent.EventIds.EID_CHANNELJOIN, ActiveFlags, 0, "", Name).WriteTo(user.Client);
 
             if (!ActiveFlags.HasFlag(Flags.Silent))
             {
@@ -111,23 +112,23 @@ namespace Atlasd.Battlenet
                         foreach (var subuser in Users)
                         {
                             // Tell this user about everyone in the channel:
-                            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, subuser.ChannelFlags, subuser.Ping, subuser.OnlineName, Product.ProductToStatstring(subuser.Product)), user.Client);
+                            new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, subuser.ChannelFlags, subuser.Ping, subuser.OnlineName, Product.ProductToStatstring(subuser.Product)).WriteTo(user.Client);
 
                             // Tell everyone else about this user entering the channel:
                             if (subuser != user)
-                                WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, user.ChannelFlags, user.Ping, user.OnlineName, Product.ProductToStatstring(user.Product)), subuser.Client);
+                                new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, user.ChannelFlags, user.Ping, user.OnlineName, Product.ProductToStatstring(user.Product)).WriteTo(subuser.Client);
                         }
                     }
                 }
             }
             else
             {
-                WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, "This channel does not have chat privileges."), user.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, "This channel does not have chat privileges.").WriteTo(user.Client);
             }
 
             var topic = RenderTopic(user).Split("\n");
             foreach (var line in topic)
-                WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line), user.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line).WriteTo(user.Client);
 
             object autoOp = false;
             lock (Common.Settings) Common.Settings.TryGetValue("channel.autoop", out autoOp);
@@ -180,20 +181,24 @@ namespace Atlasd.Battlenet
 
         public void RemoveUser(GameState user)
         {
-            lock (Users)
+            lock (user)
             {
-                if (!Users.Contains(user)) return;
-
-                Users.Remove(user);
-
-                foreach (var subuser in Users)
+                lock (Users)
                 {
-                    // Tell everyone else about this user leaving the channel:
-                    WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERLEAVE, user.ChannelFlags, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring)), subuser.Client);
-                }
-            }
+                    if (!Users.Contains(user)) return;
 
-            lock (user) user.ChannelFlags &= ~Account.Flags.ChannelOp;
+                    Users.Remove(user);
+                    user.ActiveChannel = null;
+
+                    foreach (var subuser in Users)
+                    {
+                        // Tell everyone else about this user leaving the channel:
+                        new ChatEvent(ChatEvent.EventIds.EID_USERLEAVE, user.ChannelFlags, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring)).WriteTo(subuser.Client);
+                    }
+                }
+
+                user.ChannelFlags &= ~Account.Flags.ChannelOp;
+            }
 
             if (Count == 0 && !ActiveFlags.HasFlag(Flags.Public)) Dispose();
         }
@@ -221,23 +226,23 @@ namespace Atlasd.Battlenet
                 foreach (var user in Users)
                 {
                     // Tell users they re-entered the channel:
-                    WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_CHANNELJOIN, ActiveFlags, 0, "", Name), user.Client);
+                    WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_CHANNELJOIN, ActiveFlags, 0, "", Name), user.Client.GameState);
 
                     // Show users in channel or display info about no chat:
                     if (!ActiveFlags.HasFlag(Flags.Silent))
                     {
                         var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, user.ChannelFlags, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring));
-                        foreach (var subuser in Users) WriteChatEvent(chatEvent, subuser.Client, user.Client);
+                        foreach (var subuser in Users) WriteChatEvent(chatEvent, subuser.Client.GameState);
                     }
                     else
                     {
-                        WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, "This channel does not have chat privileges."), user.Client);
+                        WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, Resources.ChannelIsChatRestricted), user.Client.GameState);
                     }
 
                     // Channel topic:
                     var topic = RenderTopic(user);
                     foreach (var line in topic.Split("\n"))
-                        WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line), user.Client);
+                        WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line), user.Client.GameState);
                 }
             }
         }
@@ -284,7 +289,7 @@ namespace Atlasd.Battlenet
                     var lines = RenderTopic(user).Split("\n");
 
                     foreach (var line in lines)
-                        WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line), user.Client);
+                        new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line).WriteTo(user.Client);
                 }
             }
         }
@@ -321,43 +326,11 @@ namespace Atlasd.Battlenet
             client.Ping = ping;
             client.Statstring = Encoding.ASCII.GetBytes(statstring);
 
-            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, client.ChannelFlags, client.Ping, client.OnlineName, Encoding.ASCII.GetString(client.Statstring)));
+            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, client.ChannelFlags, client.Ping, client.OnlineName, Encoding.ASCII.GetString(client.Statstring)), client);
         }
 
-        public static void WriteChatEvent(ChatEvent chatEvent, ClientState receiver)
+        public void WriteChatEvent(ChatEvent chatEvent, GameState owner = null)
         {
-            // suspect bug in this function, combine these two?
-
-            var args = new Dictionary<string, object> { { "chatEvent", chatEvent } };
-            var msg = new SID_CHATEVENT();
-
-            msg.Invoke(new MessageContext(receiver, Protocols.MessageDirection.ServerToClient, args));
-
-            switch (receiver.ProtocolType)
-            {
-                case ProtocolType.Game:
-                    {
-                        receiver.Send(msg.ToByteArray());
-                        break;
-                    }
-                case ProtocolType.Chat:
-                case ProtocolType.Chat_Alt1:
-                case ProtocolType.Chat_Alt2:
-                    {
-                        receiver.Send(Encoding.ASCII.GetBytes(msg.ToString()));
-                        break;
-                    }
-                default:
-                    {
-                        throw new NotSupportedException("Invalid channel state, user in channel is using an incompatible protocol");
-                    }
-            }
-        }
-
-        public void WriteChatEvent(ChatEvent chatEvent, ClientState receiver = null, ClientState sender = null)
-        {
-            // suspect bug in this function, combine these two?
-
             var args = new Dictionary<string, object> {{ "chatEvent", chatEvent }};
             var msg = new SID_CHATEVENT();
 
@@ -365,10 +338,10 @@ namespace Atlasd.Battlenet
             {
                 foreach (var user in Users)
                 {
-                    if (receiver != null && receiver.GameState != null && user == receiver.GameState && chatEvent.EventId == ChatEvent.EventIds.EID_TALK)
+                    if (owner != null && user == owner && chatEvent.EventId == ChatEvent.EventIds.EID_TALK)
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Channel, "[" + Name + "] Dropping EID_TALK from being echoed to sender");
-                        return;
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Channel, $"[{Name}] Dropping EID_TALK from being echoed to sender");
+                        continue;
                     }
 
                     msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
@@ -388,9 +361,7 @@ namespace Atlasd.Battlenet
                                 break;
                             }
                         default:
-                            {
-                                throw new NotSupportedException("Invalid channel state, user in channel is using an incompatible protocol");
-                            }
+                            throw new NotSupportedException("Invalid channel state, user in channel is using an incompatible protocol");
                     }
                 }
             }
@@ -409,14 +380,18 @@ namespace Atlasd.Battlenet
             var numTotalOnline = Common.ActiveClients.Count;
             var numTotalAdvertisements = 0;
 
-            var chatEvents = new List<ChatEvent>(){
-                { new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, "Welcome to Battle.net!") },
-                { new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, "This server is hosted by BNETDocs.") },
-                { new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, string.Format("There are currently {0:D} users playing {1:D} games of {2}, and {3:D} users playing {4:D} games on Battle.net.", numGameOnline, numGameAdvertisements, strGame, numTotalOnline, numTotalAdvertisements)) },
-            };
+            var str = Resources.ChannelFirstJoinGreeting;
 
-            foreach (var chatEvent in chatEvents)
-                Channel.WriteChatEvent(chatEvent, receiver);
+            str = str.Replace("{realm}", "Battle.net");
+            str = str.Replace("{host}", "BNETDocs");
+            str = str.Replace("{game}", strGame);
+            str = str.Replace("{gameUsers}", numGameOnline.ToString("#,0"));
+            str = str.Replace("{gameAds}", numGameAdvertisements.ToString("#,0"));
+            str = str.Replace("{totalUsers}", numTotalOnline.ToString("#,0"));
+            str = str.Replace("{totalGameAds}", numTotalAdvertisements.ToString("#,0"));
+
+            foreach (var line in str.Split("\r\n"))
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, line).WriteTo(receiver);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
+using Atlasd.Localization;
 using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
@@ -30,31 +31,19 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             var text = Encoding.ASCII.GetString(Buffer, 0, Buffer.Length - 1);
 
+            if (text.Length < 1)
+                throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND command must be at least 1 bytes");
+
             if (text[0] != '/')
             {
                 if (context.Client.GameState.ActiveChannel == null)
                     throw new GameProtocolViolationException(context.Client, "Cannot send message, user is not in a channel");
 
                 if (context.Client.GameState.ActiveChannel.Count <= 1 || context.Client.GameState.ActiveChannel.ActiveFlags.HasFlag(Channel.Flags.Silent))
-                    Channel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, context.Client.GameState.ActiveChannel.ActiveFlags, 0, context.Client.GameState.ActiveChannel.Name, "No one hears you."), context.Client);
+                    new ChatEvent(ChatEvent.EventIds.EID_INFO, context.Client.GameState.ActiveChannel.ActiveFlags, 0, context.Client.GameState.ActiveChannel.Name, Resources.NoOneHearsYou).WriteTo(context.Client);
                 else
-                    context.Client.GameState.ActiveChannel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_TALK, context.Client.GameState.ChannelFlags, context.Client.GameState.Ping, context.Client.GameState.OnlineName, text));
+                    context.Client.GameState.ActiveChannel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_TALK, context.Client.GameState.ChannelFlags, context.Client.GameState.Ping, context.Client.GameState.OnlineName, text), context.Client.GameState);
 
-                return true;
-            }
-
-            if (text[0..2] == "/j" || text[0..5] == "/join" || text[0..8] == "/channel")
-            {
-                var channelName = "";
-
-                if (text[0..2] == "/j") channelName = text[3..];
-                if (text[0..5] == "/join") channelName = text[6..];
-                if (text[0..8] == "/channel") channelName = text[9..];
-
-                var channel = Channel.GetChannelByName(channelName);
-                if (channel == null) channel = new Channel(channelName, Channel.Flags.None);
-
-                channel.AcceptUser(context.Client.GameState);
                 return true;
             }
 
@@ -63,7 +52,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             if (!command.CanInvoke(commandContext))
             {
-                Channel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.Client.GameState.ChannelFlags, context.Client.GameState.Ping, context.Client.GameState.OnlineName, "That command is not available at the moment."), context.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.Client.GameState.ChannelFlags, context.Client.GameState.Ping, context.Client.GameState.OnlineName, Resources.ChatCommandUnavailable).WriteTo(context.Client);
                 return true;
             }
 

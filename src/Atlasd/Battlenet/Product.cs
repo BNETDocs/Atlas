@@ -27,6 +27,19 @@ namespace Atlasd.Battlenet
             WarcraftIIIReignOfChaos = 0x57415233, // WAR3
         }
 
+        public static bool IsChatRestricted(ProductCode code)
+        {
+            return code switch
+            {
+                ProductCode.Chat => true,
+                ProductCode.DiabloRetail => true,
+                ProductCode.DiabloShareware => true,
+                ProductCode.StarcraftShareware => true,
+                ProductCode.WarcraftIIIDemo => true,
+                _ => false,
+            };
+        }
+
         public static bool IsDiabloII(ProductCode code)
         {
             return code switch

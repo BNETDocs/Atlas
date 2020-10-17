@@ -20,6 +20,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public Account.Flags ChannelFlags;
         public DateTime ConnectedTimestamp;
         public List<GameKey> GameKeys;
+        public DateTime LastLogon;
         public IPAddress LocalIPAddress;
         public LocaleInfo Locale;
         public LogonTypes LogonType;
@@ -53,6 +54,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             ChannelFlags = Account.Flags.None;
             ConnectedTimestamp = DateTime.Now;
             GameKeys = new List<GameKey>();
+            LastLogon = DateTime.Now;
             LocalIPAddress = null;
             Locale = new LocaleInfo();
             LogonType = LogonTypes.OLS;

@@ -1,5 +1,6 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
+using Atlasd.Localization;
 using System;
 using System.IO;
 
@@ -70,14 +71,39 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             if (channel == null && flags == Flags.NoCreate)
             {
-                Channel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_CHANNELFULL, Channel.Flags.None, context.Client.GameState.Ping, context.Client.GameState.OnlineName, channelName), context.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_CHANNELFULL, Channel.Flags.None, context.Client.GameState.Ping, context.Client.GameState.OnlineName, channelName).WriteTo(context.Client);
                 return true;
             }
 
             if (channel == null) channel = new Channel(channelName, firstJoin ? Channel.Flags.Public | Channel.Flags.ProductSpecific : Channel.Flags.None);
             channel.AcceptUser(context.Client.GameState, ignoreLimits, true);
 
-            if (firstJoin) Channel.WriteServerStats(context.Client);
+            if (firstJoin)
+            {
+                var gameState = context.Client.GameState;
+
+                var account = gameState.ActiveAccount;
+                var activeUserFlags = gameState.ChannelFlags;
+                var activeUserPing = gameState.Ping;
+                var lastLogon = gameState.LastLogon;
+                var onlineName = gameState.OnlineName;
+
+                Channel.WriteServerStats(context.Client);
+
+                if (Product.IsChatRestricted(gameState.Product))
+                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, activeUserFlags, activeUserPing, onlineName, Resources.GameProductIsChatRestricted).WriteTo(context.Client);
+
+                var lastLogonTimestamp = lastLogon.ToString("ddd MMM dd hh:mm tt"); // example: "Sat Oct 17  6:11 AM"
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, activeUserFlags, activeUserPing, onlineName, Resources.LastLogonInfo.Replace("{timestamp}", lastLogonTimestamp)).WriteTo(context.Client);
+
+                var failedLogins = (UInt32)0;
+                if (account.ContainsKey(Account.FailedLogonsKey)) failedLogins = (UInt32)account.Get(Account.FailedLogonsKey);
+                account.Set(Account.FailedLogonsKey, (UInt32)0);
+
+                if (failedLogins > 0)
+                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, activeUserFlags, activeUserPing, onlineName, Resources.FailedLogonAttempts.Replace("{count}", failedLogins.ToString("##,0"))).WriteTo(context.Client);
+
+            }
 
             return true;
         }

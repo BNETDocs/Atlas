@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Atlasd.Localization;
+using System.Collections.Generic;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
@@ -6,14 +7,14 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
     {
         public InvalidCommand(List<string> arguments) : base(arguments) { }
 
-        public new bool CanInvoke(ChatCommandContext context) /* from IChatCommand */
+        public override bool CanInvoke(ChatCommandContext context)
         {
             return context != null && context.GameState != null && context.GameState.ActiveAccount != null;
         }
 
-        public new void Invoke(ChatCommandContext context) /* from IChatCommand */
+        public override void Invoke(ChatCommandContext context)
         {
-            Channel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, "That is not a valid command. Type /help or /? for more info."), context.GameState.Client);
+            new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, Resources.InvalidChatCommand).WriteTo(context.GameState.Client);
         }
     }
 }

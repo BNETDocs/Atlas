@@ -68,6 +68,7 @@ namespace Atlasd.Battlenet
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, "TCP connection established");
 
+            ClientStream.ReadTimeout = 180000; // 3 minutes
             client.Client.NoDelay = true;
 
             if (client.Client.ReceiveBufferSize < 0xFFFF)
@@ -159,7 +160,7 @@ namespace Atlasd.Battlenet
             if (!Client.Connected || ClientStream == null || !(ClientStream.CanRead && ClientStream.CanWrite))
                 throw new ClientException(this, "TCP connection lost");
 
-            Send(System.Text.Encoding.ASCII.GetBytes("The chat gateway is currently unsupported on Atlasd.\r\n"));
+            Send(System.Text.Encoding.UTF8.GetBytes("The chat gateway is currently unsupported on Atlasd.\r\n"));
             throw new ProtocolNotSupportedException(ProtocolType, this, "Unsupported protocol type [0x" + ((byte)ProtocolType).ToString("X2") + "]");
         }
 
@@ -171,7 +172,7 @@ namespace Atlasd.Battlenet
             byte[] newBuffer;
 
             // Block for socket data transmission:
-            byte[] data = new byte[0xFFFF];
+            byte[] data = new byte[1024]; // should be at or below socket interface mtu for best performance
             int size = ClientStream.Read(data);
 
             // Retest for connection after being blocked:
@@ -270,9 +271,13 @@ namespace Atlasd.Battlenet
                     {
                         Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection lost!" + (ex.Message.Length > 0 ? " " + ex.Message : ""));
                     }
+                    catch (IOException ex)
+                    {
+                        Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection lost!" + (ex.Message.Length > 0 ? " " + ex.Message : ""));
+                    }
                     catch (Exception ex)
                     {
-                        Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, ex.GetType().Name + " error encountered!" + (ex.Message.Length > 0 ? " " + ex.Message : ""));
+                        Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Client, RemoteEndPoint, ex.GetType().Name + " error encountered!" + (ex.Message.Length > 0 ? " " + ex.Message : ""));
                     }
                     finally
                     {
