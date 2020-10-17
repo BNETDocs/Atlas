@@ -38,7 +38,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_LOGONRESPONSE2 (" + (4 + Buffer.Length) + " bytes)");
 
                         if (Buffer.Length < 29)
-                            throw new ProtocolViolationException(context.Client.ProtocolType, "SID_LOGONRESPONSE2 buffer must be at least 29 bytes");
+                            throw new GameProtocolViolationException(context.Client, "SID_LOGONRESPONSE2 buffer must be at least 29 bytes");
 
                         /**
                          * (UINT32)     Client Token
@@ -85,6 +85,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             context.Client.GameState.ActiveAccount.Set(Account.LastLogonKey, DateTime.Now);
                             context.Client.GameState.ActiveAccount.Set(Account.PortKey, context.Client.RemoteEndPoint.ToString().Split(":")[1]);
 
+                            lock (Battlenet.Common.ActiveAccounts) Battlenet.Common.ActiveAccounts.Add(context.Client.GameState.Username, account);
+
                             status = Statuses.Success;
                         }
 
@@ -116,7 +118,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_LOGONRESPONSE2 (" + (4 + Buffer.Length) + " bytes)");
-                        context.Client.Client.Client.Send(ToByteArray());
+                        context.Client.Send(ToByteArray());
                         return true;
                     }
             }

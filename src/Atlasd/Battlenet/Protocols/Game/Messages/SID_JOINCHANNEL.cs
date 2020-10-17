@@ -30,12 +30,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
         public override bool Invoke(MessageContext context)
         {
             if (context.Direction == MessageDirection.ServerToClient)
-                throw new ProtocolViolationException(ProtocolType.Game, "Server isn't allowed to send SID_JOINCHANNEL");
+                throw new GameProtocolViolationException(context.Client, "Server isn't allowed to send SID_JOINCHANNEL");
 
             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_JOINCHANNEL (" + (4 + Buffer.Length) + " bytes)");
 
             if (Buffer.Length < 5)
-                throw new ProtocolViolationException(context.Client.ProtocolType, "SID_JOINCHANNEL buffer must be at least 5 bytes");
+                throw new GameProtocolViolationException(context.Client, "SID_JOINCHANNEL buffer must be at least 5 bytes");
 
             /**
               * (UINT32) Flags
@@ -51,14 +51,17 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             r.Close();
             m.Close();
 
-            if (channelName.Length < 1) throw new ProtocolViolationException(context.Client.ProtocolType, "Channel name must be greater than zero");
+            if (channelName.Length < 1) throw new GameProtocolViolationException(context.Client, "Channel name must be greater than zero");
 
             if (channelName.Length > 31) channelName = channelName.Substring(0, 31);
 
             foreach (var c in channelName)
             {
-                if ((uint)c < 31) throw new ProtocolViolationException(context.Client.ProtocolType, "Channel name must not have ASCII control characters");
+                if ((uint)c < 31) throw new GameProtocolViolationException(context.Client, "Channel name must not have ASCII control characters");
             }
+
+            var firstJoin = flags == Flags.First || flags == Flags.First_D2;
+            if (firstJoin) channelName = Product.ProductChannelName(context.Client.GameState.Product) + " " + context.Client.GameState.Locale.CountryNameAbbreviated + "-1";
 
             var userFlags = (Account.Flags)context.Client.GameState.ActiveAccount.Get(Account.FlagsKey);
             var ignoreLimits = userFlags.HasFlag(Account.Flags.Employee);
@@ -71,21 +74,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 return true;
             }
 
-            if (channel == null) channel = new Channel(channelName, 0);
-            channel.AcceptUser(context.Client.GameState, ignoreLimits);
+            if (channel == null) channel = new Channel(channelName, firstJoin ? Channel.Flags.Public | Channel.Flags.ProductSpecific : Channel.Flags.None);
+            channel.AcceptUser(context.Client.GameState, ignoreLimits, true);
 
-            if (flags == Flags.First || flags == Flags.First_D2)
-            {
-                var strGame = Product.ProductName(context.Client.GameState.Product, true);
-                var numGameOnline = Battlenet.Common.ActiveAccounts.Count;
-                var numGameAdvertisements = 0;
-                var numTotalOnline = Battlenet.Common.ActiveAccounts.Count;
-                var numTotalAdvertisements = 0;
-
-                Channel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, "Welcome to Battle.net!"), context.Client);
-                Channel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, "This server is hosted by BNETDocs."), context.Client);
-                Channel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, string.Format("There are currently {0:D} users playing {1:D} games of {2}, and {3:D} users playing {4:D} games on Battle.net.", numGameOnline, numGameAdvertisements, strGame, numTotalOnline, numTotalAdvertisements)), context.Client);
-            }
+            if (firstJoin) Channel.WriteServerStats(context.Client);
 
             return true;
         }

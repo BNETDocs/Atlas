@@ -4,7 +4,7 @@ using System.Net;
 
 namespace Atlasd.Battlenet.Protocols.Game
 {
-    class GameState
+    class GameState : IDisposable
     {
         public enum LogonTypes : UInt32
         {
@@ -38,6 +38,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public bool SpawnKey;
         public byte[] Statstring;
         public Int32 TimezoneBias;
+        public bool UDPSupported;
         public UInt32 UDPToken;
         public string Username;
 
@@ -70,11 +71,12 @@ namespace Atlasd.Battlenet.Protocols.Game
             SpawnKey = false;
             Statstring = new byte[4];
             TimezoneBias = 0;
+            UDPSupported = false;
             UDPToken = (uint)r.Next(0, 0x7FFFFFFF);
             Username = null;
         }
 
-        public void Dispose()
+        public void Dispose() /* part of IDisposable */
         {
             if (ActiveAccount != null)
             {

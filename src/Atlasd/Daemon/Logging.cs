@@ -68,12 +68,9 @@ namespace Atlasd.Daemon
         {
             if (level > CurrentLogLevel) return;
 
-            lock (Console.Out) {
-                Console.Out.Write("[" + LogLevelToString(level) + "] ");
-                Console.Out.Write("[" + LogTypeToString(type).Replace("_", "] [") + "] ");
-                if (endp is EndPoint) Console.Out.Write("[" + endp.ToString() + "] ");
-                Console.Out.WriteLine(buffer);
-            }
+            string buf = string.Format("[{0}] [{1}] {2}", LogLevelToString(level), LogTypeToString(type).Replace("_", "] ["), (endp != null ? "[" + endp.ToString() + "] " : "") + buffer);
+
+            lock (Console.Out) Console.Out.WriteLine(buf);
         }
     }
 }

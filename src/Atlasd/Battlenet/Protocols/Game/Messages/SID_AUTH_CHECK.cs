@@ -28,7 +28,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_AUTH_CHECK (" + (4 + Buffer.Length) + " bytes)");
 
                         if (Buffer.Length < 22)
-                            throw new Exceptions.ProtocolViolationException(context.Client.ProtocolType, "SID_AUTH_CHECK must be at least 22 bytes");
+                            throw new Exceptions.GameProtocolViolationException(context.Client, "SID_AUTH_CHECK must be at least 22 bytes");
                         /**
                          * (UINT32) Client Token
                          * (UINT32) EXE Version
@@ -67,7 +67,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             var hashedKeyData = r.ReadBytes(20);
 
                             if (unknownValue != 0)
-                                throw new Exceptions.ProtocolViolationException(ProtocolType.Game, "Invalid game key unknown value");
+                                throw new Exceptions.GameProtocolViolationException(context.Client, "Invalid game key unknown value");
 
                             var gameKey = new GameKey(keyLength, productValue, publicValue, hashedKeyData);
                             context.Client.GameState.GameKeys.Append(gameKey);
@@ -100,7 +100,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_AUTH_CHECK (" + (4 + Buffer.Length) + " bytes)");
-                        context.Client.Client.Client.Send(ToByteArray());
+                        context.Client.Send(ToByteArray());
                         return true;
                     }
             }

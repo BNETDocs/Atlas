@@ -3,7 +3,6 @@ using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Atlasd.Battlenet
@@ -46,7 +45,7 @@ namespace Atlasd.Battlenet
             Users = new List<GameState>();
         }
 
-        public void AcceptUser(GameState user, bool ignoreLimits = false, bool noCreate = false)
+        public void AcceptUser(GameState user, bool ignoreLimits = false, bool extendedErrors = false)
         {
             if (!ignoreLimits)
             {
@@ -56,7 +55,7 @@ namespace Atlasd.Battlenet
                 {
                     Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Channel, string.Format("[{0}] Rejecting user [{1}] for reason [{2}]", Name, user.OnlineName, "full"));
 
-                    if (noCreate)
+                    if (extendedErrors)
                         WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_CHANNELFULL, ActiveFlags, 0, "", Name), user.Client);
                     else
                         WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, "That channel is full."), user.Client);
@@ -70,7 +69,7 @@ namespace Atlasd.Battlenet
                     {
                         Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Channel, string.Format("[{0}] Rejecting user [{1}] for reason [{2}]", Name, user.OnlineName, "banned"));
 
-                        if (noCreate)
+                        if (extendedErrors)
                             WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_CHANNELRESTRICTED, ActiveFlags, 0, "", Name), user.Client);
                         else
                             WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, "You are banned from that channel."));
@@ -83,7 +82,7 @@ namespace Atlasd.Battlenet
                 {
                     Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Channel, string.Format("[{0}] Rejecting user [{1}] for reason [{2}]", Name, user.OnlineName, "restricted"));
 
-                    if (noCreate)
+                    if (extendedErrors)
                         WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_CHANNELRESTRICTED, ActiveFlags, 0, "", Name), user.Client);
                     else
                         WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, "That channel is restricted."), user.Client);
@@ -112,11 +111,11 @@ namespace Atlasd.Battlenet
                         foreach (var subuser in Users)
                         {
                             // Tell this user about everyone in the channel:
-                            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, subuser.ChannelFlags, subuser.Ping, subuser.OnlineName, Product.ProductToStatstring(subuser.Product)), user.Client, subuser.Client);
+                            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, subuser.ChannelFlags, subuser.Ping, subuser.OnlineName, Product.ProductToStatstring(subuser.Product)), user.Client);
 
                             // Tell everyone else about this user entering the channel:
                             if (subuser != user)
-                                WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, user.ChannelFlags, user.Ping, user.OnlineName, Product.ProductToStatstring(user.Product)), subuser.Client, user.Client);
+                                WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, user.ChannelFlags, user.Ping, user.OnlineName, Product.ProductToStatstring(user.Product)), subuser.Client);
                         }
                     }
                 }
@@ -130,7 +129,10 @@ namespace Atlasd.Battlenet
             foreach (var line in topic)
                 WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line), user.Client);
 
-            if (Name.ToLower() == "op " + user.OnlineName.ToLower())
+            object autoOp = false;
+            lock (Common.Settings) Common.Settings.TryGetValue("channel.autoop", out autoOp);
+
+            if (((bool)autoOp == true && Count == 1 && IsPrivate()) || Name.ToLower() == "op " + user.OnlineName.ToLower())
                 UpdateUser(user, user.ChannelFlags | Account.Flags.ChannelOp);
         }
 
@@ -187,14 +189,11 @@ namespace Atlasd.Battlenet
                 foreach (var subuser in Users)
                 {
                     // Tell everyone else about this user leaving the channel:
-                    WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERLEAVE, user.ChannelFlags, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring)), subuser.Client, user.Client);
+                    WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERLEAVE, user.ChannelFlags, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring)), subuser.Client);
                 }
             }
 
-            lock (user)
-            {
-                user.ChannelFlags &= ~Account.Flags.ChannelOp;
-            }
+            lock (user) user.ChannelFlags &= ~Account.Flags.ChannelOp;
 
             if (Count == 0 && !ActiveFlags.HasFlag(Flags.Public)) Dispose();
         }
@@ -327,6 +326,8 @@ namespace Atlasd.Battlenet
 
         public static void WriteChatEvent(ChatEvent chatEvent, ClientState receiver)
         {
+            // suspect bug in this function, combine these two?
+
             var args = new Dictionary<string, object> { { "chatEvent", chatEvent } };
             var msg = new SID_CHATEVENT();
 
@@ -355,11 +356,7 @@ namespace Atlasd.Battlenet
 
         public void WriteChatEvent(ChatEvent chatEvent, ClientState receiver = null, ClientState sender = null)
         {
-            if (receiver == sender && chatEvent.EventId == ChatEvent.EventIds.EID_TALK)
-            {
-                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Channel, "[" + Name + "] Dropping EID_TALK from being echoed to sender");
-                return;
-            }
+            // suspect bug in this function, combine these two?
 
             var args = new Dictionary<string, object> {{ "chatEvent", chatEvent }};
             var msg = new SID_CHATEVENT();
@@ -368,6 +365,12 @@ namespace Atlasd.Battlenet
             {
                 foreach (var user in Users)
                 {
+                    if (receiver != null && receiver.GameState != null && user == receiver.GameState && chatEvent.EventId == ChatEvent.EventIds.EID_TALK)
+                    {
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Channel, "[" + Name + "] Dropping EID_TALK from being echoed to sender");
+                        return;
+                    }
+
                     msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
 
                     switch (user.Client.ProtocolType)
@@ -391,6 +394,29 @@ namespace Atlasd.Battlenet
                     }
                 }
             }
+        }
+
+        public static void WriteServerStats(ClientState receiver)
+        {
+            if (receiver == null || receiver.GameState == null || receiver.GameState.ActiveChannel == null)
+                return;
+
+            var channel = receiver.GameState.ActiveChannel;
+
+            var strGame = Product.ProductName(receiver.GameState.Product, true);
+            var numGameOnline = Common.GetActiveClientCountByProduct(receiver.GameState.Product);
+            var numGameAdvertisements = 0;
+            var numTotalOnline = Common.ActiveClients.Count;
+            var numTotalAdvertisements = 0;
+
+            var chatEvents = new List<ChatEvent>(){
+                { new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, "Welcome to Battle.net!") },
+                { new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, "This server is hosted by BNETDocs.") },
+                { new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, string.Format("There are currently {0:D} users playing {1:D} games of {2}, and {3:D} users playing {4:D} games on Battle.net.", numGameOnline, numGameAdvertisements, strGame, numTotalOnline, numTotalAdvertisements)) },
+            };
+
+            foreach (var chatEvent in chatEvents)
+                Channel.WriteChatEvent(chatEvent, receiver);
         }
     }
 }

@@ -38,10 +38,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          */
 
                         if (Buffer.Length < 12)
-                            throw new ProtocolViolationException(context.Client.ProtocolType, "SID_READUSERDATA buffer must be at least 12 bytes");
+                            throw new GameProtocolViolationException(context.Client, "SID_READUSERDATA buffer must be at least 12 bytes");
 
                         if (context.Client.GameState == null || context.Client.GameState.ActiveAccount == null)
-                            throw new ProtocolViolationException(context.Client.ProtocolType, "SID_READUSERDATA cannot be processed without an active login");
+                            throw new GameProtocolViolationException(context.Client, "SID_READUSERDATA cannot be processed without an active login");
 
                         var m = new MemoryStream(Buffer);
                         var r = new BinaryReader(m);
@@ -61,6 +61,9 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         r.Close();
                         m.Close();
+
+                        if (numKeys > 31)
+                            throw new GameProtocolViolationException(context.Client, "SID_READUSERDATA must request no more than 31 keys");
 
                         return new SID_READUSERDATA().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {
                             { "requestId", requestId },
@@ -97,7 +100,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_READUSERDATA (" + (4 + Buffer.Length) + " bytes)");
-                        context.Client.Client.Client.Send(ToByteArray());
+                        context.Client.Send(ToByteArray());
                         return true;
                     }
             }

@@ -30,7 +30,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_GETCHANNELLIST (" + (4 + Buffer.Length) + " bytes)");
 
                         if (Buffer.Length != 4)
-                            throw new ProtocolViolationException(context.Client.ProtocolType, "SID_GETCHANNELLIST buffer must be 4 bytes");
+                            throw new GameProtocolViolationException(context.Client, "SID_GETCHANNELLIST buffer must be 4 bytes");
 
                         /**
                          * (UINT32) Product Id
@@ -74,7 +74,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_GETCHANNELLIST (" + (4 + Buffer.Length) + " bytes)");
-                        context.Client.Client.Client.Send(ToByteArray());
+                        context.Client.Send(ToByteArray());
                         return true;
                     }
             }

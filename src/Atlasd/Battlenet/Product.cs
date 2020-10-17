@@ -70,6 +70,27 @@ namespace Atlasd.Battlenet
             };
         }
 
+        public static string ProductChannelName(ProductCode code)
+        {
+            return code switch
+            {
+                ProductCode.Chat => "Public Chat",
+                ProductCode.DiabloII => "Diablo II",
+                ProductCode.DiabloIILordOfDestruction => "Lord of Destruction",
+                ProductCode.DiabloRetail => "Diablo",
+                ProductCode.DiabloShareware => "Diablo Shareware",
+                ProductCode.StarcraftBroodwar => "Brood War",
+                ProductCode.StarcraftJapanese => "StarCraft",
+                ProductCode.StarcraftOriginal => "StarCraft",
+                ProductCode.StarcraftShareware => "StarCraft Shareware",
+                ProductCode.WarcraftII => "WarCraft II",
+                ProductCode.WarcraftIIIDemo => "WarCraft III",
+                ProductCode.WarcraftIIIFrozenThrone => "Frozen Throne",
+                ProductCode.WarcraftIIIReignOfChaos => "WarCraft III",
+                _ => "Unknown",
+            };
+        }
+
         public static string ProductToStatstring(ProductCode product)
         {
             var buf = new byte[4];

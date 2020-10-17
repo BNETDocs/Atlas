@@ -29,7 +29,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_AUTH_INFO (" + (4 + Buffer.Length) + " bytes)");
 
                         if (Buffer.Length < 38)
-                            throw new Exceptions.ProtocolViolationException(context.Client.ProtocolType, "SID_AUTH_INFO must be at least 38 bytes");
+                            throw new Exceptions.GameProtocolViolationException(context.Client, "SID_AUTH_INFO must be at least 38 bytes");
                         /**
                          * (UINT32) Protocol ID
                          * (UINT32) Platform code
@@ -105,7 +105,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_AUTH_INFO (" + (4 + Buffer.Length) + " bytes)");
-                        context.Client.Client.Client.Send(ToByteArray());
+                        context.Client.Send(ToByteArray());
                         return true;
                     }
             }

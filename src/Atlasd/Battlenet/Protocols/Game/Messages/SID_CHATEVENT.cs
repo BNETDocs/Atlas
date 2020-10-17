@@ -1,7 +1,5 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
-using System;
-using System.IO;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -22,7 +20,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
         public override bool Invoke(MessageContext context)
         {
             if (context.Direction == MessageDirection.ClientToServer)
-                throw new ProtocolViolationException(ProtocolType.Game, "Client is not allowed to send SID_CHATEVENT");
+                throw new GameProtocolViolationException(context.Client, "Client is not allowed to send SID_CHATEVENT");
 
             Buffer = ((ChatEvent)context.Arguments["chatEvent"]).ToByteArray();
 

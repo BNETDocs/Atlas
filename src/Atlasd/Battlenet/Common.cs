@@ -16,6 +16,7 @@ namespace Atlasd.Battlenet
         public static IPAddress DefaultInterface { get; private set; }
         public static int DefaultPort { get; private set; }
         public static TcpListener Listener;
+        public static Dictionary<string, object> Settings { get; private set; }
 
         public static void Initialize()
         {
@@ -23,9 +24,14 @@ namespace Atlasd.Battlenet
             ActiveAccounts = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClients = new List<ClientState>();
+            Settings = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+
+            Settings.Add("channel.autoOp", true);
 
             new Channel("The Void", Channel.Flags.Public | Channel.Flags.Silent, -1);
             new Channel("Backstage", Channel.Flags.Public | Channel.Flags.Restricted, -1, "Abandon hope, all ye who enter here...");
+            new Channel("Open Tech Support", Channel.Flags.Public | Channel.Flags.TechSupport, -1);
+            new Channel("Blizzard Tech Support", Channel.Flags.Public | Channel.Flags.TechSupport | Channel.Flags.Moderated, -1);
             new Channel("Town Square", Channel.Flags.Public, 200, "Welcome and enjoy your stay!");
 
             DefaultInterface = IPAddress.Any;
@@ -37,6 +43,22 @@ namespace Atlasd.Battlenet
             Listener.Server.NoDelay = true;
             Listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true); // SO_KEEPALIVE
             Listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
+        }
+        
+        public static uint GetActiveClientCountByProduct(Product.ProductCode productCode)
+        {
+            var count = (uint)0;
+
+            lock (ActiveClients)
+            {
+                foreach (var client in ActiveClients)
+                {
+                    if (client == null || client.GameState == null || client.GameState.Product == Product.ProductCode.None) continue;
+                    if (client.GameState.Product == productCode) count++;
+                }
+            }
+
+            return count;
         }
 
         public static string ProtocolTypeName(ProtocolType protocolType)

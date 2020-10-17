@@ -30,10 +30,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_FRIENDSLIST (" + (4 + Buffer.Length) + " bytes)");
 
                         if (Buffer.Length != 0)
-                            throw new ProtocolViolationException(context.Client.ProtocolType, "SID_FRIENDSLIST buffer must be 0 bytes");
+                            throw new GameProtocolViolationException(context.Client, "SID_FRIENDSLIST buffer must be 0 bytes");
 
                         if (context.Client.GameState == null || context.Client.GameState.ActiveAccount == null)
-                            throw new ProtocolViolationException(context.Client.ProtocolType, "SID_FRIENDSLIST cannot be processed without an active login");
+                            throw new GameProtocolViolationException(context.Client, "SID_FRIENDSLIST cannot be processed without an active login");
 
                         return new SID_FRIENDSLIST().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
                     }
@@ -71,7 +71,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_FRIENDSLIST (" + (4 + Buffer.Length) + " bytes)");
-                        context.Client.Client.Client.Send(ToByteArray());
+                        context.Client.Send(ToByteArray());
                         return true;
                     }
             }

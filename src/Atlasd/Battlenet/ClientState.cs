@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace Atlasd.Battlenet
 {
-    class ClientState
+    class ClientState : IDisposable
     {
         public TcpClient Client { get; private set; }
         public NetworkStream ClientStream { get; private set; }
@@ -27,7 +27,7 @@ namespace Atlasd.Battlenet
             ThreadMain();
         }
 
-        public void Dispose()
+        public void Dispose() /* part of IDisposable */
         {
             Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection forcefully closed by server");
             if (Client != null) Client.Close();
@@ -38,28 +38,28 @@ namespace Atlasd.Battlenet
             {
                 lock (ClientStream)
                 {
-                    if (ClientStream != null)
-                    {
-                        ClientStream.Dispose();
-                        ClientStream = null;
-                    }
-                }
-
-                lock (GameState)
-                {
-                    if (GameState != null)
-                    {
-                        GameState.Dispose();
-                        GameState = null;
-                    }
+                    ClientStream.Dispose();
+                    ClientStream = null;
                 }
             }
             catch (ArgumentNullException) { }
+            catch (NullReferenceException) { }
+
+            try
+            {
+                lock (GameState)
+                {
+                    GameState.Dispose();
+                    GameState = null;
+                }
+            }
+            catch (ArgumentNullException) { }
+            catch (NullReferenceException) { }
         }
 
         protected void Initialize(TcpClient client)
         {
-            Common.ActiveClients.Add(this);
+            lock (Common.ActiveClients) Common.ActiveClients.Add(this);
 
             Client = client;
             ClientStream = client.GetStream();
@@ -98,7 +98,7 @@ namespace Atlasd.Battlenet
                     if (!BattlenetGameFrame.Messages.Dequeue().Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer))) return false;
                 }
             }
-            catch (ProtocolViolationException ex)
+            catch (GameProtocolViolationException ex)
             {
                 var log_type = (ProtocolType) switch
                 {
@@ -117,105 +117,106 @@ namespace Atlasd.Battlenet
             return true;
         }
 
-        public bool Receive()
+        public void Receive()
+        {
+            if (ProtocolType == ProtocolType.None) ReceiveProtocolType();
+            ReceiveProtocol();
+        }
+
+        protected void ReceiveProtocolType()
         {
             if (!Client.Connected || ClientStream == null || !ClientStream.CanRead)
-            {
-                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection lost");
-                return false;
-            }
+                throw new ClientException(this, "TCP connection lost");
 
-            if (ProtocolType == ProtocolType.None)
-            {
-                byte[] data = new byte[1];
-                int size = ClientStream.Read(data);
-                if (size == 0) return false;
+            if (ProtocolType != ProtocolType.None) return;
 
-                ProtocolType = (ProtocolType)data[0];
+            byte[] data = new byte[1];
+            int size = ClientStream.Read(data); // Block until 1 byte is received
+            if (size == 0) throw new ClientException(this, "TCP connection lost");
 
-                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, "Set protocol [" + Common.ProtocolTypeName(ProtocolType) + "]");
-            }
+            ProtocolType = (ProtocolType)data[0];
 
-            if (!Client.Connected)
-            {
-                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection lost");
-                return false;
-            }
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, string.Format("Set protocol type [0x{0:X2}] ({1})", (byte)ProtocolType, Common.ProtocolTypeName(ProtocolType)));
+        }
 
+        protected void ReceiveProtocol()
+        {
             switch (ProtocolType)
             {
                 case ProtocolType.Game:
-                    {
-                        byte[] newBuffer;
-
-                        while (ClientStream.DataAvailable)
-                        {
-                            byte[] data = new byte[0xFFFF];
-                            int size = ClientStream.Read(data);
-
-                            // Append received data to previously received data
-                            if (size > 0)
-                            {
-                                newBuffer = new byte[ReceiveBuffer.Length + size];
-                                Buffer.BlockCopy(ReceiveBuffer, 0, newBuffer, 0, ReceiveBuffer.Length);
-                                Buffer.BlockCopy(data, 0, newBuffer, ReceiveBuffer.Length, size);
-                                ReceiveBuffer = newBuffer;
-                            }
-                        }
-
-                        if (!Client.Connected)
-                        {
-                            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection lost");
-                            return false;
-                        }
-
-                        while (ReceiveBuffer.Length > 0) {
-                            if (ReceiveBuffer.Length < 4) return true; // Partial message header
-
-                            UInt16 messageLen = (UInt16)((ReceiveBuffer[3] << 8) + ReceiveBuffer[2]);
-
-                            if (ReceiveBuffer.Length < messageLen) return true; // Partial message
-
-                            //byte messagePad = ReceiveBuffer[0];
-                            byte messageId = ReceiveBuffer[1];
-                            byte[] messageBuffer = new byte[messageLen - 4];
-                            Buffer.BlockCopy(ReceiveBuffer, 4, messageBuffer, 0, messageLen - 4);
-
-                            // Pop message off the receive buffer
-                            newBuffer = new byte[ReceiveBuffer.Length - messageLen];
-                            Buffer.BlockCopy(ReceiveBuffer, messageLen, newBuffer, 0, ReceiveBuffer.Length - messageLen);
-                            ReceiveBuffer = newBuffer;
-                            
-                            // Push message onto stack
-                            Message message = Message.FromByteArray(messageId, messageBuffer);
-
-                            if (message is Message)
-                            {
-                                BattlenetGameFrame.Messages.Enqueue(message);
-                                continue;
-                            } else
-                            {
-                                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, RemoteEndPoint, "Received unknown SID_0x" + messageId.ToString("X2") + " (" + messageLen.ToString() + " bytes)");
-                                return false;
-                            }
-                        }
-
-                        return true;
-                    }
+                    ReceiveProtocolGame(); break;
                 case ProtocolType.Chat:
                 case ProtocolType.Chat_Alt1:
                 case ProtocolType.Chat_Alt2:
-                    {
-                        Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Chat, RemoteEndPoint, "Unsupported protocol [0x" + ((byte)ProtocolType).ToString("X2") + "]");
-                        string message = "The chat gateway is currently unsupported on Atlasd.\r\n";
-                        Client.Client.Send(System.Text.Encoding.ASCII.GetBytes(message));
-                        return false;
-                    }
+                    ReceiveProtocolChat(); break;
                 default:
-                    {
-                        Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "Unsupported protocol [0x" + ((byte)ProtocolType).ToString("X2") + "]");
-                        return false;
-                    }
+                    throw new ProtocolNotSupportedException(ProtocolType, this, string.Format("Unsupported protocol type [0x{0:X2}]", (byte)ProtocolType));
+            }
+        }
+
+        protected void ReceiveProtocolChat()
+        {
+            if (!Client.Connected || ClientStream == null || !(ClientStream.CanRead && ClientStream.CanWrite))
+                throw new ClientException(this, "TCP connection lost");
+
+            Send(System.Text.Encoding.ASCII.GetBytes("The chat gateway is currently unsupported on Atlasd.\r\n"));
+            throw new ProtocolNotSupportedException(ProtocolType, this, "Unsupported protocol type [0x" + ((byte)ProtocolType).ToString("X2") + "]");
+        }
+
+        protected void ReceiveProtocolGame()
+        {
+            if (!Client.Connected || ClientStream == null || !(ClientStream.CanRead && ClientStream.CanWrite))
+                throw new ClientException(this, "TCP connection lost");
+
+            byte[] newBuffer;
+
+            // Block for socket data transmission:
+            byte[] data = new byte[0xFFFF];
+            int size = ClientStream.Read(data);
+
+            // Retest for connection after being blocked:
+            if (!Client.Connected || ClientStream == null || !(ClientStream.CanRead && ClientStream.CanWrite))
+                throw new ClientException(this, "TCP connection lost");
+
+            // Append received data to previously received data
+            if (size > 0)
+            {
+                newBuffer = new byte[ReceiveBuffer.Length + size];
+                Buffer.BlockCopy(ReceiveBuffer, 0, newBuffer, 0, ReceiveBuffer.Length);
+                Buffer.BlockCopy(data, 0, newBuffer, ReceiveBuffer.Length, size);
+                ReceiveBuffer = newBuffer;
+            }
+
+            while (ReceiveBuffer.Length > 0)
+            {
+                if (ReceiveBuffer.Length < 4) return; // Partial message header
+
+                UInt16 messageLen = (UInt16)((ReceiveBuffer[3] << 8) + ReceiveBuffer[2]);
+
+                if (ReceiveBuffer.Length < messageLen) return; // Partial message
+
+                //byte messagePad = ReceiveBuffer[0];
+                byte messageId = ReceiveBuffer[1];
+                byte[] messageBuffer = new byte[messageLen - 4];
+                Buffer.BlockCopy(ReceiveBuffer, 4, messageBuffer, 0, messageLen - 4);
+
+                // Pop message off the receive buffer
+                newBuffer = new byte[ReceiveBuffer.Length - messageLen];
+                Buffer.BlockCopy(ReceiveBuffer, messageLen, newBuffer, 0, ReceiveBuffer.Length - messageLen);
+                ReceiveBuffer = newBuffer;
+
+                // Push message onto stack
+                Message message = Message.FromByteArray(messageId, messageBuffer);
+
+                if (message is Message)
+                {
+                    BattlenetGameFrame.Messages.Enqueue(message);
+                    continue;
+                }
+                else
+                {
+                    throw new GameProtocolException(this, "Received unknown SID_0x" + messageId.ToString("X2") + " (" + messageLen.ToString() + " bytes)");
+                }
             }
         }
 
@@ -251,12 +252,19 @@ namespace Atlasd.Battlenet
                 while (true) // Infinitely loop childSocketThread ...
                 {
                     var bCloseConnection = true;
+
                     try
                     {
-                        if (!Receive()) break; // ... unless Receive() or
-                        if (!Invoke()) break; // ... Invoke() return false
+                        Receive();
+
+                        if (!Invoke()) break;
+                        
                         bCloseConnection = false;
                         continue;
+                    }
+                    catch (ClientException ex)
+                    {
+                        Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, ex.Message.Length > 0 ? ex.Message : null);
                     }
                     catch (SocketException ex)
                     {
@@ -270,6 +278,7 @@ namespace Atlasd.Battlenet
                     {
                         if (bCloseConnection) Dispose();
                     }
+
                     break;
                 }
             }).Start();

@@ -22,7 +22,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_NULL (" + (4 + Buffer.Length) + " bytes)");
 
             if (Buffer.Length != 0)
-                throw new ProtocolViolationException(context.Client.ProtocolType, "SID_NULL buffer must be 0 bytes");
+                throw new GameProtocolViolationException(context.Client, "SID_NULL buffer must be 0 bytes");
 
             return true;
         }

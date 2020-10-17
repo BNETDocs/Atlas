@@ -43,10 +43,10 @@ namespace Atlasd.Battlenet.Protocols.Game
         public GameKey(UInt32 keyLength, UInt32 productValue, UInt32 publicValue, byte[] hashedKeyData)
         {
             if (!(keyLength == 13 || keyLength == 16 || keyLength == 26))
-                throw new ProtocolViolationException(ProtocolType.Game, "Invalid game key length");
+                throw new GameProtocolViolationException(null, "Invalid game key length");
 
             if (!IsValidProductValue((ProductValues)productValue))
-                throw new ProtocolViolationException(ProtocolType.Game, "Invalid game key product value");
+                throw new GameProtocolViolationException(null, "Invalid game key product value");
 
             SetProductValue(productValue);
             SetPublicValue(publicValue);
@@ -95,7 +95,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public void SetPrivateValue(byte[] privateValue)
         {
             if (!(privateValue.Length == 4 || privateValue.Length == 20))
-                throw new ProtocolViolationException(ProtocolType.Game, "Invalid game key private value");
+                throw new GameProtocolViolationException(null, "Invalid game key private value");
 
             PrivateValue = privateValue;
         }

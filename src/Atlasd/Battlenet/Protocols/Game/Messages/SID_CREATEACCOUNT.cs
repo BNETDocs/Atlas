@@ -6,31 +6,23 @@ using System.IO;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
-    class SID_CREATEACCOUNT2 : Message
+    class SID_CREATEACCOUNT : Message
     {
         protected enum Statuses : UInt32
         {
-            None = 0x7fffffff,
-            AccountCreated = 0,
-            UsernameTooShort = 1,
-            UsernameInvalidChars = 2,
-            UsernameBannedWord = 3,
-            AccountExists = 4,
-            LastCreateInProgress = 5,
-            UsernameShortAlphanumeric = 6,
-            UsernameAdjacentPunctuation = 7,
-            UsernameTooManyPunctuation = 8,
+            Failure = 0,
+            Success = 1,
         };
 
-        public SID_CREATEACCOUNT2()
+        public SID_CREATEACCOUNT()
         {
-            Id = (byte)MessageIds.SID_CREATEACCOUNT2;
+            Id = (byte)MessageIds.SID_CREATEACCOUNT;
             Buffer = new byte[0];
         }
 
-        public SID_CREATEACCOUNT2(byte[] buffer)
+        public SID_CREATEACCOUNT(byte[] buffer)
         {
-            Id = (byte)MessageIds.SID_CREATEACCOUNT2;
+            Id = (byte)MessageIds.SID_CREATEACCOUNT;
             Buffer = buffer;
         }
 
@@ -40,10 +32,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_CREATEACCOUNT2 (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_CREATEACCOUNT (" + (4 + Buffer.Length) + " bytes)");
 
                         if (Buffer.Length < 21)
-                            throw new GameProtocolViolationException(context.Client, "SID_CREATEACCOUNT2 buffer must be at least 21 bytes");
+                            throw new GameProtocolViolationException(context.Client, "SID_CREATEACCOUNT buffer must be at least 21 bytes");
 
                         /**
                          * (UINT32) [5] Password hash
@@ -56,13 +48,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var passwordHash = r.ReadBytes(20);
                         var username = r.ReadString();
 
-                        Statuses status = Statuses.None;
+                        Statuses status = Statuses.Success;
 
-                        if (status == Statuses.None && username.Length < AccountCreationOptions.MinimumUsernameSize)
-                            status = Statuses.UsernameTooShort;
+                        if (status == Statuses.Success && username.Length < AccountCreationOptions.MinimumUsernameSize)
+                            status = Statuses.Failure;
 
-                        if (status == Statuses.None && username.Length > AccountCreationOptions.MaximumUsernameSize)
-                            status = Statuses.UsernameShortAlphanumeric;
+                        if (status == Statuses.Success && username.Length > AccountCreationOptions.MaximumUsernameSize)
+                            status = Statuses.Failure;
 
                         uint total_alphanumeric = 0;
                         uint total_punctuation = 0;
@@ -84,47 +76,45 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                             if (total_punctuation > AccountCreationOptions.MaximumPunctuation)
                             {
-                                status = Statuses.UsernameTooManyPunctuation;
+                                status = Statuses.Failure;
                                 break;
                             }
 
                             if (adjacent_punctuation > AccountCreationOptions.MaximumAdjacentPunctuation)
                             {
-                                status = Statuses.UsernameAdjacentPunctuation;
+                                status = Statuses.Failure;
                                 break;
                             }
 
                             last_c = c;
                         }
 
-                        if (status == Statuses.None && total_alphanumeric < AccountCreationOptions.MinimumAlphanumericSize)
-                            status = Statuses.UsernameShortAlphanumeric;
+                        if (status == Statuses.Success && total_alphanumeric < AccountCreationOptions.MinimumAlphanumericSize)
+                            status = Statuses.Failure;
 
-                        if (status == Statuses.None && Battlenet.Common.AccountsDb.ContainsKey(username))
-                            status = Statuses.AccountExists;
+                        if (status == Statuses.Success && Battlenet.Common.AccountsDb.ContainsKey(username))
+                            status = Statuses.Failure;
 
-                        if (status == Statuses.None)
-                        {
-                            var account = new Account();
+                        status = Statuses.Success;
 
-                            account.Set(Account.UsernameKey, username);
-                            account.Set(Account.PasswordKey, passwordHash);
+                        var account = new Account();
 
-                            account.Set(Account.FlagsKey, Battlenet.Common.AccountsDb.Count == 0 ? (Account.Flags.Employee | Account.Flags.Admin) : (UInt32)0);
+                        account.Set(Account.UsernameKey, username);
+                        account.Set(Account.PasswordKey, passwordHash);
 
-                            account.Set(Account.AccountCreatedKey, (long)DateTime.UtcNow.ToBinary());
-                            account.Set(Account.LastLogoffKey, null);
-                            account.Set(Account.LastLogonKey, null);
-                            account.Set(Account.TimeLoggedKey, (uint)0);
+                        account.Set(Account.FlagsKey, Battlenet.Common.AccountsDb.Count == 0 ? (Account.Flags.Employee | Account.Flags.Admin) : (UInt32)0);
 
-                            lock (Battlenet.Common.AccountsDb) Battlenet.Common.AccountsDb.Add(username, account);
-                            status = Statuses.AccountCreated;
-                        }
+                        account.Set(Account.AccountCreatedKey, (long)DateTime.UtcNow.ToBinary());
+                        account.Set(Account.LastLogoffKey, null);
+                        account.Set(Account.LastLogonKey, null);
+                        account.Set(Account.TimeLoggedKey, (uint)0);
+
+                        lock (Battlenet.Common.AccountsDb) Battlenet.Common.AccountsDb.Add(username, account);
 
                         r.Close();
                         m.Close();
 
-                        return new SID_CREATEACCOUNT2().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {
+                        return new SID_CREATEACCOUNT().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {
                             { "status", status }, { "info", (string)"" }
                         }));
                     }
@@ -148,7 +138,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Close();
                         m.Close();
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_CREATEACCOUNT2 (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_CREATEACCOUNT (" + (4 + Buffer.Length) + " bytes)");
                         context.Client.Send(ToByteArray());
                         return true;
                     }
