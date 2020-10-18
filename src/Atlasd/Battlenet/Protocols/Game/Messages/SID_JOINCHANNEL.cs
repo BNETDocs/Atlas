@@ -62,7 +62,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             }
 
             var firstJoin = flags == Flags.First || flags == Flags.First_D2;
-            if (firstJoin) channelName = Product.ProductChannelName(context.Client.GameState.Product) + " " + context.Client.GameState.Locale.CountryNameAbbreviated + "-1";
+            if (firstJoin) channelName = $"{Product.ProductChannelName(context.Client.GameState.Product)} {context.Client.GameState.Locale.CountryNameAbbreviated}-1";
 
             var userFlags = (Account.Flags)context.Client.GameState.ActiveAccount.Get(Account.FlagsKey);
             var ignoreLimits = userFlags.HasFlag(Account.Flags.Employee);
@@ -93,7 +93,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 if (Product.IsChatRestricted(gameState.Product))
                     new ChatEvent(ChatEvent.EventIds.EID_ERROR, activeUserFlags, activeUserPing, onlineName, Resources.GameProductIsChatRestricted).WriteTo(context.Client);
 
-                var lastLogonTimestamp = lastLogon.ToString("ddd MMM dd hh:mm tt"); // example: "Sat Oct 17  6:11 AM"
+                var lastLogonTimestamp = lastLogon.ToString(Common.HumanDateTimeFormat);
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, activeUserFlags, activeUserPing, onlineName, Resources.LastLogonInfo.Replace("{timestamp}", lastLogonTimestamp)).WriteTo(context.Client);
 
                 var failedLogins = (UInt32)0;
@@ -102,7 +102,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                 if (failedLogins > 0)
                     new ChatEvent(ChatEvent.EventIds.EID_ERROR, activeUserFlags, activeUserPing, onlineName, Resources.FailedLogonAttempts.Replace("{count}", failedLogins.ToString("##,0"))).WriteTo(context.Client);
-
             }
 
             return true;

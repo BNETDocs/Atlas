@@ -39,6 +39,10 @@ namespace Atlasd.Battlenet.Protocols.Game
                 case "help":
                 case "?":
                     return new HelpCommand(args);
+                case "time":
+                    return new TimeCommand(args);
+                case "who":
+                    return new WhoCommand(args);
                 case "whoami":
                     return new WhoAmICommand(args);
                 default:

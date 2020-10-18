@@ -62,6 +62,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         r.Close();
                         m.Close();
 
+                        if (numAccounts > 1)
+                        {
+                            accounts = new List<string>();
+                            keys = new List<string>();
+                        }
+
                         if (numKeys > 31)
                             throw new GameProtocolViolationException(context.Client, "SID_READUSERDATA must request no more than 31 keys");
 

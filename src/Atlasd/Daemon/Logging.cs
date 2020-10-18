@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Runtime.InteropServices;
 
 namespace Atlasd.Daemon
 {
@@ -61,16 +62,14 @@ namespace Atlasd.Daemon
 
         public static void WriteLine(LogLevel level, LogType type, string buffer)
         {
-            WriteLine(level, type, null, buffer);
+            if (level > CurrentLogLevel) return;
+
+            lock (Console.Out) Console.Out.WriteLine($"[{DateTime.Now.ToString(Battlenet.Protocols.Common.HumanDateTimeFormat)}] [{LogLevelToString(level)}] [{LogTypeToString(type).Replace("_", "] [")}] {buffer}");
         }
 
         public static void WriteLine(LogLevel level, LogType type, EndPoint endp, string buffer)
         {
-            if (level > CurrentLogLevel) return;
-
-            string buf = string.Format("[{0}] [{1}] {2}", LogLevelToString(level), LogTypeToString(type).Replace("_", "] ["), (endp != null ? "[" + endp.ToString() + "] " : "") + buffer);
-
-            lock (Console.Out) Console.Out.WriteLine(buf);
+            WriteLine(level, type, $"[{endp}] {buffer}");
         }
     }
 }

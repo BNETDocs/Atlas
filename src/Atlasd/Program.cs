@@ -2,7 +2,6 @@
 using Atlasd.Daemon;
 using System;
 using System.Reflection;
-using System.Threading;
 
 namespace Atlasd
 {
@@ -10,14 +9,17 @@ namespace Atlasd
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(DateTime.Now.ToString("ddd, dd MMM yyyy, h:mm tt")); // Mon, 23 Dec 2019, 4:32 AM
-
-            var version = Assembly.GetEntryAssembly();
-            Console.WriteLine(version.GetName().Name + " v" + version.GetName().Version.ToString());
+            var assembly = Assembly.GetCallingAssembly();
+            Console.WriteLine($"[{DateTime.Now.ToString(Battlenet.Protocols.Common.HumanDateTimeFormat)}] Welcome to {assembly.GetName().Name}!");
+#if DEBUG
+            Console.WriteLine($"[{DateTime.Now.ToString(Battlenet.Protocols.Common.HumanDateTimeFormat)}] Build: {assembly.GetName().Version} (debug)");
+#else
+            Console.WriteLine($"[{DateTime.Now.ToString(Battlenet.Protocols.Common.HumanDateTimeFormat)}] Build: {assembly.GetName().Version} (release)");
+#endif
 
             Common.Initialize();
 
-            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, "Binding socket...");
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, $"Binding TCP listener socket to [{Common.Listener.LocalEndpoint}]");
             Common.Listener.Start();
 
             while (true) // Infinitely loop main thread

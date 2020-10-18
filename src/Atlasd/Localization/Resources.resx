@@ -131,6 +131,10 @@ There are currently {gameUsers} users playing {gameAds} games of {game}, and {to
   <data name="ChannelIsRestricted" xml:space="preserve">
     <value>That channel is restricted.</value>
   </data>
+  <data name="ChannelNotFound" xml:space="preserve">
+    <value>That channel does not exist.
+(If you are trying to search for a user, use the /whois command.)</value>
+  </data>
   <data name="ChatCommandUnavailable" xml:space="preserve">
     <value>That command is not available at the moment.</value>
   </data>
@@ -151,6 +155,14 @@ There are currently {gameUsers} users playing {gameAds} games of {game}, and {to
   </data>
   <data name="NoOneHearsYou" xml:space="preserve">
     <value>No one hears you.</value>
+  </data>
+  <data name="TimeCommand" xml:space="preserve">
+    <value>{realm} time: {realmTime}
+Your local time: {localTime}</value>
+  </data>
+  <data name="WhoCommand" xml:space="preserve">
+    <value>Users in channel {channel}:
+{users}</value>
   </data>
   <data name="YouAreBannedFromThatChannel" xml:space="preserve">
     <value>You are banned from that channel.</value>

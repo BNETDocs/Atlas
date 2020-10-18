@@ -134,16 +134,35 @@ Es sind {gameUsers} benutzer spielen {gameAds} spiele von {game}, und {totalUser
   <data name="ChatCommandUnavailable" xml:space="preserve">
     <value>Dieser Befehl ist im Moment nicht verfügbar.</value>
   </data>
+  <data name="FailedLogonAttempts" xml:space="preserve">
+    <value>Fehlgeschlagene Anmeldeversuche seitdem: {count}</value>
+  </data>
+  <data name="GameProductIsChatRestricted" xml:space="preserve">
+    <value>Das Chatten mit diesem Spiel ist auf die im Kanalmenü aufgeführten Kanäle beschränkt.</value>
+  </data>
   <data name="InvalidChannelName" xml:space="preserve">
     <value>Ungültiger Kanalname.</value>
   </data>
   <data name="InvalidChatCommand" xml:space="preserve">
     <value>Das ist kein gültiger Befehl. Typ /help oder /? für mehr information.</value>
   </data>
+  <data name="LastLogonInfo" xml:space="preserve">
+    <value>Letzte Anmeldung: {timestamp}</value>
+  </data>
   <data name="NoOneHearsYou" xml:space="preserve">
     <value>Niemand hört dich.</value>
   </data>
+  <data name="TimeCommand" xml:space="preserve">
+    <value>{realm} zeit: {realmTime}
+Ihre Ortszeit: {localTime}</value>
+  </data>
   <data name="YouAreBannedFromThatChannel" xml:space="preserve">
     <value>Sie sind von diesem Kanal verboten.</value>
+  </data>
+  <data name="YouAreUsingGameInRealm" xml:space="preserve">
+    <value>Du bist {name}, benutzt {game} auf {realm}.</value>
+  </data>
+  <data name="YouAreUsingGameInTheChannel" xml:space="preserve">
+    <value>Du bist {name}, benutzt {game} im die Kanal {channel}.</value>
   </data>
 </root>

@@ -99,6 +99,16 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to That channel does not exist.
+        ///(If you are trying to search for a user, use the /whois command.).
+        /// </summary>
+        public static string ChannelNotFound {
+            get {
+                return ResourceManager.GetString("ChannelNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to That command is not available at the moment..
         /// </summary>
         public static string ChatCommandUnavailable {
@@ -158,6 +168,26 @@ namespace Atlasd.Localization {
         public static string NoOneHearsYou {
             get {
                 return ResourceManager.GetString("NoOneHearsYou", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {realm} time: {realmTime}
+        ///Your local time: {localTime}.
+        /// </summary>
+        public static string TimeCommand {
+            get {
+                return ResourceManager.GetString("TimeCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Users in channel {channel}:
+        ///{users}.
+        /// </summary>
+        public static string WhoCommand {
+            get {
+                return ResourceManager.GetString("WhoCommand", resourceCulture);
             }
         }
         

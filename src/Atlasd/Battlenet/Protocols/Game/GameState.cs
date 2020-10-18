@@ -22,6 +22,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public List<GameKey> GameKeys;
         public DateTime LastLogon;
         public IPAddress LocalIPAddress;
+        public DateTime LocalTime { get => DateTime.UtcNow.AddMinutes(0 - TimezoneBias); }
         public LocaleInfo Locale;
         public LogonTypes LogonType;
         public DateTime PingDelta;

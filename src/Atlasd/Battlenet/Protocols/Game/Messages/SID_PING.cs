@@ -26,7 +26,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length != 4)
                 throw new GameProtocolViolationException(context.Client, "SID_PING buffer must be 4 bytes");
 
-            if (context.Arguments.ContainsKey("token"))
+            if (context.Arguments != null && context.Arguments.ContainsKey("token"))
             {
                 var m = new MemoryStream(Buffer);
                 var w = new BinaryWriter(m);

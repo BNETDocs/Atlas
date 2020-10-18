@@ -155,6 +155,11 @@ namespace Atlasd.Battlenet
             return Common.ActiveChannels.TryGetValue(name, out Channel channel) ? channel : null;
         }
 
+        public string GetUsersAsString()
+        {
+            return "TODO";
+        }
+
         public bool IsPrivate()
         {
             return !ActiveFlags.HasFlag(Channel.Flags.Public);
@@ -369,8 +374,18 @@ namespace Atlasd.Battlenet
 
         public static void WriteServerStats(ClientState receiver)
         {
+            var chatEvents = GetServerStats(receiver);
+
+            foreach (var chatEvent in chatEvents)
+                chatEvent.WriteTo(receiver);
+        }
+
+        public static List<ChatEvent> GetServerStats(ClientState receiver)
+        {
+            var chatEvents = new List<ChatEvent>();
+
             if (receiver == null || receiver.GameState == null || receiver.GameState.ActiveChannel == null)
-                return;
+                return chatEvents;
 
             var channel = receiver.GameState.ActiveChannel;
 
@@ -391,7 +406,9 @@ namespace Atlasd.Battlenet
             str = str.Replace("{totalGameAds}", numTotalAdvertisements.ToString("#,0"));
 
             foreach (var line in str.Split("\r\n"))
-                new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, line).WriteTo(receiver);
+                chatEvents.Add(new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, line));
+
+            return chatEvents;
         }
     }
 }
