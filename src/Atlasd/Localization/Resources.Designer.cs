@@ -61,6 +61,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to That account is already logged on..
+        /// </summary>
+        public static string AccountIsAlreadyLoggedOn {
+            get {
+                return ResourceManager.GetString("AccountIsAlreadyLoggedOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Welcome to {realm}!
         ///This server is hosted by {host}.
         ///There are currently {gameUsers} users playing {gameAds} games of {game}, and {totalUsers} users playing {totalGameAds} games on {realm}..
@@ -114,6 +123,15 @@ namespace Atlasd.Localization {
         public static string ChatCommandUnavailable {
             get {
                 return ResourceManager.GetString("ChatCommandUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string ErrorCaption {
+            get {
+                return ResourceManager.GetString("ErrorCaption", resourceCulture);
             }
         }
         

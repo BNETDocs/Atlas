@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccountIsAlreadyLoggedOn" xml:space="preserve">
+    <value>That account is already logged on.</value>
+  </data>
   <data name="ChannelFirstJoinGreeting" xml:space="preserve">
     <value>Welcome to {realm}!
 This server is hosted by {host}.
@@ -137,6 +140,9 @@ There are currently {gameUsers} users playing {gameAds} games of {game}, and {to
   </data>
   <data name="ChatCommandUnavailable" xml:space="preserve">
     <value>That command is not available at the moment.</value>
+  </data>
+  <data name="ErrorCaption" xml:space="preserve">
+    <value>Error</value>
   </data>
   <data name="FailedLogonAttempts" xml:space="preserve">
     <value>Failed logon attempts since then: {count}</value>
