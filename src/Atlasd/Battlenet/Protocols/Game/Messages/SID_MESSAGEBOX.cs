@@ -22,7 +22,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
         public override bool Invoke(MessageContext context)
         {
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_MESSAGEBOX (" + (4 + Buffer.Length) + " bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_MESSAGEBOX ({4 + Buffer.Length} bytes)");
 
             if (context.Direction != MessageDirection.ServerToClient)
                 throw new GameProtocolViolationException(context.Client, "SID_MESSAGEBOX must be sent from server to client");
@@ -48,7 +48,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             w.Close();
             m.Close();
 
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_MESSAGEBOX (" + (4 + Buffer.Length) + " bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_MESSAGEBOX ({4 + Buffer.Length} bytes)");
             context.Client.Send(ToByteArray());
             return true;
         }

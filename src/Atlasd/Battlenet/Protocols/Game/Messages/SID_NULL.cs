@@ -19,7 +19,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
         public override bool Invoke(MessageContext context)
         {
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_NULL (" + (4 + Buffer.Length) + " bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_NULL ({4 + Buffer.Length} bytes)");
 
             if (Buffer.Length != 0)
                 throw new GameProtocolViolationException(context.Client, "SID_NULL buffer must be 0 bytes");

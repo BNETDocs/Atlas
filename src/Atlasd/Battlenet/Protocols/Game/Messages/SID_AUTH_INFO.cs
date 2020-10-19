@@ -28,7 +28,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_AUTH_INFO (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_AUTH_INFO ({4 + Buffer.Length} bytes)");
 
                         if (Buffer.Length < 38)
                             throw new Exceptions.GameProtocolViolationException(context.Client, "SID_AUTH_INFO must be at least 38 bytes");
@@ -118,7 +118,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Close();
                         m.Close();
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_AUTH_INFO (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_AUTH_INFO ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray());
                         return true;
                     }

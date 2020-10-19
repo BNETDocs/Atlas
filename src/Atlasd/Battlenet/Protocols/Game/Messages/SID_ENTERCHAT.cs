@@ -27,7 +27,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_ENTERCHAT (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_ENTERCHAT ({4 + Buffer.Length} bytes)");
 
                         if (Buffer.Length < 2)
                             throw new GameProtocolViolationException(context.Client, "SID_ENTERCHAT buffer must be at least 2 bytes");
@@ -104,7 +104,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             context.Client.GameState.ChannelFlags = (Account.Flags)context.Client.GameState.ActiveAccount.Get(Account.FlagsKey);
                         }
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_ENTERCHAT (" + (4 + Buffer.Length) + " bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_ENTERCHAT ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray());
                         return true;
                     }

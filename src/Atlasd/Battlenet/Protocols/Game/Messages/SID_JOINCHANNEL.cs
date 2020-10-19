@@ -33,7 +33,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (context.Direction == MessageDirection.ServerToClient)
                 throw new GameProtocolViolationException(context.Client, "Server isn't allowed to send SID_JOINCHANNEL");
 
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "[" + Common.DirectionToString(context.Direction) + "] SID_JOINCHANNEL (" + (4 + Buffer.Length) + " bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_JOINCHANNEL ({4 + Buffer.Length} bytes)");
 
             if (Buffer.Length < 5)
                 throw new GameProtocolViolationException(context.Client, "SID_JOINCHANNEL buffer must be at least 5 bytes");
