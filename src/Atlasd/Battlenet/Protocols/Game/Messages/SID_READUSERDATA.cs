@@ -40,8 +40,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (Buffer.Length < 12)
                             throw new GameProtocolViolationException(context.Client, "SID_READUSERDATA buffer must be at least 12 bytes");
 
-                        if (context.Client.GameState == null || context.Client.GameState.ActiveAccount == null)
-                            throw new GameProtocolViolationException(context.Client, "SID_READUSERDATA cannot be processed without an active login");
+                        if (context.Client.GameState == null || context.Client.GameState.Version == null || context.Client.GameState.Version.VersionByte == 0)
+                            throw new GameProtocolViolationException(context.Client, "SID_READUSERDATA cannot be processed without an active version");
 
                         var m = new MemoryStream(Buffer);
                         var r = new BinaryReader(m);
