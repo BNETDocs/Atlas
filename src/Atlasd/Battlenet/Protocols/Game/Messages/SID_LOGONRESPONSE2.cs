@@ -1,5 +1,6 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
+using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -79,14 +80,26 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         {
                             context.Client.GameState.ActiveAccount = account;
                             context.Client.GameState.LastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
-                            context.Client.GameState.OnlineName = context.Client.GameState.Username;
-                            context.Client.GameState.Username = (string)account.Get(Account.UsernameKey, context.Client.GameState.Username);
 
                             account.Set(Account.IPAddressKey, context.Client.RemoteEndPoint.ToString().Split(":")[0]);
                             account.Set(Account.LastLogonKey, DateTime.Now);
                             account.Set(Account.PortKey, context.Client.RemoteEndPoint.ToString().Split(":")[1]);
 
-                            lock (Battlenet.Common.ActiveAccounts) Battlenet.Common.ActiveAccounts.Add(context.Client.GameState.Username, account);
+                            lock (Battlenet.Common.ActiveAccounts)
+                            {
+                                var serial = 1;
+                                var onlineName = context.Client.GameState.Username;
+
+                                while (Battlenet.Common.ActiveAccounts.ContainsKey(onlineName))
+                                {
+                                    onlineName = $"{context.Client.GameState.Username}#{++serial}";
+                                }
+
+                                context.Client.GameState.OnlineName = onlineName;
+                                Battlenet.Common.ActiveAccounts.Add(onlineName, account);
+                            }
+
+                            context.Client.GameState.Username = (string)account.Get(Account.UsernameKey, context.Client.GameState.Username);
 
                             status = Statuses.Success;
                         }
