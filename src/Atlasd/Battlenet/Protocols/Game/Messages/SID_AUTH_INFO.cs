@@ -69,8 +69,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] Setting client locale...");
                             Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo((int)context.Client.GameState.Locale.UserLocaleId);
                         }
-                        catch (ArgumentOutOfRangeException ex)
+                        catch (Exception ex)
                         {
+                            if (!(ex is ArgumentOutOfRangeException || ex is CultureNotFoundException)) throw;
+
                             Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] Error setting client locale to [{(int)context.Client.GameState.Locale.UserLocaleId}], using default");
                         }
 
