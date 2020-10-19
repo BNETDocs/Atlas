@@ -91,12 +91,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var keys = new List<string>();
                         var values = new List<string>();
 
-                        while (values.Count < keys.Count)
+                        while (values.Count < (accounts.Count * keys.Count))
                             values.Add("");
 
                         var size = 12;
                         foreach (var value in values)
-                            size += Encoding.UTF8.GetByteCount(value);
+                            size += 1 + Encoding.UTF8.GetByteCount(value);
 
                         Buffer = new byte[size];
 
