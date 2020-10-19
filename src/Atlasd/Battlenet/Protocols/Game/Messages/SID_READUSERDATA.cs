@@ -3,6 +3,7 @@ using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -90,7 +91,14 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var keys = new List<string>();
                         var values = new List<string>();
 
-                        Buffer = new byte[12];
+                        while (values.Count < keys.Count)
+                            values.Add("");
+
+                        var size = 12;
+                        foreach (var value in values)
+                            size += Encoding.UTF8.GetByteCount(value);
+
+                        Buffer = new byte[size];
 
                         var m = new MemoryStream(Buffer);
                         var w = new BinaryWriter(m);
@@ -100,7 +108,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write((UInt32)context.Arguments["requestId"]);
 
                         foreach (var value in values)
-                            w.Write((string)value);
+                        {
+                            w.Write(Encoding.UTF8.GetBytes(value));
+                            w.Write((byte)0);
+                        }
 
                         w.Close();
                         m.Close();
