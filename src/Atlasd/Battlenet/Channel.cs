@@ -157,7 +157,42 @@ namespace Atlasd.Battlenet
 
         public string GetUsersAsString()
         {
-            return "TODO";
+            if (ActiveFlags.HasFlag(Channel.Flags.Silent)) return "";
+
+            var names = new LinkedList<string>();
+
+            lock (Users)
+            {
+                foreach (var user in Users)
+                {
+                    if (user.ChannelFlags.HasFlag(Account.Flags.Employee) ||
+                        user.ChannelFlags.HasFlag(Account.Flags.ChannelOp) ||
+                        user.ChannelFlags.HasFlag(Account.Flags.Admin))
+                    {
+                        names.AddFirst($"[{user.OnlineName.ToUpper()}]");
+                    } else
+                    {
+                        names.AddLast(user.OnlineName);
+                    }
+                }
+            }
+
+            var s = "";
+            var i = 0;
+            foreach (var n in names)
+            {
+                if (i % 2 == 0)
+                {
+                    s += $"{n}, ";
+                } else
+                {
+                    s += $"{n}\r\n";
+                }
+                i++;
+            }
+            if (i % 2 != 0) s = s[..-2]; // trim trailing comma
+
+            return s;
         }
 
         public bool IsPrivate()
