@@ -21,7 +21,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             str = str.Replace("{realmTime}", DateTime.Now.ToString(Common.HumanDateTimeFormat));
             str = str.Replace("{localTime}", context.GameState.LocalTime.ToString(Common.HumanDateTimeFormat));
 
-            new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, str).WriteTo(context.GameState.Client);
+            foreach (var line in str.Split("\r\n"))
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
         }
     }
 }
