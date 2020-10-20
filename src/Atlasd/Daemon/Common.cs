@@ -10,7 +10,7 @@ namespace Atlasd.Daemon
 
         public static void Initialize()
         {
-            Settings = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            Settings = new Dictionary<string, dynamic>(StringComparer.OrdinalIgnoreCase);
 
             Settings.Add("account.auto_admin", true);
             Settings.Add("account.disallow_words", new List<string>()
