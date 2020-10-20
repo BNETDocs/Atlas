@@ -6,7 +6,7 @@ namespace Atlasd.Daemon
 {
     class Common
     {
-        public static Dictionary<string, object> Settings { get; private set; }
+        public static Dictionary<string, dynamic> Settings { get; private set; }
 
         public static void Initialize()
         {
