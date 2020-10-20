@@ -33,7 +33,7 @@ namespace Atlasd.Battlenet
             new Channel("Town Square", Channel.Flags.Public, 200, "Welcome and enjoy your stay!");
 
             DefaultInterface = IPAddress.Any;
-            DefaultPort = 6112;
+            DefaultPort = (int)Daemon.Common.Settings["battlenet.listener.port"];
 
             Listener = new TcpListener(DefaultInterface, DefaultPort) { ExclusiveAddressUse = false };
 
