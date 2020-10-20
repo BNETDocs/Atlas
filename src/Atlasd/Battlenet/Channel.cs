@@ -130,10 +130,14 @@ namespace Atlasd.Battlenet
             foreach (var line in topic)
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line).WriteTo(user.Client);
 
-            object autoOp = false;
-            lock (Common.Settings) Common.Settings.TryGetValue("channel.autoop", out autoOp);
+            var autoOp = false;
+            lock (Daemon.Common.Settings)
+            {
+                Daemon.Common.Settings.TryGetValue("channel.autoop", out object _autoOp);
+                autoOp = (bool)_autoOp;
+            }
 
-            if (((bool)autoOp == true && Count == 1 && IsPrivate()) || Name.ToLower() == "op " + user.OnlineName.ToLower())
+            if ((autoOp == true && Count == 1 && IsPrivate()) || Name.ToLower() == "op " + user.OnlineName.ToLower())
                 UpdateUser(user, user.ChannelFlags | Account.Flags.ChannelOp);
         }
 
