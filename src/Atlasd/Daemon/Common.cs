@@ -17,9 +17,12 @@ namespace Atlasd.Daemon
             {
                 "ass",
                 "battle.net",
+                "blizzard",
                 "chink",
                 "cracker",
                 "cunt",
+                "fag",
+                "faggot",
                 "fuck",
                 "idiot",
                 "nigga",
