@@ -22,6 +22,99 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             Buffer = buffer;
         }
 
+        private void CollectValues(GameState requester, List<string> accounts, List<string> keys, out List<string> values)
+        {
+            values = new List<string>();
+
+            for (var i = 0; i < accounts.Count; i++)
+            {
+                var accountName = accounts[i];
+                Account account = null;
+                lock (Battlenet.Common.AccountsDb) Battlenet.Common.AccountsDb.TryGetValue(accountName, out account);
+
+                if (account == null)
+                {
+                    for (var j = 0; j < keys.Count; j++)
+                    {
+                        values.Add("");
+                    }
+
+                    continue;
+                }
+
+                foreach (var reqKey in keys)
+                {
+                    account.Get(reqKey, out var kv);
+
+                    if (kv == null)
+                    {
+                        values.Add("");
+                        continue;
+                    }
+
+                    if (kv.Readable != AccountKeyValue.ReadLevel.Any)
+                    {
+                        if (!(kv.Readable == AccountKeyValue.ReadLevel.Owner && account == requester.ActiveAccount))
+                        {
+                            // No permission
+                            values.Add("");
+                            continue;
+                        }
+                    }
+
+                    try
+                    {
+                        if (kv.Value is string)
+                        {
+                            values.Add(kv.Value);
+                        }
+                        else if (kv.Value is long)
+                        {
+                            values.Add(((long)kv.Value).ToString());
+                        }
+                        else if (kv.Value is ulong)
+                        {
+                            values.Add(((ulong)kv.Value).ToString());
+                        }
+                        else if (kv.Value is int)
+                        {
+                            values.Add(((int)kv.Value).ToString());
+                        }
+                        else if (kv.Value is uint)
+                        {
+                            values.Add(((uint)kv.Value).ToString());
+                        }
+                        else if (kv.Value is short)
+                        {
+                            values.Add(((short)kv.Value).ToString());
+                        }
+                        else if (kv.Value is ushort)
+                        {
+                            values.Add(((ushort)kv.Value).ToString());
+                        }
+                        else if (kv.Value is byte)
+                        {
+                            values.Add(((byte)kv.Value).ToString());
+                        }
+                        else if (kv.Value is DateTime)
+                        {
+                            var _value = ((DateTime)kv.Value).ToFileTime();
+                            var high = (uint)(_value >> 32);
+                            var low = (uint)_value;
+                            values.Add(high.ToString() + " " + low.ToString());
+                        } else
+                        {
+                            values.Add("");
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        values.Add("");
+                    }
+                }
+            }
+        }
+
         public override bool Invoke(MessageContext context)
         {
             switch (context.Direction)
@@ -87,16 +180,15 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (STRING) [] Requested Key Values
                          */
 
-                        var accounts = new List<string>();
-                        var keys = new List<string>();
-                        var values = new List<string>();
-
-                        while (values.Count < (accounts.Count * keys.Count))
-                            values.Add("");
+                        var accounts = (List<string>)context.Arguments["accounts"];
+                        var keys = (List<string>)context.Arguments["keys"];
+                        CollectValues(context.Client.GameState, accounts, keys, out var values);
 
                         var size = 12;
                         foreach (var value in values)
-                            size += 1 + Encoding.UTF8.GetByteCount(value);
+                        {
+                            size += 1 + Encoding.ASCII.GetByteCount(value);
+                        }
 
                         Buffer = new byte[size];
 
@@ -109,8 +201,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         foreach (var value in values)
                         {
-                            w.Write(Encoding.UTF8.GetBytes(value));
-                            w.Write((byte)0);
+                            w.Write((string)value);
                         }
 
                         w.Close();

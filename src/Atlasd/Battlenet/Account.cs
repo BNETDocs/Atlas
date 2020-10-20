@@ -58,7 +58,7 @@ namespace Atlasd.Battlenet
         {
             Userdata = new List<AccountKeyValue>()
             {
-                { new AccountKeyValue(AccountCreatedKey, (long)DateTime.UtcNow.ToBinary(), AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.ReadOnly) },
+                { new AccountKeyValue(AccountCreatedKey, DateTime.Now, AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.ReadOnly) },
                 { new AccountKeyValue(FailedLogonsKey, (long)0, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
                 { new AccountKeyValue(FlagsKey, Flags.None, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
                 { new AccountKeyValue(FriendsKey, new List<string>(), AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
@@ -101,7 +101,7 @@ namespace Atlasd.Battlenet
                 {
                     if (kv.Key.ToLower() == keyL)
                     {
-                        value = kv.Value;
+                        value = kv;
                         return true;
                     }
                 }
@@ -113,13 +113,15 @@ namespace Atlasd.Battlenet
 
         public dynamic Get(string key, dynamic onKeyNotFound = null)
         {
-            if (!Get(key, out var value))
+            if (!Get(key, out dynamic value))
             {
                 return onKeyNotFound;
-            } else
-            {
-                return value;
             }
+
+            if (value == null) return onKeyNotFound;
+            if (!(value is AccountKeyValue)) return value;
+
+            return ((AccountKeyValue)value).Value;
         }
 
         public void Set(string key, dynamic value)
