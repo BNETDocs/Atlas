@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Runtime.InteropServices;
 
 namespace Atlasd.Daemon
 {
@@ -18,6 +17,7 @@ namespace Atlasd.Daemon
 
         public enum LogType
         {
+            Account,
             Channel,
             Config,
             Client,
@@ -46,6 +46,7 @@ namespace Atlasd.Daemon
         {
             return type switch
             {
+                LogType.Account => "Account",
                 LogType.Channel => "Channel",
                 LogType.Config => "Config",
                 LogType.Client => "Client",

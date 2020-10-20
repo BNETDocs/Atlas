@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Atlasd.Daemon;
+using System;
 using System.Collections.Generic;
 
 namespace Atlasd.Battlenet
@@ -99,6 +100,18 @@ namespace Atlasd.Battlenet
             var MinimumAlphanumericSize = (uint)Daemon.Common.Settings["account.min_alphanumeric"];
             var MinimumUsernameSize = (uint)Daemon.Common.Settings["account.min_length"];
 
+            lock (Common.AccountsProcessing)
+            {
+                if (Common.AccountsProcessing.Contains(username))
+                {
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, "Still processing new account request...");
+                    return CreateStatus.LastCreateInProgress;
+                }
+                Common.AccountsProcessing.Add(username);
+            }
+
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, "Processing new account request...");
+
             if (username.Length < MinimumUsernameSize)
                 return CreateStatus.UsernameTooShort;
 
@@ -113,7 +126,10 @@ namespace Atlasd.Battlenet
             foreach (var c in username)
             {
                 if (!Alphanumeric.Contains(c) && !Punctuation.Contains(c))
+                {
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, "Requested username contains invalid characters");
                     return CreateStatus.UsernameInvalidChars;
+                }
 
                 if (Alphanumeric.Contains(c))
                     total_alphanumeric++;
@@ -127,21 +143,31 @@ namespace Atlasd.Battlenet
                 }
 
                 if (total_punctuation > MaximumPunctuation)
+                {
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{username}] contains too many punctuation");
                     return CreateStatus.UsernameTooManyPunctuation;
+                }
 
                 if (adjacent_punctuation > MaximumAdjacentPunctuation)
+                {
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{username}] contains too many adjacent punctuation");
                     return CreateStatus.UsernameAdjacentPunctuation;
+                }
 
                 last_c = c;
             }
 
             if (total_alphanumeric < MinimumAlphanumericSize)
+            {
+                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{username}] is too short or contains too few alphanumeric characters");
                 return CreateStatus.UsernameShortAlphanumeric;
+            }
 
             foreach (var word in BannedWords)
             {
                 if (username.Contains(word))
                 {
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{username}] contains a banned word or phrase");
                     return CreateStatus.UsernameBannedWord;
                 }
             }
@@ -149,7 +175,10 @@ namespace Atlasd.Battlenet
             lock (Common.AccountsDb)
             {
                 if (Common.AccountsDb.ContainsKey(username))
+                {
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{username}] already exists");
                     return CreateStatus.AccountExists;
+                }
 
                 account = new Account();
 
@@ -161,6 +190,12 @@ namespace Atlasd.Battlenet
                 Common.AccountsDb.Add(username, account);
             }
 
+            lock (Common.AccountsProcessing)
+            {
+                Common.AccountsProcessing.Remove(username);
+            }
+
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Created new account [{username}]");
             return CreateStatus.Success;
         }
     }

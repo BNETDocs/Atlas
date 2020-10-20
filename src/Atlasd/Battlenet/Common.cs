@@ -11,6 +11,7 @@ namespace Atlasd.Battlenet
     {
 
         public static Dictionary<string, Account> AccountsDb;
+        public static List<string> AccountsProcessing;
         public static Dictionary<string, Account> ActiveAccounts;
         public static Dictionary<string, Channel> ActiveChannels;
         public static List<ClientState> ActiveClients;
@@ -21,6 +22,7 @@ namespace Atlasd.Battlenet
         public static void Initialize()
         {
             AccountsDb = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
+            AccountsProcessing = new List<string>();
             ActiveAccounts = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClients = new List<ClientState>();
