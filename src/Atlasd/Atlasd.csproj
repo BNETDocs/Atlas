@@ -16,6 +16,10 @@
     <AssemblyName>atlasd</AssemblyName>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\MBNCSUtil\MBNCSUtil.csproj" />
   </ItemGroup>
