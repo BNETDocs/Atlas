@@ -17,15 +17,15 @@ namespace Atlasd
             Console.WriteLine($"[{DateTime.Now.ToString(Battlenet.Protocols.Common.HumanDateTimeFormat)}] Build: {assembly.GetName().Version} (release)");
 #endif
 
-            Common.Initialize();
+            Battlenet.Common.Initialize();
 
-            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, $"Binding TCP listener socket to [{Common.Listener.LocalEndpoint}]");
-            Common.Listener.Start();
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, $"Binding TCP listener socket to [{Battlenet.Common.Listener.LocalEndpoint}]");
+            Battlenet.Common.Listener.Start();
 
             while (true) // Infinitely loop main thread
             {
                 // Block until a connection is received ...
-                new ClientState(Common.Listener.AcceptTcpClient());
+                new ClientState(Battlenet.Common.Listener.AcceptTcpClient());
             }
         }
     }

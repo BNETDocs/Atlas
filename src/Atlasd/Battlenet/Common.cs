@@ -17,7 +17,6 @@ namespace Atlasd.Battlenet
         public static IPAddress DefaultInterface { get; private set; }
         public static int DefaultPort { get; private set; }
         public static TcpListener Listener;
-        public static Dictionary<string, object> Settings { get; private set; }
 
         public static void Initialize()
         {
@@ -25,9 +24,6 @@ namespace Atlasd.Battlenet
             ActiveAccounts = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClients = new List<ClientState>();
-            Settings = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-
-            Settings.Add("channel.autoOp", true);
 
             new Channel("The Void", Channel.Flags.Public | Channel.Flags.Silent, -1);
             new Channel("Backstage", Channel.Flags.Public | Channel.Flags.Restricted, -1, "Abandon hope, all ye who enter here...");
