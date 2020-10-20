@@ -13,6 +13,7 @@
     <RepositoryUrl>https://github.com/BNETDocs/Atlas</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Atlas, Battle.net, Blizzard, Classic, Diablo, Emulation, Linux, StarCraft, WarCraft, Windows</PackageTags>
+    <AssemblyName>atlasd</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
