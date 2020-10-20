@@ -1,6 +1,7 @@
 ﻿using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace Atlasd.Battlenet
 {
@@ -51,42 +52,93 @@ namespace Atlasd.Battlenet
             Closed = 0x80,
         };
 
-        public Dictionary<string, dynamic> Userdata { get; protected set; }
+        public List<AccountKeyValue> Userdata { get; protected set; }
 
         private Account()
         {
-            Userdata = new Dictionary<string, dynamic>()
+            Userdata = new List<AccountKeyValue>()
             {
-                { AccountCreatedKey, (long)DateTime.UtcNow.ToBinary() },
-                { FailedLogonsKey, (long)0 },
-                { FlagsKey, Flags.None },
-                { FriendsKey, new List<string>() },
-                { PasswordKey, new byte[0] },
-                { ProfileAgeKey, "" },
-                { ProfileDescriptionKey, "" },
-                { ProfileLocationKey, "" },
-                { ProfileSexKey, "" },
-                { TimeLoggedKey, (long)0 },
-                { UsernameKey, "" },
+                { new AccountKeyValue(AccountCreatedKey, (long)DateTime.UtcNow.ToBinary(), AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.ReadOnly) },
+                { new AccountKeyValue(FailedLogonsKey, (long)0, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
+                { new AccountKeyValue(FlagsKey, Flags.None, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
+                { new AccountKeyValue(FriendsKey, new List<string>(), AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
+                { new AccountKeyValue(IPAddressKey, IPAddress.Any, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
+                { new AccountKeyValue(LastLogoffKey, DateTime.Now, AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.Internal) },
+                { new AccountKeyValue(LastLogonKey, DateTime.Now, AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.Internal) },
+                { new AccountKeyValue(PortKey, 0, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
+                { new AccountKeyValue(PasswordKey, new byte[0], AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
+                { new AccountKeyValue(ProfileAgeKey, "", AccountKeyValue.ReadLevel.Any, AccountKeyValue.WriteLevel.Owner) },
+                { new AccountKeyValue(ProfileDescriptionKey, "", AccountKeyValue.ReadLevel.Any, AccountKeyValue.WriteLevel.Owner) },
+                { new AccountKeyValue(ProfileLocationKey, "", AccountKeyValue.ReadLevel.Any, AccountKeyValue.WriteLevel.Owner) },
+                { new AccountKeyValue(ProfileSexKey, "", AccountKeyValue.ReadLevel.Any, AccountKeyValue.WriteLevel.Owner) },
+                { new AccountKeyValue(TimeLoggedKey, (long)0, AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.Internal) },
+                { new AccountKeyValue(UsernameKey, "", AccountKeyValue.ReadLevel.Any, AccountKeyValue.WriteLevel.Internal) },
             };
         }
 
         public bool ContainsKey(string key)
         {
-            return Userdata.ContainsKey(key);
+            var keyL = key.ToLower();
+
+            lock (Userdata)
+            {
+                foreach (var kv in Userdata)
+                {
+                    if (kv.Key.ToLower() == keyL) return true;
+                }
+            }
+
+            return false;
         }
 
-        public dynamic Get(string key, dynamic defaultValue = null)
+        public bool Get(string key, out dynamic value)
         {
-            if (!Userdata.TryGetValue(key, out dynamic value))
-                return defaultValue;
+            var keyL = key.ToLower();
 
-            return value ?? defaultValue;
+            lock (Userdata)
+            {
+                foreach (var kv in Userdata)
+                {
+                    if (kv.Key.ToLower() == keyL)
+                    {
+                        value = kv.Value;
+                        return true;
+                    }
+                }
+            }
+
+            value = null;
+            return false;
+        }
+
+        public dynamic Get(string key, dynamic onKeyNotFound = null)
+        {
+            if (!Get(key, out var value))
+            {
+                return onKeyNotFound;
+            } else
+            {
+                return value;
+            }
         }
 
         public void Set(string key, dynamic value)
         {
-            Userdata[key] = value;
+            var keyL = key.ToLower();
+
+            lock (Userdata)
+            {
+                foreach (var kv in Userdata)
+                {
+                    if (kv.Key.ToLower() == keyL)
+                    {
+                        kv.Value = value;
+                        return;
+                    }
+                }
+            }
+
+            throw new KeyNotFoundException(key);
         }
 
         public static CreateStatus TryCreate(string username, byte[] passwordHash, out Account account)

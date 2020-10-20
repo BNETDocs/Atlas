@@ -23,7 +23,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             var channelName = string.Join(" ", Arguments);
 
-            var userFlags = (Account.Flags)context.GameState.ActiveAccount.Get(Account.FlagsKey);
+            context.GameState.ActiveAccount.Get(Account.FlagsKey, out var userFlags);
             var ignoreLimits = userFlags.HasFlag(Account.Flags.Employee);
 
             var channel = Channel.GetChannelByName(channelName);

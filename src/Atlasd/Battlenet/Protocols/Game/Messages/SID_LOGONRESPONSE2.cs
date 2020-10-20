@@ -11,7 +11,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
     {
         protected enum Statuses : UInt32
         {
-            None = 0x7fffffff,
+            None = 0xFFFFFFFF,
             Success = 0,
             AccountNotFound = 1,
             BadPassword = 2,
@@ -65,14 +65,14 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         if (status == Statuses.None)
                         {
-                            var passwordHashDb = (byte[])account.Get(Account.PasswordKey);
+                            var passwordHashDb = (byte[])account.Get(Account.PasswordKey, new byte[20]);
                             var compareHash = OldAuth.CheckDoubleHashData(passwordHashDb, clientToken, serverToken);
                             if (compareHash.Equals(passwordHash)) status = Statuses.BadPassword;
                         }
 
                         if (status == Statuses.None)
                         {
-                            var flags = (Account.Flags)account.Get(Account.FlagsKey);
+                            var flags = (Account.Flags)account.Get(Account.FlagsKey, Account.Flags.None);
                             if ((flags & Account.Flags.Closed) != 0) status = Statuses.AccountClosed;
                         }
                         
