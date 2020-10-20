@@ -64,7 +64,7 @@ namespace Atlasd.Daemon
         {
             if (level > CurrentLogLevel) return;
 
-            lock (Console.Out) Console.Out.WriteLine($"[{DateTime.Now.ToString(Battlenet.Protocols.Common.HumanDateTimeFormat)}] [{LogLevelToString(level)}] [{LogTypeToString(type).Replace("_", "] [")}] {buffer}");
+            lock (Console.Out) Console.Out.WriteLine($"[{DateTime.Now}] [{LogLevelToString(level)}] [{LogTypeToString(type).Replace("_", "] [")}] {buffer}");
         }
 
         public static void WriteLine(LogLevel level, LogType type, EndPoint endp, string buffer)
