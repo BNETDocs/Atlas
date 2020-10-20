@@ -68,37 +68,41 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         {
                             values.Add(kv.Value);
                         }
-                        else if (kv.Value is long)
+                        else if (kv.Value is long @long)
                         {
-                            values.Add(((long)kv.Value).ToString());
+                            values.Add(@long.ToString());
                         }
-                        else if (kv.Value is ulong)
+                        else if (kv.Value is ulong @ulong)
                         {
-                            values.Add(((ulong)kv.Value).ToString());
+                            values.Add(@ulong.ToString());
                         }
-                        else if (kv.Value is int)
+                        else if (kv.Value is int @int)
                         {
-                            values.Add(((int)kv.Value).ToString());
+                            values.Add(@int.ToString());
                         }
-                        else if (kv.Value is uint)
+                        else if (kv.Value is uint @uint)
                         {
-                            values.Add(((uint)kv.Value).ToString());
+                            values.Add(@uint.ToString());
                         }
-                        else if (kv.Value is short)
+                        else if (kv.Value is short @short)
                         {
-                            values.Add(((short)kv.Value).ToString());
+                            values.Add(@short.ToString());
                         }
-                        else if (kv.Value is ushort)
+                        else if (kv.Value is ushort @ushort)
                         {
-                            values.Add(((ushort)kv.Value).ToString());
+                            values.Add(@ushort.ToString());
                         }
-                        else if (kv.Value is byte)
+                        else if (kv.Value is byte @byte)
                         {
-                            values.Add(((byte)kv.Value).ToString());
+                            values.Add(@byte.ToString());
                         }
-                        else if (kv.Value is DateTime)
+                        else if (kv.Value is bool @bool)
                         {
-                            var _value = ((DateTime)kv.Value).ToFileTime();
+                            values.Add(@bool ? "1" : "0");
+                        }
+                        else if (kv.Value is DateTime @dateTime)
+                        {
+                            var _value = dateTime.ToFileTime();
                             var high = (uint)(_value >> 32);
                             var low = (uint)_value;
                             values.Add(high.ToString() + " " + low.ToString());
