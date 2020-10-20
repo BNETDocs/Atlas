@@ -24,7 +24,7 @@ namespace Atlasd.Battlenet
         public static uint MaximumAdjacentPunctuation = 0;
         public static uint MaximumPunctuation = 7;
         public static uint MaximumUsernameSize = 15;
-        public static uint MinimumAlphanumericSize = 3;
+        public static uint MinimumAlphanumericSize = 1;
         public static uint MinimumUsernameSize = 3;
     }
 }
