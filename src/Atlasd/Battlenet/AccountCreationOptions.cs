@@ -7,19 +7,7 @@ namespace Atlasd.Battlenet
         public const string Alphanumeric = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         public const string Punctuation = "`~!$%^&*()-_=+[{]}\\|;:'\",<.>/?";
 
-        public List<string> BannedWords = new List<string> {
-            "ass",
-            "chink",
-            "cracker",
-            "cunt",
-            "fuck",
-            "idiot",
-            "nigga",
-            "nigger",
-            "niglet",
-            "twat",
-            "wetback",
-        };
+        public static List<string> BannedWords = (List<string>)Daemon.Common.Settings["account.disallow_words"];
 
         public static uint MaximumAdjacentPunctuation = 0;
         public static uint MaximumPunctuation = 7;
