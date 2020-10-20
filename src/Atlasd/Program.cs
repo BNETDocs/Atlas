@@ -17,6 +17,7 @@ namespace Atlasd
             Console.WriteLine($"[{DateTime.Now.ToString(Battlenet.Protocols.Common.HumanDateTimeFormat)}] Build: {assembly.GetName().Version} (release)");
 #endif
 
+            Daemon.Common.Initialize();
             Battlenet.Common.Initialize();
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, $"Binding TCP listener socket to [{Battlenet.Common.Listener.LocalEndpoint}]");

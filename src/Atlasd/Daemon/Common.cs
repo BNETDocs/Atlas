@@ -8,7 +8,7 @@ namespace Atlasd.Daemon
     {
         public static Dictionary<string, object> Settings { get; private set; }
 
-        public void Initialize()
+        public static void Initialize()
         {
             Settings = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
