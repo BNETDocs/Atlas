@@ -10,6 +10,9 @@ namespace Atlasd.Battlenet
 {
     class Channel
     {
+        public const string TheVoid = "The Void";
+        public const Flags TheVoidFlags = Flags.Public | Flags.Silent;
+
         public enum Flags : UInt32
         {
             None            = 0x00000, // aka "Private"
@@ -145,8 +148,8 @@ namespace Atlasd.Battlenet
         {
             if (Users != null)
             {
-                var theVoid = Channel.GetChannelByName("The Void");
-                if (theVoid == null) theVoid = new Channel("The Void", Flags.Public | Flags.Silent, -1);
+                var theVoid = Channel.GetChannelByName(TheVoid);
+                if (theVoid == null) theVoid = new Channel(TheVoid, TheVoidFlags, -1);
                 foreach (var user in Users) Channel.MoveUser(user, theVoid);
             }
 
@@ -384,7 +387,7 @@ namespace Atlasd.Battlenet
                 {
                     if (owner != null && user == owner && chatEvent.EventId == ChatEvent.EventIds.EID_TALK)
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Channel, $"[{Name}] Dropping EID_TALK from being echoed to sender");
+                        // Dropping EID_TALK from being echoed back to sender
                         continue;
                     }
 

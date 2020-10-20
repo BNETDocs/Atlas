@@ -25,7 +25,8 @@ namespace Atlasd.Battlenet
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClients = new List<ClientState>();
 
-            new Channel("The Void", Channel.Flags.Public | Channel.Flags.Silent, -1);
+            // Channel adds itself to ActiveChannels during instantiation.
+            new Channel(Channel.TheVoid, Channel.TheVoidFlags, -1);
             new Channel("Backstage", Channel.Flags.Public | Channel.Flags.Restricted, -1, "Abandon hope, all ye who enter here...");
             new Channel("Open Tech Support", Channel.Flags.Public | Channel.Flags.TechSupport, -1);
             new Channel("Blizzard Tech Support", Channel.Flags.Public | Channel.Flags.TechSupport | Channel.Flags.Moderated, -1);
