@@ -138,6 +138,9 @@ There are currently {gameUsers} users playing {gameAds} games of {game}, and {to
     <value>That channel does not exist.
 (If you are trying to search for a user, use the /whois command.)</value>
   </data>
+  <data name="CharacterNotLoggedOn" xml:space="preserve">
+    <value>That character is not logged on.  Try using *username to message a user or character@realm to message a character in a different realm.</value>
+  </data>
   <data name="ChatCommandUnavailable" xml:space="preserve">
     <value>That command is not available at the moment.</value>
   </data>
@@ -166,6 +169,21 @@ There are currently {gameUsers} users playing {gameAds} games of {game}, and {to
     <value>{realm} time: {realmTime}
 Your local time: {localTime}</value>
   </data>
+  <data name="UserIsUsingDiablo2InAPrivateGame" xml:space="preserve">
+    <value>{character}#{characterRealm} (*{username}) is using {game} in a private game.</value>
+  </data>
+  <data name="UserIsUsingGameInAPrivateGame" xml:space="preserve">
+    <value>{username} is using {game} in a private game.</value>
+  </data>
+  <data name="UserIsUsingGameInTheGame" xml:space="preserve">
+    <value>{username} is using {game} in game {gameAd}.</value>
+  </data>
+  <data name="UserIsUsingGameInThePasswordedGame" xml:space="preserve">
+    <value>{username} is using {game} in the password-protected game {gameAd}.</value>
+  </data>
+  <data name="UserNotLoggedOn" xml:space="preserve">
+    <value>That user is not logged on.</value>
+  </data>
   <data name="WhoCommand" xml:space="preserve">
     <value>Users in channel {channel}:
 {users}</value>
@@ -173,10 +191,25 @@ Your local time: {localTime}</value>
   <data name="YouAreBannedFromThatChannel" xml:space="preserve">
     <value>You are banned from that channel.</value>
   </data>
+  <data name="YouAreUsingGameInGame" xml:space="preserve">
+    <value>You are {name}, using {game} in game {gameAd}.</value>
+  </data>
   <data name="YouAreUsingGameInRealm" xml:space="preserve">
     <value>You are {name}, using {game} in {realm}</value>
   </data>
   <data name="YouAreUsingGameInTheChannel" xml:space="preserve">
     <value>You are {name}, using {game} in the channel {channel}.</value>
+  </data>
+  <data name="YourFriendEnteredGame" xml:space="preserve">
+    <value>Your friend {friend} has entered a {game} game called {gameAd}.</value>
+  </data>
+  <data name="YourFriendEnteredPasswordedGame" xml:space="preserve">
+    <value>Your friend {friend} has entered a password-protected {game} game called {gameAd}.</value>
+  </data>
+  <data name="YourFriendLoggedOff" xml:space="preserve">
+    <value>Your friend {friend} has exited {realm}.</value>
+  </data>
+  <data name="YourFriendLoggedOn" xml:space="preserve">
+    <value>Your friend {friend} has entered {realm}.</value>
   </data>
 </root>

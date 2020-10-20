@@ -118,6 +118,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to That character is not logged on.  Try using *username to message a user or character@realm to message a character in a different realm..
+        /// </summary>
+        public static string CharacterNotLoggedOn {
+            get {
+                return ResourceManager.GetString("CharacterNotLoggedOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to That command is not available at the moment..
         /// </summary>
         public static string ChatCommandUnavailable {
@@ -200,6 +209,51 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {character}#{characterRealm} (*{username}) is using {game} in a private game..
+        /// </summary>
+        public static string UserIsUsingDiablo2InAPrivateGame {
+            get {
+                return ResourceManager.GetString("UserIsUsingDiablo2InAPrivateGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {username} is using {game} in a private game..
+        /// </summary>
+        public static string UserIsUsingGameInAPrivateGame {
+            get {
+                return ResourceManager.GetString("UserIsUsingGameInAPrivateGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {username} is using {game} in game {gameAd}..
+        /// </summary>
+        public static string UserIsUsingGameInTheGame {
+            get {
+                return ResourceManager.GetString("UserIsUsingGameInTheGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {username} is using {game} in the password-protected game {gameAd}..
+        /// </summary>
+        public static string UserIsUsingGameInThePasswordedGame {
+            get {
+                return ResourceManager.GetString("UserIsUsingGameInThePasswordedGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to That user is not logged on..
+        /// </summary>
+        public static string UserNotLoggedOn {
+            get {
+                return ResourceManager.GetString("UserNotLoggedOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Users in channel {channel}:
         ///{users}.
         /// </summary>
@@ -219,6 +273,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You are {name}, using {game} in game {gameAd}..
+        /// </summary>
+        public static string YouAreUsingGameInGame {
+            get {
+                return ResourceManager.GetString("YouAreUsingGameInGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You are {name}, using {game} in {realm}.
         /// </summary>
         public static string YouAreUsingGameInRealm {
@@ -233,6 +296,42 @@ namespace Atlasd.Localization {
         public static string YouAreUsingGameInTheChannel {
             get {
                 return ResourceManager.GetString("YouAreUsingGameInTheChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your friend {friend} has entered a {game} game called {gameAd}..
+        /// </summary>
+        public static string YourFriendEnteredGame {
+            get {
+                return ResourceManager.GetString("YourFriendEnteredGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your friend {friend} has entered a password-protected {game} game called {gameAd}..
+        /// </summary>
+        public static string YourFriendEnteredPasswordedGame {
+            get {
+                return ResourceManager.GetString("YourFriendEnteredPasswordedGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your friend {friend} has exited {realm}..
+        /// </summary>
+        public static string YourFriendLoggedOff {
+            get {
+                return ResourceManager.GetString("YourFriendLoggedOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your friend {friend} has entered {realm}..
+        /// </summary>
+        public static string YourFriendLoggedOn {
+            get {
+                return ResourceManager.GetString("YourFriendLoggedOn", resourceCulture);
             }
         }
     }
