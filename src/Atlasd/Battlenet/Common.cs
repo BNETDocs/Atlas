@@ -35,9 +35,8 @@ namespace Atlasd.Battlenet
             DefaultInterface = IPAddress.Any;
             DefaultPort = 6112;
 
-            Listener = new TcpListener(DefaultInterface, DefaultPort);
+            Listener = new TcpListener(DefaultInterface, DefaultPort) { ExclusiveAddressUse = false };
 
-            Listener.ExclusiveAddressUse = false;
             Listener.Server.NoDelay = true;
             Listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true); // SO_KEEPALIVE
             try {
