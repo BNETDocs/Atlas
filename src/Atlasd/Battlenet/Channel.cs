@@ -133,7 +133,7 @@ namespace Atlasd.Battlenet
             var autoOp = false;
             lock (Daemon.Common.Settings)
             {
-                Daemon.Common.Settings.TryGetValue("channel.autoop", out object _autoOp);
+                Daemon.Common.Settings.TryGetValue("channel.auto_op", out object _autoOp);
                 autoOp = (bool)_autoOp;
             }
 
