@@ -3,14 +3,12 @@ using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Daemon;
 using System;
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet
 {
     class ClientState : IDisposable
     {
-        private bool IsDisposing = false;
+        public bool IsDisposing { get; private set; } = false;
 
         public GameState GameState = null;
         public ProtocolType ProtocolType = ProtocolType.None;
@@ -107,7 +105,12 @@ namespace Atlasd.Battlenet
             // check if the remote host closed the connection
             if (!(e.SocketError == SocketError.Success && e.BytesTransferred > 0))
             {
-                throw new ClientException(this, "TCP connection lost");
+                if (!IsDisposing && Socket != null)
+                {
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, $"TCP connection lost");
+                    Dispose();
+                }
+                return;
             }
 
             // Append received data to previously received data
@@ -128,19 +131,22 @@ namespace Atlasd.Battlenet
             // check if the remote host closed the connection
             if (e.SocketError != SocketError.Success)
             {
-                throw new ClientException(this, "TCP connection lost");
+                if (!IsDisposing && Socket != null)
+                {
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, $"TCP connection lost");
+                    Dispose();
+                }
+                return;
             }
 
             e.SetBuffer(new byte[1024], 0, 1024);
 
             // read the next block of data send from the client
-            Task.Run(() => {
-                bool willRaiseEvent = Socket.ReceiveAsync(e);
-                if (!willRaiseEvent)
-                {
-                    ProcessReceive(e);
-                }
-            });
+            bool willRaiseEvent = Socket.ReceiveAsync(e);
+            if (!willRaiseEvent)
+            {
+                SocketIOCompleted(this, e);
+            }
         }
 
         protected void ReceiveProtocolType(SocketAsyncEventArgs e)
@@ -231,7 +237,7 @@ namespace Atlasd.Battlenet
             bool willRaiseEvent = Socket.SendAsync(e);
             if (!willRaiseEvent)
             {
-                ProcessSend(e);
+                SocketIOCompleted(this, e);
             }
         }
 
