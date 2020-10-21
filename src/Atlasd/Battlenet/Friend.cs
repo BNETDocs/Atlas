@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Atlasd.Battlenet.Protocols.Game
+﻿namespace Atlasd.Battlenet
 {
     class Friend
     {
