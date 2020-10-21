@@ -1,5 +1,6 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -50,22 +51,37 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          *   (STRING) Location name
                          */
 
-                        var size = (uint)0;
-                        var friends = new List<string>();
+                        var size = (uint)1;
+                        var friends = new List<Friend>();
+                        var friendStrings = (List<string>)context.Client.GameState.ActiveAccount.Get(Account.FriendsKey);
 
-                        if (context.Client.GameState.ActiveAccount.ContainsKey(Account.FriendsKey))
-                            friends = (List<string>)context.Client.GameState.ActiveAccount.Get(Account.FriendsKey);
+                        foreach (var friendString in friendStrings)
+                        {
+                            var friend = new Friend(friendString);
+                            friends.Add(friend);
+                            size += (uint)(8 + Encoding.ASCII.GetByteCount(friend.Username) + Encoding.ASCII.GetByteCount(friend.GetLocationString()));
 
-                        foreach (var friend in friends)
-                            size += (uint)(1 + Encoding.ASCII.GetByteCount(friend));
+                            if (friends.Count == 255) // Hard limit based on counter in message format
+                            {
+                                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, $"Hard limit of 255 friends reached, dropping remaining {friends.Count - 255} friends from SID_FRIENDSLIST reply");
+                                break;
+                            }
+                        }
 
                         Buffer = new byte[size];
 
                         var m = new MemoryStream(Buffer);
                         var w = new BinaryWriter(m);
 
+                        w.Write((byte)friends.Count);
                         foreach (var friend in friends)
-                            w.Write((string)friend);
+                        {
+                            w.Write(friend.Username);
+                            w.Write((byte)friend.GetStatus());
+                            w.Write((byte)friend.GetLocation());
+                            w.Write((uint)friend.GetProductCode());
+                            w.Write(friend.GetLocationString());
+                        }
 
                         w.Close();
                         m.Close();
