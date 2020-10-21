@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Atlasd.Daemon;
+using System;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Atlasd
 {
     class Program
     {
-        static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             Thread.CurrentThread.Name = "Main";
 
@@ -21,9 +23,9 @@ namespace Atlasd
             Daemon.Common.Initialize();
             Battlenet.Common.Initialize();
 
-            Daemon.Common.Start();
+            await Task.Run(() => { Daemon.Common.Start(); });
 
-            Console.WriteLine("Press enter key to terminate daemon");
+            Console.WriteLine("Press the enter key to terminate daemon");
             Console.ReadLine();
         }
     }
