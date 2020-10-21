@@ -25,8 +25,10 @@ namespace Atlasd
 
             await Task.Run(() => { Daemon.Common.Start(); });
 
-            Console.WriteLine("Press the enter key to terminate daemon");
-            Console.ReadLine();
+            while (true)
+            {
+                Thread.Sleep(10);
+            }
         }
     }
 }
