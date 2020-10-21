@@ -1,7 +1,7 @@
-﻿using Atlasd.Daemon;
+﻿using Atlasd.Battlenet.Protocols.Game;
+using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 
@@ -15,9 +15,12 @@ namespace Atlasd.Battlenet
         public static Dictionary<string, Account> ActiveAccounts;
         public static Dictionary<string, Channel> ActiveChannels;
         public static List<ClientState> ActiveClients;
-        public static IPAddress DefaultInterface { get; private set; }
+        public static IPAddress DefaultAddress { get; private set; }
         public static int DefaultPort { get; private set; }
-        public static TcpListener Listener;
+        public static ServerSocket Listener { get; private set; }
+        public static IPAddress ListenerAddress { get; private set; }
+        public static IPEndPoint ListenerEndPoint { get; private set; }
+        public static int ListenerPort { get; private set; }
 
         public static void Initialize()
         {
@@ -27,25 +30,39 @@ namespace Atlasd.Battlenet
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClients = new List<ClientState>();
 
-            // Channel adds itself to ActiveChannels during instantiation.
+            // Channel object adds itself to ActiveChannels during instantiation.
             new Channel(Channel.TheVoid, Channel.TheVoidFlags, -1);
             new Channel("Backstage", Channel.Flags.Public | Channel.Flags.Restricted, -1, "Abandon hope, all ye who enter here...");
             new Channel("Open Tech Support", Channel.Flags.Public | Channel.Flags.TechSupport, -1);
             new Channel("Blizzard Tech Support", Channel.Flags.Public | Channel.Flags.TechSupport | Channel.Flags.Moderated, -1);
             new Channel("Town Square", Channel.Flags.Public, 200, "Welcome and enjoy your stay!");
 
-            DefaultInterface = IPAddress.Any;
-            DefaultPort = (int)Daemon.Common.Settings["battlenet.listener.port"];
+            DefaultAddress = IPAddress.Any;
+            DefaultPort = 6112;
 
-            Listener = new TcpListener(DefaultInterface, DefaultPort) { ExclusiveAddressUse = false };
+            InitializeListener();
+        }
 
-            Listener.Server.NoDelay = true;
-            Listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true); // SO_KEEPALIVE
-            try {
-                Listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
-            } catch (SocketException ex) {
-                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Server, $"Unable to set linger option on listening socket: {ex.Message}");
+        private static void InitializeListener()
+        {
+            var listenerAddressStr = (string)Daemon.Common.Settings["battlenet.listener.interface"];
+            if (!IPAddress.TryParse(listenerAddressStr, out IPAddress listenerAddress))
+            {
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, $"Unable to parse IP address from [battlenet.listener.interface] with value [{listenerAddressStr}]; using any");
+                listenerAddress = DefaultAddress;
             }
+
+            ListenerAddress = listenerAddress;
+            ListenerPort = (int)(Daemon.Common.Settings["battlenet.listener.port"] ?? DefaultPort);
+
+            if (!IPEndPoint.TryParse($"{ListenerAddress}:{ListenerPort}", out IPEndPoint listenerEndPoint))
+            {
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, $"Unable to parse endpoint with value [{ListenerAddress}:{ListenerPort}]");
+                return;
+            }
+            ListenerEndPoint = listenerEndPoint;
+
+            Listener = new ServerSocket(ListenerEndPoint);
         }
         
         public static uint GetActiveClientCountByProduct(Product.ProductCode productCode)
