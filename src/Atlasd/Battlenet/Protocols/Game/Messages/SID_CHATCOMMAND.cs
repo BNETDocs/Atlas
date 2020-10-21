@@ -26,6 +26,9 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (context.Direction != MessageDirection.ClientToServer)
                 throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND may only be transmitted from client to server");
 
+            if (context.Client.GameState == null)
+                throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND requires a GameState object");
+
             if (Buffer.Length < 1)
                 throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND buffer must be at least 1 bytes");
 
