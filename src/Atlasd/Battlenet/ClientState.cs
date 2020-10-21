@@ -250,6 +250,8 @@ namespace Atlasd.Battlenet
             // Spawn a new thread to handle this connection ...
             new Thread(() =>
             {
+                Thread.CurrentThread.Name = RemoteEndPoint.ToString();
+
                 while (true) // Infinitely loop childSocketThread ...
                 {
                     var bCloseConnection = true;
