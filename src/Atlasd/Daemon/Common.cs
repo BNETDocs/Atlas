@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Atlasd.Daemon
 {
@@ -10,37 +9,46 @@ namespace Atlasd.Daemon
 
         public static void Initialize()
         {
-            Settings = new Dictionary<string, dynamic>(StringComparer.OrdinalIgnoreCase);
-
-            Settings.Add("account.auto_admin", true);
-            Settings.Add("account.disallow_words", new List<string>()
+            Settings = new Dictionary<string, dynamic>(StringComparer.OrdinalIgnoreCase)
             {
-                "ass",
-                "battle.net",
-                "blizzard",
-                "chink",
-                "cracker",
-                "cunt",
-                "fag",
-                "faggot",
-                "fuck",
-                "idiot",
-                "nigga",
-                "nigger",
-                "niglet",
-                "twat",
-                "wetback",
-            });
-            Settings.Add("account.max_adjacent_punctuation", 0);
-            Settings.Add("account.max_length", 15);
-            Settings.Add("account.max_punctuation", 7);
-            Settings.Add("account.min_alphanumeric", 1);
-            Settings.Add("account.min_length", 3);
-            Settings.Add("battlenet.listener.interface", "0.0.0.0");
-            Settings.Add("battlenet.listener.port", 6112);
-            Settings.Add("channel.auto_op", true);
-            Settings.Add("channel.max_length", 31);
-            Settings.Add("channel.max_users", 40);
+                { "account.auto_admin", true },
+                {
+                    "account.disallow_words",
+                    new List<string>()
+                    {
+                        "ass",
+                        "battle.net",
+                        "blizzard",
+                        "chink",
+                        "cracker",
+                        "cunt",
+                        "fag",
+                        "faggot",
+                        "fuck",
+                        "idiot",
+                        "nigga",
+                        "nigger",
+                        "niglet",
+                        "twat",
+                        "wetback",
+                    }
+                },
+                { "account.max_adjacent_punctuation", 0 },
+                { "account.max_length", 15 },
+                { "account.max_punctuation", 7 },
+                { "account.min_alphanumeric", 1 },
+                { "account.min_length", 3 },
+                { "battlenet.listener.interface", "0.0.0.0" },
+                { "battlenet.listener.port", 6112 },
+                { "channel.auto_op", true },
+                { "channel.max_length", 31 },
+                { "channel.max_users", 40 },
+            };
+        }
+
+        public static void Start()
+        {
+            Battlenet.Common.Listener.Start();
         }
     }
 }

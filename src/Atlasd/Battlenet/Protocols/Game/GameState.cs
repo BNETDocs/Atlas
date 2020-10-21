@@ -13,6 +13,8 @@ namespace Atlasd.Battlenet.Protocols.Game
             NLS = 2,
         };
 
+        private bool IsDisposing = false;
+
         public ClientState Client { get; protected set; }
 
         public Account ActiveAccount;
@@ -81,6 +83,9 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public void Dispose() /* part of IDisposable */
         {
+            if (IsDisposing) return;
+            IsDisposing = true;
+
             if (ActiveAccount != null)
             {
                 lock (ActiveAccount)
@@ -103,6 +108,8 @@ namespace Atlasd.Battlenet.Protocols.Game
                 lock (ActiveChannel) ActiveChannel.RemoveUser(this);
                 ActiveChannel = null;
             }
+
+            IsDisposing = false;
         }
     }
 }
