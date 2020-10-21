@@ -12,7 +12,7 @@ namespace Atlasd
         {
             Thread.CurrentThread.Name = "Main";
 
-            var assembly = Assembly.GetCallingAssembly();
+            var assembly = typeof(Program).Assembly;
             Console.WriteLine($"[{DateTime.Now}] Welcome to {assembly.GetName().Name}!");
 #if DEBUG
             Console.WriteLine($"[{DateTime.Now}] Build: {assembly.GetName().Version} (debug)");
