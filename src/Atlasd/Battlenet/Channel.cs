@@ -197,7 +197,7 @@ namespace Atlasd.Battlenet
                 }
                 i++;
             }
-            if (i % 2 != 0) s = s[..-2]; // trim trailing comma
+            if (i % 2 != 0) s = s[0..^2]; // trim trailing comma
 
             return s;
         }
