@@ -2,6 +2,7 @@
 using Atlasd.Daemon;
 using System;
 using System.Reflection;
+using System.Threading;
 
 namespace Atlasd
 {
@@ -9,6 +10,8 @@ namespace Atlasd
     {
         static void Main(string[] args)
         {
+            Thread.CurrentThread.Name = "Main";
+
             var assembly = Assembly.GetCallingAssembly();
             Console.WriteLine($"[{DateTime.Now.ToString(Battlenet.Protocols.Common.HumanDateTimeFormat)}] Welcome to {assembly.GetName().Name}!");
 #if DEBUG
