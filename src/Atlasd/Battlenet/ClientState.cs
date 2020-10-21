@@ -86,12 +86,17 @@ namespace Atlasd.Battlenet
 
         private void Invoke(SocketAsyncEventArgs e)
         {
-            while (BattlenetGameFrame.Messages.Count > 0)
+            var context = new MessageContext(this, Protocols.MessageDirection.ClientToServer);
+
+            lock (BattlenetGameFrame.Messages)
             {
-                if (!BattlenetGameFrame.Messages.Dequeue().Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer)))
+                while (BattlenetGameFrame.Messages.Count > 0)
                 {
-                    Dispose();
-                    return;
+                    if (!BattlenetGameFrame.Messages.Dequeue().Invoke(context))
+                    {
+                        Dispose();
+                        return;
+                    }
                 }
             }
         }
