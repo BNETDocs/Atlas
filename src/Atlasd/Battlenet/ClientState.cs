@@ -2,8 +2,9 @@
 using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Daemon;
 using System;
-using System.IO;
 using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet
 {
@@ -110,10 +111,9 @@ namespace Atlasd.Battlenet
             }
 
             // Append received data to previously received data
-            byte[] newBuffer;
             lock (ReceiveBuffer)
             {
-                newBuffer = new byte[ReceiveBuffer.Length + e.BytesTransferred];
+                var newBuffer = new byte[ReceiveBuffer.Length + e.BytesTransferred];
                 Buffer.BlockCopy(ReceiveBuffer, 0, newBuffer, 0, ReceiveBuffer.Length);
                 Buffer.BlockCopy(e.Buffer, e.Offset, newBuffer, ReceiveBuffer.Length, e.BytesTransferred);
                 ReceiveBuffer = newBuffer;
@@ -134,11 +134,13 @@ namespace Atlasd.Battlenet
             e.SetBuffer(new byte[1024], 0, 1024);
 
             // read the next block of data send from the client
-            bool willRaiseEvent = Socket.ReceiveAsync(e);
-            if (!willRaiseEvent)
-            {
-                ProcessReceive(e);
-            }
+            Task.Run(() => {
+                bool willRaiseEvent = Socket.ReceiveAsync(e);
+                if (!willRaiseEvent)
+                {
+                    ProcessReceive(e);
+                }
+            });
         }
 
         protected void ReceiveProtocolType(SocketAsyncEventArgs e)
@@ -212,7 +214,7 @@ namespace Atlasd.Battlenet
                 }
                 else
                 {
-                    throw new GameProtocolException(this, "Received unknown SID_0x" + messageId.ToString("X2") + " (" + messageLen.ToString() + " bytes)");
+                    throw new GameProtocolException(this, $"Received unknown SID_0x{messageId:X2} ({messageLen} bytes)");
                 }
             }
 

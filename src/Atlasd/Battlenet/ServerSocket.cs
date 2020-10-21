@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet
 {
@@ -58,11 +59,13 @@ namespace Atlasd.Battlenet
             readEventArgs.UserToken = clientState;
 
             // As soon as the client is connected, post a receive to the connection
-            bool willRaiseEvent = clientState.Socket.ReceiveAsync(readEventArgs);
-            if (!willRaiseEvent)
-            {
-                clientState.ProcessReceive(readEventArgs);
-            }
+            Task.Run(() => {
+                bool willRaiseEvent = clientState.Socket.ReceiveAsync(readEventArgs);
+                if (!willRaiseEvent)
+                {
+                    clientState.ProcessReceive(readEventArgs);
+                }
+            });
 
             // Accept the next connection request
             StartAccept(e);
