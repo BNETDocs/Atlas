@@ -48,12 +48,13 @@ namespace Atlasd.Battlenet
             {
                 lock (GameState)
                 {
-                    GameState.Dispose();
+                    if (GameState != null) GameState.Dispose();
                     GameState = null;
                 }
             }
             catch (ArgumentNullException) { }
             catch (NullReferenceException) { }
+            catch (ObjectDisposedException) { }
 
             IsDisposing = false;
         }
