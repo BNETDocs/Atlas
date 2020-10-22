@@ -63,6 +63,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_CDKEY2 => new Messages.SID_CDKEY2(buffer),
                 MessageIds.SID_LOGONRESPONSE2 => new Messages.SID_LOGONRESPONSE2(buffer),
                 MessageIds.SID_CREATEACCOUNT2 => new Messages.SID_CREATEACCOUNT2(buffer),
+                MessageIds.SID_QUERYADURL => new Messages.SID_QUERYADURL(buffer),
                 MessageIds.SID_NEWS_INFO => new Messages.SID_NEWS_INFO(buffer),
                 MessageIds.SID_AUTH_INFO => new Messages.SID_AUTH_INFO(buffer),
                 MessageIds.SID_AUTH_CHECK => new Messages.SID_AUTH_CHECK(buffer),
