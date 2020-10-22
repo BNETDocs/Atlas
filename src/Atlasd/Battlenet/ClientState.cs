@@ -201,13 +201,6 @@ namespace Atlasd.Battlenet
             }
 
             e.SetBuffer(new byte[1024], 0, 1024);
-
-            // read the next block of data send from the client
-            bool willRaiseEvent = Socket.ReceiveAsync(e);
-            if (!willRaiseEvent)
-            {
-                SocketIOCompleted(this, e);
-            }
         }
 
         protected void ReceiveProtocolType(SocketAsyncEventArgs e)
