@@ -15,7 +15,10 @@ namespace Atlasd
             "release";
 #endif
 
-        public static async Task Main(string[] args)
+        public static bool Exit = false;
+        public static int ExitCode = 0;
+
+        public static async Task<int> Main(string[] args)
         {
             Thread.CurrentThread.Name = "Main";
 
@@ -28,10 +31,12 @@ namespace Atlasd
 
             await Task.Run(() => { Common.Start(); });
 
-            while (true)
+            while (!Exit)
             {
-                Thread.Sleep(10);
+                await Task.Delay(10);
             }
+
+            return ExitCode;
         }
     }
 }
