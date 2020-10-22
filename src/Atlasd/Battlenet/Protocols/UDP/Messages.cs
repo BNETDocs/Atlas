@@ -1,6 +1,6 @@
 ﻿namespace Atlasd.Battlenet.Protocols.UDP
 {
-    enum Messages
+    enum Messages : byte
     {
         PKT_STORM = 0x00,
         PKT_CLIENTREQ = 0x03,

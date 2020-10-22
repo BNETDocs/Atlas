@@ -1,6 +1,6 @@
 ﻿namespace Atlasd.Battlenet.Protocols.MCP
 {
-    enum Messages
+    enum Messages : byte
     {
         MCP_STARTUP = 0x01,
         MCP_CHARCREATE = 0x02,
