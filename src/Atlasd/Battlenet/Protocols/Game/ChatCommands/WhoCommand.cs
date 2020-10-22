@@ -40,6 +40,11 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             r = r.Replace("{channel}", ch == null ? "(null)" : ch.Name);
             r = r.Replace("{users}", ch.GetUsersAsString());
 
+            foreach (var kv in context.Environment)
+            {
+                r = r.Replace("{" + kv.Key + "}", kv.Value);
+            }
+
             foreach (var line in r.Split("\r\n"))
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
         }

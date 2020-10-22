@@ -153,11 +153,60 @@ There are currently {gameUsers} users playing {gameAds} games of {game}, and {to
   <data name="GameProductIsChatRestricted" xml:space="preserve">
     <value>Chatting with this game is restricted to the channels listed in the channel menu.</value>
   </data>
+  <data name="HelpCommandAdvancedRemarks" xml:space="preserve">
+    <value>Advanced chat commands:
+/ban /beep /clan /designate /friends /kick /mail
+/nobeep /options /rejoin /stats /time /unban /users
+Type  /help COMMAND  for information about a specific command.</value>
+  </data>
+  <data name="HelpCommandAliasesRemarks" xml:space="preserve">
+    <value>Command aliases:
+  /?         -- /help
+  /channel   -- /join
+  /squelch   -- /ignore
+  /whisper   -- /w /m /msg
+  /emote     -- /me
+  /rejoin    -- /resign
+  /unsquelch -- /unignore
+  /whois     -- /where /whereis
+  /friends   -- /f
+  /clan      -- /c
+Type  /help COMMAND  for information about a specific command.</value>
+  </data>
+  <data name="HelpCommandBanRemarks" xml:space="preserve">
+    <value>/ban USERNAME  (see also: /unban)
+(For channel Operators only) Bans a USERNAME from the channel, and prevents him from returning.
+Example: /ban JoeUser</value>
+  </data>
+  <data name="HelpCommandCommandsRemarks" xml:space="preserve">
+    <value>Basic chat commands:
+/away /dnd /channel /emote 
+/friends /options /squelch /unsquelch 
+/whisper /who /whoami /whois
+Type /help COMMAND for information about a specific command.</value>
+  </data>
+  <data name="HelpCommandJoinRemarks" xml:space="preserve">
+    <value>/channel CHANNEL  (alias: /join)
+Moves you to a different CHANNEL.
+Example: /channel Blizzard Tech Support</value>
+  </data>
+  <data name="HelpCommandRemarks" xml:space="preserve">
+    <value>Battle.net help topics:
+commands  aliases  advanced
+Type /help TOPIC for information about a specific topic.</value>
+  </data>
+  <data name="HelpCommandTimeRemarks" xml:space="preserve">
+    <value>/time
+Displays the current {realm} Time ({realmTimezone}).</value>
+  </data>
   <data name="InvalidChannelName" xml:space="preserve">
     <value>Invalid channel name.</value>
   </data>
   <data name="InvalidChatCommand" xml:space="preserve">
     <value>That is not a valid command. Type /help or /? for more info.</value>
+  </data>
+  <data name="InvalidUser" xml:space="preserve">
+    <value>Invalid user.</value>
   </data>
   <data name="LastLogonInfo" xml:space="preserve">
     <value>Last logon: {timestamp}</value>
@@ -168,6 +217,9 @@ There are currently {gameUsers} users playing {gameAds} games of {game}, and {to
   <data name="TimeCommand" xml:space="preserve">
     <value>{realm} time: {realmTime}
 Your local time: {localTime}</value>
+  </data>
+  <data name="UserBannedFromChannel" xml:space="preserve">
+    <value>{target} was banned by {source}</value>
   </data>
   <data name="UserIsUsingDiablo2InAPrivateGame" xml:space="preserve">
     <value>{character}#{characterRealm} (*{username}) is using {game} in a private game.</value>
@@ -181,8 +233,17 @@ Your local time: {localTime}</value>
   <data name="UserIsUsingGameInThePasswordedGame" xml:space="preserve">
     <value>{username} is using {game} in the password-protected game {gameAd}.</value>
   </data>
+  <data name="UserKickedFromChannel" xml:space="preserve">
+    <value>{target} was kicked out of the channel by {source}.</value>
+  </data>
+  <data name="UserKickedFromChannelWithReason" xml:space="preserve">
+    <value>{target} was kicked out of the channel by {source} ({reason}).</value>
+  </data>
   <data name="UserNotLoggedOn" xml:space="preserve">
     <value>That user is not logged on.</value>
+  </data>
+  <data name="UserUnBannedFromChannel" xml:space="preserve">
+    <value>{target} was unbanned by {source}</value>
   </data>
   <data name="WhoCommand" xml:space="preserve">
     <value>Users in channel {channel}:
@@ -190,6 +251,9 @@ Your local time: {localTime}</value>
   </data>
   <data name="YouAreBannedFromThatChannel" xml:space="preserve">
     <value>You are banned from that channel.</value>
+  </data>
+  <data name="YouAreNotAChannelOperator" xml:space="preserve">
+    <value>You are not a channel operator.</value>
   </data>
   <data name="YouAreUsingGameInGame" xml:space="preserve">
     <value>You are {name}, using {game} in game {gameAd}.</value>
@@ -199,6 +263,9 @@ Your local time: {localTime}</value>
   </data>
   <data name="YouAreUsingGameInTheChannel" xml:space="preserve">
     <value>You are {name}, using {game} in the channel {channel}.</value>
+  </data>
+  <data name="YouCannotKickAChannelOperator" xml:space="preserve">
+    <value>You can't kick a channel operator.</value>
   </data>
   <data name="YourFriendEnteredGame" xml:space="preserve">
     <value>Your friend {friend} has entered a {game} game called {gameAd}.</value>
@@ -211,5 +278,8 @@ Your local time: {localTime}</value>
   </data>
   <data name="YourFriendLoggedOn" xml:space="preserve">
     <value>Your friend {friend} has entered {realm}.</value>
+  </data>
+  <data name="YouWereKickedFromChannel" xml:space="preserve">
+    <value>{source} kicked you out of the channel!</value>
   </data>
 </root>

@@ -163,6 +163,94 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Advanced chat commands:
+        ////ban /beep /clan /designate /friends /kick /mail
+        ////nobeep /options /rejoin /stats /time /unban /users
+        ///Type  /help COMMAND  for information about a specific command..
+        /// </summary>
+        public static string HelpCommandAdvancedRemarks {
+            get {
+                return ResourceManager.GetString("HelpCommandAdvancedRemarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Command aliases:
+        ///  /?         -- /help
+        ///  /channel   -- /join
+        ///  /squelch   -- /ignore
+        ///  /whisper   -- /w /m /msg
+        ///  /emote     -- /me
+        ///  /rejoin    -- /resign
+        ///  /unsquelch -- /unignore
+        ///  /whois     -- /where /whereis
+        ///  /friends   -- /f
+        ///  /clan      -- /c
+        ///Type  /help COMMAND  for information about a specific command..
+        /// </summary>
+        public static string HelpCommandAliasesRemarks {
+            get {
+                return ResourceManager.GetString("HelpCommandAliasesRemarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /ban USERNAME  (see also: /unban)
+        ///(For channel Operators only) Bans a USERNAME from the channel, and prevents him from returning.
+        ///Example: /ban JoeUser.
+        /// </summary>
+        public static string HelpCommandBanRemarks {
+            get {
+                return ResourceManager.GetString("HelpCommandBanRemarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Basic chat commands:
+        ////away /dnd /channel /emote 
+        ////friends /options /squelch /unsquelch 
+        ////whisper /who /whoami /whois
+        ///Type /help COMMAND for information about a specific command..
+        /// </summary>
+        public static string HelpCommandCommandsRemarks {
+            get {
+                return ResourceManager.GetString("HelpCommandCommandsRemarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /channel CHANNEL  (alias: /join)
+        ///Moves you to a different CHANNEL.
+        ///Example: /channel Blizzard Tech Support.
+        /// </summary>
+        public static string HelpCommandJoinRemarks {
+            get {
+                return ResourceManager.GetString("HelpCommandJoinRemarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Battle.net help topics:
+        ///commands  aliases  advanced
+        ///Type /help TOPIC for information about a specific topic..
+        /// </summary>
+        public static string HelpCommandRemarks {
+            get {
+                return ResourceManager.GetString("HelpCommandRemarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /time
+        ///Displays the current {realm} Time ({realmTimezone})..
+        /// </summary>
+        public static string HelpCommandTimeRemarks {
+            get {
+                return ResourceManager.GetString("HelpCommandTimeRemarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid channel name..
         /// </summary>
         public static string InvalidChannelName {
@@ -177,6 +265,15 @@ namespace Atlasd.Localization {
         public static string InvalidChatCommand {
             get {
                 return ResourceManager.GetString("InvalidChatCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid user..
+        /// </summary>
+        public static string InvalidUser {
+            get {
+                return ResourceManager.GetString("InvalidUser", resourceCulture);
             }
         }
         
@@ -205,6 +302,15 @@ namespace Atlasd.Localization {
         public static string TimeCommand {
             get {
                 return ResourceManager.GetString("TimeCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {target} was banned by {source}.
+        /// </summary>
+        public static string UserBannedFromChannel {
+            get {
+                return ResourceManager.GetString("UserBannedFromChannel", resourceCulture);
             }
         }
         
@@ -245,11 +351,38 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {target} was kicked out of the channel by {source}..
+        /// </summary>
+        public static string UserKickedFromChannel {
+            get {
+                return ResourceManager.GetString("UserKickedFromChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {target} was kicked out of the channel by {source} ({reason})..
+        /// </summary>
+        public static string UserKickedFromChannelWithReason {
+            get {
+                return ResourceManager.GetString("UserKickedFromChannelWithReason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to That user is not logged on..
         /// </summary>
         public static string UserNotLoggedOn {
             get {
                 return ResourceManager.GetString("UserNotLoggedOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {target} was unbanned by {source}.
+        /// </summary>
+        public static string UserUnBannedFromChannel {
+            get {
+                return ResourceManager.GetString("UserUnBannedFromChannel", resourceCulture);
             }
         }
         
@@ -269,6 +402,15 @@ namespace Atlasd.Localization {
         public static string YouAreBannedFromThatChannel {
             get {
                 return ResourceManager.GetString("YouAreBannedFromThatChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are not a channel operator..
+        /// </summary>
+        public static string YouAreNotAChannelOperator {
+            get {
+                return ResourceManager.GetString("YouAreNotAChannelOperator", resourceCulture);
             }
         }
         
@@ -296,6 +438,15 @@ namespace Atlasd.Localization {
         public static string YouAreUsingGameInTheChannel {
             get {
                 return ResourceManager.GetString("YouAreUsingGameInTheChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t kick a channel operator..
+        /// </summary>
+        public static string YouCannotKickAChannelOperator {
+            get {
+                return ResourceManager.GetString("YouCannotKickAChannelOperator", resourceCulture);
             }
         }
         
@@ -332,6 +483,15 @@ namespace Atlasd.Localization {
         public static string YourFriendLoggedOn {
             get {
                 return ResourceManager.GetString("YourFriendLoggedOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {source} kicked you out of the channel!.
+        /// </summary>
+        public static string YouWereKickedFromChannel {
+            get {
+                return ResourceManager.GetString("YouWereKickedFromChannel", resourceCulture);
             }
         }
     }

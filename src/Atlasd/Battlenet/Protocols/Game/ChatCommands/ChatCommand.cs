@@ -1,4 +1,5 @@
 ﻿using Atlasd.Battlenet.Protocols.Game.ChatCommands;
+using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
 
@@ -39,6 +40,8 @@ namespace Atlasd.Battlenet.Protocols.Game
                 case "help":
                 case "?":
                     return new HelpCommand(args);
+                case "kick":
+                    return new KickCommand(args);
                 case "time":
                     return new TimeCommand(args);
                 case "who":

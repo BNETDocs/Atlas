@@ -1,6 +1,8 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
 using Atlasd.Localization;
+using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
@@ -51,7 +53,22 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             }
 
             var command = ChatCommand.FromString(text[1..]);
-            var commandContext = new ChatCommandContext(command, context.Client.GameState);
+            var commandEnvironment = new Dictionary<string, string>()
+            {
+                { "accountName", context.Client.GameState.Username },
+                { "channel", context.Client.GameState.ActiveChannel == null ? "(null)" : context.Client.GameState.ActiveChannel.Name },
+                { "game", Product.ProductName(context.Client.GameState.Product, true) },
+                { "host", "BNETDocs" },
+                { "localTime", context.Client.GameState.LocalTime.ToString(Common.HumanDateTimeFormat) },
+                { "name", context.Client.GameState.OnlineName },
+                { "onlineName", context.Client.GameState.OnlineName },
+                { "realm", "Battle.net" },
+                { "realmTime", DateTime.Now.ToString(Common.HumanDateTimeFormat) },
+                { "realmTimezone", $"UTC{DateTime.Now:zzz}" },
+                { "username", context.Client.GameState.OnlineName },
+                { "userName", context.Client.GameState.OnlineName },
+            };
+            var commandContext = new ChatCommandContext(command, commandEnvironment, context.Client.GameState);
 
             if (!command.CanInvoke(commandContext))
             {

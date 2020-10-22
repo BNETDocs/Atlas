@@ -17,9 +17,12 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
         {
             var str = Resources.TimeCommand;
 
-            str = str.Replace("{realm}", "BNETDocs");
-            str = str.Replace("{realmTime}", DateTime.Now.ToString(Common.HumanDateTimeFormat));
-            str = str.Replace("{localTime}", context.GameState.LocalTime.ToString(Common.HumanDateTimeFormat));
+            foreach (var kv in context.Environment)
+            {
+                str = str.Replace("{" + kv.Key + "}", kv.Value);
+            }
+
+            str = str.Replace(" 0", "  ");
 
             foreach (var line in str.Split("\r\n"))
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Atlasd.Localization;
+using System;
 using System.Collections.Generic;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
@@ -14,14 +15,34 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            var lines = new List<string>
-            {
-                "Battle.net help topics:",
-                "commands  aliases  advanced",
-                "Type /help TOPIC for information about a specific topic.",
-            };
+            var topic = Arguments.Count == 0 ? "" : Arguments[0];
+            var subtopic = Arguments.Count <= 1 ? "" : Arguments[1];
+            var remarks = Resources.HelpCommandRemarks;
 
-            foreach (var line in lines)
+            switch (topic.ToLower())
+            {
+                case "advanced":
+                    remarks = Resources.HelpCommandAdvancedRemarks; break;
+                case "aliases":
+                    remarks = Resources.HelpCommandAliasesRemarks; break;
+                case "ban":
+                    remarks = Resources.HelpCommandBanRemarks; break;
+                case "channel":
+                case "join":
+                case "j":
+                    remarks = Resources.HelpCommandJoinRemarks; break;
+                case "commands":
+                    remarks = Resources.HelpCommandCommandsRemarks; break;
+                case "time":
+                    remarks = Resources.HelpCommandTimeRemarks; break;
+            }
+
+            foreach (var kv in context.Environment)
+            {
+                remarks = remarks.Replace("{" + kv.Key + "}", kv.Value);
+            }
+
+            foreach (var line in remarks.Split("\r\n"))
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
         }
     }

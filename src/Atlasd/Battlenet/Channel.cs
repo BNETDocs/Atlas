@@ -150,7 +150,7 @@ namespace Atlasd.Battlenet
             {
                 var theVoid = GetChannelByName(TheVoid);
                 if (theVoid == null) theVoid = new Channel(TheVoid, TheVoidFlags, -1);
-                foreach (var user in Users) MoveUser(user, theVoid);
+                foreach (var user in Users) MoveUser(user, theVoid, true);
             }
 
             if (Common.ActiveChannels.ContainsKey(Name))
@@ -212,6 +212,62 @@ namespace Atlasd.Battlenet
             return ActiveFlags.HasFlag(Flags.Public);
         }
 
+        public void KickUser(GameState source, string target, string reason)
+        {
+            GameState targetClient = null;
+
+            lock (Users)
+            {
+                foreach (var client in Users)
+                {
+                    if (client.OnlineName == target)
+                    {
+                        targetClient = client;
+                        break;
+                    }
+                }
+            }
+
+            if (targetClient == null)
+            {
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, Resources.InvalidUser).WriteTo(source.Client);
+                return;
+            }
+
+            var sourceSudoPrivs = source.ChannelFlags.HasFlag(Account.Flags.Admin) || source.ChannelFlags.HasFlag(Account.Flags.Employee);
+            var targetSudoPrivs = targetClient.ChannelFlags.HasFlag(Account.Flags.Admin)
+                || targetClient.ChannelFlags.HasFlag(Account.Flags.ChannelOp)
+                || targetClient.ChannelFlags.HasFlag(Account.Flags.Employee);
+
+            if (targetSudoPrivs && !sourceSudoPrivs)
+            {
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, Resources.YouCannotKickAChannelOperator).WriteTo(source.Client);
+                return;
+            }
+
+            var kickedStr = reason.Length > 0 ? Resources.UserKickedFromChannelWithReason : Resources.UserKickedFromChannel;
+
+            kickedStr = kickedStr.Replace("{reason}", reason);
+            kickedStr = kickedStr.Replace("{source}", source.OnlineName);
+            kickedStr = kickedStr.Replace("{target}", target);
+
+            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, source.ChannelFlags, source.Ping, source.OnlineName, kickedStr));
+
+            RemoveUser(targetClient);
+
+            kickedStr = Resources.YouWereKickedFromChannel;
+
+            kickedStr = kickedStr.Replace("{reason}", reason);
+            kickedStr = kickedStr.Replace("{source}", source.OnlineName);
+            kickedStr = kickedStr.Replace("{target}", target);
+
+            new ChatEvent(ChatEvent.EventIds.EID_INFO, source.ChannelFlags, source.Ping, source.OnlineName, kickedStr).WriteTo(targetClient.Client);
+
+            var theVoid = GetChannelByName(TheVoid);
+            if (theVoid == null) theVoid = new Channel(TheVoid, TheVoidFlags, -1);
+            MoveUser(targetClient, theVoid, true);
+        }
+
         public static void MoveUser(GameState client, string name, bool ignoreLimits = true)
         {
             var channel = GetChannelByName(name);
@@ -221,7 +277,7 @@ namespace Atlasd.Battlenet
 
         public static void MoveUser(GameState client, Channel channel, bool ignoreLimits = true)
         {
-            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Channel, "Moving user [" + client.OnlineName + "] " + (client.ActiveChannel != null ? "from [" + client.ActiveChannel.Name + "] " : "") + "to [" + channel.Name + "] (ignoreLimits: " + (ignoreLimits ? "yes" : "no") + ")");
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Channel, $"Moving user [{client.OnlineName}] {(client.ActiveChannel != null ? $"from [{client.ActiveChannel.Name}] " : "")}to [{channel.Name}] (ignoreLimits: {ignoreLimits})");
 
             channel.AcceptUser(client, ignoreLimits);
         }

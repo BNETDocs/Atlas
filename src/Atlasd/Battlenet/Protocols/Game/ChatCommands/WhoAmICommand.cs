@@ -17,10 +17,13 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             var ch = context.GameState.ActiveChannel;
             var str = ch == null ? Resources.YouAreUsingGameInRealm : Resources.YouAreUsingGameInTheChannel;
 
-            str = str.Replace("{name}", context.GameState.OnlineName);
-            str = str.Replace("{game}", Product.ProductName(context.GameState.Product, true));
             str = str.Replace("{realm}", "BNETDocs");
             str = str.Replace("{channel}", ch == null ? "(null)" : ch.Name);
+
+            foreach (var kv in context.Environment)
+            {
+                str = str.Replace("{" + kv.Key + "}", kv.Value);
+            }
 
             new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, str).WriteTo(context.GameState.Client);
         }
