@@ -7,7 +7,8 @@ on:
     branches: [ develop ]
 
 jobs:
-  build:
+  build-atlas:
+    name: Build Atlas
 
     runs-on: ubuntu-latest
 
@@ -18,7 +19,47 @@ jobs:
       with:
         dotnet-version: 3.1.301
     - name: Change working directory
-      run: cd src
+      run: cd src/Atlas
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
+
+  build-atlasd:
+    name: Build Atlasd
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+    - name: Change working directory
+      run: cd src/Atlasd
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
+
+  build-mbncsutil:
+    name: Build MBNCSUtil
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+    - name: Change working directory
+      run: cd src/MBNCSUtil
     - name: Install dependencies
       run: dotnet restore
     - name: Build
