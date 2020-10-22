@@ -3,9 +3,11 @@ using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Daemon;
 using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet
 {
@@ -78,6 +80,8 @@ namespace Atlasd.Battlenet
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, "TCP connection established");
 
             client.NoDelay = true;
+            client.ReceiveTimeout = 500;
+            client.SendTimeout = 500;
 
             if (client.ReceiveBufferSize < 0xFFFF)
             {
@@ -96,17 +100,20 @@ namespace Atlasd.Battlenet
         {
             var context = new MessageContext(this, Protocols.MessageDirection.ClientToServer);
 
-            lock (BattlenetGameFrame.Messages)
+            Task.Run(() =>
             {
-                while (BattlenetGameFrame.Messages.Count > 0)
+                lock (BattlenetGameFrame.Messages)
                 {
-                    if (!BattlenetGameFrame.Messages.Dequeue().Invoke(context))
+                    while (BattlenetGameFrame.Messages.Count > 0)
                     {
-                        Dispose();
-                        return;
+                        if (!BattlenetGameFrame.Messages.Dequeue().Invoke(context))
+                        {
+                            Dispose();
+                            return;
+                        }
                     }
                 }
-            }
+            });
         }
 
         void ProcessNullTimer(object state)
@@ -132,11 +139,14 @@ namespace Atlasd.Battlenet
 
         void ProcessPingTimer(object state)
         {
+            var clientState = state as ClientState;
+            clientState.GameState.PingDelta = DateTime.Now;
+
             switch (ProtocolType.Type)
             {
                 case ProtocolType.Types.Game:
                     {
-                        new SID_PING().Invoke(new MessageContext(this, Protocols.MessageDirection.ServerToClient));
+                        new SID_PING().Invoke(new MessageContext(this, Protocols.MessageDirection.ServerToClient, new Dictionary<string, object>(){{ "token", GameState.PingToken }}));
                         break;
                     }
                 case ProtocolType.Types.Chat:
@@ -210,6 +220,8 @@ namespace Atlasd.Battlenet
             if (ProtocolType.IsGame() || ProtocolType.IsChat())
             {
                 GameState = new GameState(this);
+                NullTimer = new Timer(ProcessNullTimer, this, 20000, 20000); // every 20 seconds send SID_NULL
+                PingTimer = new Timer(ProcessPingTimer, this, 60000, 60000); // every 60 seconds send SID_PING
             }
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, $"Set protocol type [0x{(byte)ProtocolType.Type:X2}] ({ProtocolType})");
