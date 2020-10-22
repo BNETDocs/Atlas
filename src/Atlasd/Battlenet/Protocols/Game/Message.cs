@@ -39,7 +39,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_CHATEVENT => new Messages.SID_CHATEVENT(buffer),
                 MessageIds.SID_LEAVECHAT => new Messages.SID_LEAVECHAT(buffer),
                 MessageIds.SID_LOCALEINFO => new Messages.SID_LOCALEINFO(buffer),
-                //MessageIds.SID_FLOODDETECTED => new Messages.SID_FLOODDETECTED(buffer),
+                MessageIds.SID_FLOODDETECTED => new Messages.SID_FLOODDETECTED(buffer),
                 MessageIds.SID_UDPPINGRESPONSE => new Messages.SID_UDPPINGRESPONSE(buffer),
                 MessageIds.SID_CHECKAD => new Messages.SID_CHECKAD(buffer),
                 MessageIds.SID_CLICKAD => new Messages.SID_CLICKAD(buffer),
