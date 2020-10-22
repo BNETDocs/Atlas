@@ -78,20 +78,5 @@ namespace Atlasd.Battlenet
 
             return count;
         }
-
-        public static string ProtocolTypeName(ProtocolType protocolType)
-        {
-            return protocolType switch
-            {
-                ProtocolType.None => "None",
-                ProtocolType.Game => "Game",
-                ProtocolType.BNFTP => "BNFTP",
-                ProtocolType.Chat => "Chat",
-                ProtocolType.Chat_Alt1 => "Chat_Alt1",
-                ProtocolType.Chat_Alt2 => "Chat_Alt2",
-                ProtocolType.IPC => "IPC",
-                _ => $"Unknown (0x{(byte)protocolType:X2})",
-            };
-        }
     }
 }

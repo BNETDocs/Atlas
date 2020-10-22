@@ -71,7 +71,7 @@ namespace Atlasd.Battlenet
             GameState = null;
             NullTimer = null;
             PingTimer = null;
-            ProtocolType = ProtocolType.None;
+            ProtocolType = null;
             RemoteEndPoint = client.RemoteEndPoint;
             Socket = client;
 
@@ -111,43 +111,43 @@ namespace Atlasd.Battlenet
 
         void ProcessNullTimer(object state)
         {
-            switch (ProtocolType)
+            switch (ProtocolType.Type)
             {
-                case ProtocolType.Game:
+                case ProtocolType.Types.Game:
                     {
                         new SID_NULL().Invoke(new MessageContext(this, Protocols.MessageDirection.ServerToClient));
                         break;
                     }
-                case ProtocolType.Chat:
-                case ProtocolType.Chat_Alt1:
-                case ProtocolType.Chat_Alt2:
+                case ProtocolType.Types.Chat:
+                case ProtocolType.Types.Chat_Alt1:
+                case ProtocolType.Types.Chat_Alt2:
                     {
                         Send(Encoding.ASCII.GetBytes($"{2000 + (ushort)MessageIds.SID_NULL} NULL\r\n"));
                         break;
                     }
                 default:
-                    throw new ProtocolNotSupportedException(ProtocolType, this, $"Unsupported protocol type [0x{(byte)ProtocolType:X2}]");
+                    throw new ProtocolNotSupportedException(ProtocolType.Type, this, $"Unsupported protocol type [0x{(byte)ProtocolType.Type:X2}]");
             }
         }
 
         void ProcessPingTimer(object state)
         {
-            switch (ProtocolType)
+            switch (ProtocolType.Type)
             {
-                case ProtocolType.Game:
+                case ProtocolType.Types.Game:
                     {
                         new SID_PING().Invoke(new MessageContext(this, Protocols.MessageDirection.ServerToClient));
                         break;
                     }
-                case ProtocolType.Chat:
-                case ProtocolType.Chat_Alt1:
-                case ProtocolType.Chat_Alt2:
+                case ProtocolType.Types.Chat:
+                case ProtocolType.Types.Chat_Alt1:
+                case ProtocolType.Types.Chat_Alt2:
                     {
                         Send(Encoding.ASCII.GetBytes($"{2000 + (ushort)MessageIds.SID_PING} PING\r\n"));
                         break;
                     }
                 default:
-                    throw new ProtocolNotSupportedException(ProtocolType, this, $"Unsupported protocol type [0x{(byte)ProtocolType:X2}]");
+                    throw new ProtocolNotSupportedException(ProtocolType.Type, this, $"Unsupported protocol type [0x{(byte)ProtocolType.Type:X2}]");
             }
         }
 
@@ -173,7 +173,7 @@ namespace Atlasd.Battlenet
                 ReceiveBuffer = newBuffer;
             }
 
-            if (ProtocolType == ProtocolType.None) ReceiveProtocolType(e);
+            if (ProtocolType == null) ReceiveProtocolType(e);
             ReceiveProtocol(e);
         }
 
@@ -202,41 +202,38 @@ namespace Atlasd.Battlenet
 
         protected void ReceiveProtocolType(SocketAsyncEventArgs e)
         {
-            if (ProtocolType != ProtocolType.None) return;
+            if (ProtocolType != null) return;
 
-            ProtocolType = (ProtocolType)ReceiveBuffer[0];
+            ProtocolType = new ProtocolType((ProtocolType.Types)ReceiveBuffer[0]);
             ReceiveBuffer = ReceiveBuffer[1..];
 
-            if (ProtocolType == ProtocolType.Game ||
-                ProtocolType == ProtocolType.Chat ||
-                ProtocolType == ProtocolType.Chat_Alt1 ||
-                ProtocolType == ProtocolType.Chat_Alt2)
+            if (ProtocolType.IsGame() || ProtocolType.IsChat())
             {
                 GameState = new GameState(this);
             }
 
-            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, $"Set protocol type [0x{(byte)ProtocolType:X2}] ({Common.ProtocolTypeName(ProtocolType)})");
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, $"Set protocol type [0x{(byte)ProtocolType.Type:X2}] ({ProtocolType})");
         }
 
         protected void ReceiveProtocol(SocketAsyncEventArgs e)
         {
-            switch (ProtocolType)
+            switch (ProtocolType.Type)
             {
-                case ProtocolType.Game:
+                case ProtocolType.Types.Game:
                     ReceiveProtocolGame(e); break;
-                case ProtocolType.Chat:
-                case ProtocolType.Chat_Alt1:
-                case ProtocolType.Chat_Alt2:
+                case ProtocolType.Types.Chat:
+                case ProtocolType.Types.Chat_Alt1:
+                case ProtocolType.Types.Chat_Alt2:
                     ReceiveProtocolChat(e); break;
                 default:
-                    throw new ProtocolNotSupportedException(ProtocolType, this, $"Unsupported protocol type [0x{(byte)ProtocolType:X2}]");
+                    throw new ProtocolNotSupportedException(ProtocolType.Type, this, $"Unsupported protocol type [0x{(byte)ProtocolType.Type:X2}]");
             }
         }
 
         protected void ReceiveProtocolChat(SocketAsyncEventArgs e)
         {
             Send(System.Text.Encoding.ASCII.GetBytes("The chat gateway is currently unsupported on Atlasd.\r\n"));
-            throw new ProtocolNotSupportedException(ProtocolType, this, $"Unsupported protocol type [0x{(byte)ProtocolType:X2}]");
+            throw new ProtocolNotSupportedException(ProtocolType.Type, this, $"Unsupported protocol type [0x{(byte)ProtocolType.Type:X2}]");
         }
 
         protected void ReceiveProtocolGame(SocketAsyncEventArgs e)
@@ -315,11 +312,12 @@ namespace Atlasd.Battlenet
             {
                 var log_type = ex.ProtocolType switch
                 {
-                    ProtocolType.Game => Logging.LogType.Client_Game,
-                    ProtocolType.BNFTP => Logging.LogType.Client_BNFTP,
-                    ProtocolType.Chat => Logging.LogType.Client_Chat,
-                    ProtocolType.Chat_Alt1 => Logging.LogType.Client_Chat,
-                    ProtocolType.Chat_Alt2 => Logging.LogType.Client_Chat,
+                    ProtocolType.Types.Game => Logging.LogType.Client_Game,
+                    ProtocolType.Types.BNFTP => Logging.LogType.Client_BNFTP,
+                    ProtocolType.Types.Chat => Logging.LogType.Client_Chat,
+                    ProtocolType.Types.Chat_Alt1 => Logging.LogType.Client_Chat,
+                    ProtocolType.Types.Chat_Alt2 => Logging.LogType.Client_Chat,
+                    ProtocolType.Types.IPC => Logging.LogType.Client_IPC,
                     _ => Logging.LogType.Client,
                 };
                 Logging.WriteLine(Logging.LogLevel.Warning, log_type, clientState.RemoteEndPoint, "Protocol violation encountered!" + (ex.Message.Length > 0 ? $" {ex.Message}" : ""));

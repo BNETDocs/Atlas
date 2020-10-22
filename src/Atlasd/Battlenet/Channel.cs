@@ -148,9 +148,9 @@ namespace Atlasd.Battlenet
         {
             if (Users != null)
             {
-                var theVoid = Channel.GetChannelByName(TheVoid);
+                var theVoid = GetChannelByName(TheVoid);
                 if (theVoid == null) theVoid = new Channel(TheVoid, TheVoidFlags, -1);
-                foreach (var user in Users) Channel.MoveUser(user, theVoid);
+                foreach (var user in Users) MoveUser(user, theVoid);
             }
 
             if (Common.ActiveChannels.ContainsKey(Name))
@@ -164,7 +164,7 @@ namespace Atlasd.Battlenet
 
         public string GetUsersAsString()
         {
-            if (ActiveFlags.HasFlag(Channel.Flags.Silent)) return "";
+            if (ActiveFlags.HasFlag(Flags.Silent)) return "";
 
             var names = new LinkedList<string>();
 
@@ -204,17 +204,17 @@ namespace Atlasd.Battlenet
 
         public bool IsPrivate()
         {
-            return !ActiveFlags.HasFlag(Channel.Flags.Public);
+            return !ActiveFlags.HasFlag(Flags.Public);
         }
 
         public bool IsPublic()
         {
-            return ActiveFlags.HasFlag(Channel.Flags.Public);
+            return ActiveFlags.HasFlag(Flags.Public);
         }
 
         public static void MoveUser(GameState client, string name, bool ignoreLimits = true)
         {
-            var channel = Channel.GetChannelByName(name);
+            var channel = GetChannelByName(name);
             if (channel == null) channel = new Channel(name, 0);
             MoveUser(client, channel, ignoreLimits);
         }
@@ -392,24 +392,7 @@ namespace Atlasd.Battlenet
                     }
 
                     msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
-
-                    switch (user.Client.ProtocolType)
-                    {
-                        case ProtocolType.Game:
-                            {
-                                user.Client.Send(msg.ToByteArray());
-                                break;
-                            }
-                        case ProtocolType.Chat:
-                        case ProtocolType.Chat_Alt1:
-                        case ProtocolType.Chat_Alt2:
-                            {
-                                user.Client.Send(Encoding.ASCII.GetBytes(msg.ToString()));
-                                break;
-                            }
-                        default:
-                            throw new NotSupportedException("Invalid channel state, user in channel is using an incompatible protocol");
-                    }
+                    user.Client.Send(msg.ToByteArray());
                 }
             }
         }

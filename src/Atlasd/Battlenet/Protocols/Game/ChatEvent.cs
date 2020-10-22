@@ -81,10 +81,10 @@ namespace Atlasd.Battlenet.Protocols.Game
             Text = text;
         }
 
-        public byte[] ToByteArray(ProtocolType protocolType)
+        public byte[] ToByteArray(ProtocolType.Types protocolType)
         {
             switch (protocolType) {
-                case ProtocolType.Game:
+                case ProtocolType.Types.Game:
                     {
                         var buf = new byte[26 + Encoding.ASCII.GetByteCount(Username) + Encoding.UTF8.GetByteCount(Text)];
                         var m = new MemoryStream(buf);
@@ -106,9 +106,9 @@ namespace Atlasd.Battlenet.Protocols.Game
 
                         return buf;
                     }
-                case ProtocolType.Chat:
-                case ProtocolType.Chat_Alt1:
-                case ProtocolType.Chat_Alt2:
+                case ProtocolType.Types.Chat:
+                case ProtocolType.Types.Chat_Alt1:
+                case ProtocolType.Types.Chat_Alt2:
                     {
                         var buf = $"{1000 + EventId} ";
                         var product = Text.Length < 4 ? "" : Text[0..4];
@@ -193,24 +193,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             var msg = new SID_CHATEVENT();
 
             msg.Invoke(new MessageContext(receiver, MessageDirection.ServerToClient, args));
-
-            switch (receiver.ProtocolType)
-            {
-                case ProtocolType.Game:
-                    {
-                        receiver.Send(msg.ToByteArray());
-                        break;
-                    }
-                case ProtocolType.Chat:
-                case ProtocolType.Chat_Alt1:
-                case ProtocolType.Chat_Alt2:
-                    {
-                        receiver.Send(Encoding.UTF8.GetBytes(msg.ToString()));
-                        break;
-                    }
-                default:
-                    throw new NotSupportedException("Invalid channel state, user in channel is using an incompatible protocol");
-            }
+            receiver.Send(msg.ToByteArray());
         }
     }
 }
