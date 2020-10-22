@@ -1,0 +1,14 @@
+Atlas
+
+Copyright (c) 2020 Carl Bennett <https://github.com/carlbennett>
+Copyright (c) 2020 William LaFrance <https://keybase.io/wjlafrance>
+
+Special thanks to: BNETDocs <https://bnetdocs.org/>
+Honorable mention to: Valhalla Legends (a.k.a. vL)
+
+Atlas is free software distributed under the MIT License. It is not officially
+affiliated with or endorsed by Blizzard Entertainment, its subsidiaries, or
+business partners. Battle.net, Diablo, StarCraft, and WarCraft are registered
+trademarks of Blizzard Entertainment in the United States. This software is
+provided as-is in the hopes that it is useful without warranty of any kind.
+
