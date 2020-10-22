@@ -199,8 +199,6 @@ namespace Atlasd.Battlenet
                 }
                 return;
             }
-
-            e.SetBuffer(new byte[1024], 0, 1024);
         }
 
         protected void ReceiveProtocolType(SocketAsyncEventArgs e)
