@@ -70,7 +70,6 @@ namespace Atlasd.Battlenet
             if (!willRaiseEvent)
             {
                 clientState.SocketIOCompleted_External(this, readEventArgs);
-                StartReceiveAsync(clientState);
             }
         }
 
@@ -100,7 +99,6 @@ namespace Atlasd.Battlenet
         {
             var clientState = e.UserToken as ClientState;
             clientState.SocketIOCompleted_External(sender, e);
-            StartReceiveAsync(clientState);
         }
 
         public void Start(int backlog = 100)

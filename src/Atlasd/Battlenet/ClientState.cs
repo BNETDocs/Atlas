@@ -134,11 +134,8 @@ namespace Atlasd.Battlenet
             if (ProtocolType == null) ReceiveProtocolType(e);
             ReceiveProtocol(e);
 
-            bool willRaiseEvent = Socket.ReceiveAsync(e);
-            if (!willRaiseEvent)
-            {
-                SocketIOCompleted(this, e);
-            }
+            // Start the next read
+            ReceiveAsync();
         }
 
         public void ProcessSend(SocketAsyncEventArgs e)
@@ -152,6 +149,21 @@ namespace Atlasd.Battlenet
                     Dispose();
                 }
                 return;
+            }
+        }
+
+        public void ReceiveAsync()
+        {
+            var readEventArgs = new SocketAsyncEventArgs();
+            readEventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(SocketIOCompleted);
+            readEventArgs.SetBuffer(new byte[1024], 0, 1024);
+            readEventArgs.UserToken = this;
+
+            // As soon as the client is connected, post a receive to the connection
+            bool willRaiseEvent = Socket.ReceiveAsync(readEventArgs);
+            if (!willRaiseEvent)
+            {
+                SocketIOCompleted(this, readEventArgs);
             }
         }
 
@@ -254,14 +266,17 @@ namespace Atlasd.Battlenet
                 switch (e.LastOperation)
                 {
                     case SocketAsyncOperation.Receive:
-                        ProcessReceive(e);
+                        clientState.ProcessReceive(e);
                         break;
                     case SocketAsyncOperation.Send:
-                        ProcessSend(e);
+                        clientState.ProcessSend(e);
                         break;
                     default:
                         throw new ArgumentException("The last operation completed on the socket was not a receive or send");
                 }
+
+                // Start the next read
+                clientState.ReceiveAsync();
             }
             catch (GameProtocolViolationException ex)
             {
