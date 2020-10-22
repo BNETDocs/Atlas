@@ -1,6 +1,7 @@
 # Atlas
 **Atlas** is cross-platform software that emulates Classic Battle.net in a compatible model for Diablo, StarCraft, and WarCraft.
 
+[![GitHub watchers](https://img.shields.io/github/watchers/BNETDocs/Atlas?style=for-the-badge)](https://github.com/BNETDocs/Atlas/watchers)
 [![GitHub forks](https://img.shields.io/github/forks/BNETDocs/Atlas?style=for-the-badge)](https://github.com/BNETDocs/Atlas/network/members)
 [![GitHub Repo stars](https://img.shields.io/github/stars/BNETDocs/Atlas?style=for-the-badge)](https://github.com/BNETDocs/Atlas/stargazers)
 ![GitHub contributors](https://img.shields.io/github/contributors/BNETDocs/Atlas?style=for-the-badge)
