@@ -11,6 +11,8 @@ jobs:
     name: Build Atlas
 
     runs-on: ubuntu-latest
+    env:
+      working-directory: ./src/Atlas
 
     steps:
     - uses: actions/checkout@v2
@@ -18,19 +20,22 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
-    - name: Change working directory
-      run: cd src/Atlas
     - name: Install dependencies
       run: dotnet restore
+      working-directory: ${{env.working-directory}}
     - name: Build
       run: dotnet build --configuration Release --no-restore
+      working-directory: ${{env.working-directory}}
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+      working-directory: ${{env.working-directory}}
 
   build-atlasd:
     name: Build Atlasd
 
     runs-on: ubuntu-latest
+    env:
+      working-directory: ./src/Atlasd
 
     steps:
     - uses: actions/checkout@v2
@@ -38,19 +43,22 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
-    - name: Change working directory
-      run: cd src/Atlasd
     - name: Install dependencies
       run: dotnet restore
+      working-directory: ${{env.working-directory}}
     - name: Build
       run: dotnet build --configuration Release --no-restore
+      working-directory: ${{env.working-directory}}
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+      working-directory: ${{env.working-directory}}
 
   build-mbncsutil:
     name: Build MBNCSUtil
 
     runs-on: ubuntu-latest
+    env:
+      working-directory: ./src/MBNCSUtil
 
     steps:
     - uses: actions/checkout@v2
@@ -58,11 +66,12 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
-    - name: Change working directory
-      run: cd src/MBNCSUtil
     - name: Install dependencies
       run: dotnet restore
+      working-directory: ${{env.working-directory}}
     - name: Build
       run: dotnet build --configuration Release --no-restore
+      working-directory: ${{env.working-directory}}
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+      working-directory: ${{env.working-directory}}
