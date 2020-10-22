@@ -23,10 +23,10 @@ namespace Atlasd
             Console.WriteLine($"[{DateTime.Now}] Welcome to {assembly.GetName().Name}!");
             Console.WriteLine($"[{DateTime.Now}] Build: {assembly.GetName().Version} ({DistributionMode})");
 
-            Daemon.Common.Initialize();
+            Common.Initialize();
             Battlenet.Common.Initialize();
 
-            await Task.Run(() => { Daemon.Common.Start(); });
+            await Task.Run(() => { Common.Start(); });
 
             while (true)
             {
