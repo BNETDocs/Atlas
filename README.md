@@ -16,7 +16,8 @@
 
 * [@carlbennett](https://github.com/carlbennett) a.k.a. Caaaaarrrrlll
 * [@wjlafrance](https://github.com/wjlafrance) a.k.a. joe)x86(
-* Special thanks to [BNETDocs](https://bnetdocs.org)
+* Special thanks to: [BNETDocs](https://bnetdocs.org)
+* Honorable mention to: Valhalla Legends (a.k.a. vL)
 
 ## Setup
 
