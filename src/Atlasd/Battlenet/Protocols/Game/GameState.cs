@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet.Protocols.Game
 {
@@ -23,6 +24,8 @@ namespace Atlasd.Battlenet.Protocols.Game
         public DateTime ConnectedTimestamp;
         public List<GameKey> GameKeys;
         public DateTime LastLogon;
+        public DateTime LastNull;
+        public DateTime LastPing;
         public IPAddress LocalIPAddress;
         public DateTime LocalTime { get => DateTime.UtcNow.AddMinutes(0 - TimezoneBias); }
         public LocaleInfo Locale;
@@ -58,6 +61,8 @@ namespace Atlasd.Battlenet.Protocols.Game
             ConnectedTimestamp = DateTime.Now;
             GameKeys = new List<GameKey>();
             LastLogon = DateTime.Now;
+            LastNull = DateTime.Now;
+            LastPing = DateTime.Now;
             LocalIPAddress = null;
             Locale = new LocaleInfo();
             LogonType = LogonTypes.OLS;
@@ -79,6 +84,15 @@ namespace Atlasd.Battlenet.Protocols.Game
             UDPSupported = false;
             UDPToken = (uint)r.Next(0, 0x7FFFFFFF);
             Username = null;
+
+            Task.Run(() =>
+            {
+                lock (Battlenet.Common.NullTimerState) Battlenet.Common.NullTimerState.Add(this);
+            });
+            Task.Run(() =>
+            {
+                lock (Battlenet.Common.PingTimerState) Battlenet.Common.PingTimerState.Add(this);
+            });
         }
 
         public void Dispose() /* part of IDisposable */
@@ -106,8 +120,10 @@ namespace Atlasd.Battlenet.Protocols.Game
             if (ActiveChannel != null)
             {
                 lock (ActiveChannel) ActiveChannel.RemoveUser(this);
-                ActiveChannel = null;
             }
+
+            lock (Battlenet.Common.NullTimerState) Battlenet.Common.NullTimerState.Remove(this);
+            lock (Battlenet.Common.PingTimerState) Battlenet.Common.PingTimerState.Remove(this);
 
             IsDisposing = false;
         }

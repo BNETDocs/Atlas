@@ -38,25 +38,20 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             }
 
             var token = (UInt32)((Buffer[3] << 24) + (Buffer[2] << 16) + (Buffer[1] << 8) + Buffer[0]);
+            var serverToken = (UInt32)0;
 
-            lock (context.Client.GameState)
+            lock (context.Client.GameState) serverToken = context.Client.GameState.PingToken;
+
+            if (context.Direction == MessageDirection.ClientToServer && token == serverToken)
             {
-                if (token != context.Client.GameState.PingToken)
-                {
-                    Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"SID_PING token mismatch with server [Token: 0x{token:X8}] [Server: 0x{context.Client.GameState.PingToken:X8}]");
-                }
+                var delta = DateTime.Now - context.Client.GameState.PingDelta;
+                context.Client.GameState.Ping = (int)Math.Round(delta.TotalMilliseconds);
 
-                // Refresh the ping token that has now been used:
-                context.Client.GameState.PingToken = (uint)new Random().Next(0, 0x7FFFFFFF);
+                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Ping: {context.Client.GameState.Ping}ms");
+
+                if (context.Client.GameState.ActiveChannel != null)
+                    context.Client.GameState.ActiveChannel.UpdateUser(context.Client.GameState, context.Client.GameState.Ping);
             }
-
-            var delta = DateTime.Now - context.Client.GameState.PingDelta;
-            context.Client.GameState.Ping = (int)Math.Round(delta.TotalMilliseconds);
-
-            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Ping: {context.Client.GameState.Ping}ms");
-
-            if (context.Client.GameState.ActiveChannel != null)
-                context.Client.GameState.ActiveChannel.UpdateUser(context.Client.GameState);
 
             return true;
         }

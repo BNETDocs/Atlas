@@ -16,8 +16,6 @@ namespace Atlasd.Battlenet
         public bool IsDisposing { get; private set; } = false;
 
         public GameState GameState { get; private set; }
-        public Timer NullTimer { get; private set; }
-        public Timer PingTimer { get; private set; }
         public ProtocolType ProtocolType { get; private set; }
         public System.Net.EndPoint RemoteEndPoint { get; private set; }
         public Socket Socket { get; set; }
@@ -53,11 +51,8 @@ namespace Atlasd.Battlenet
 
             try
             {
-                lock (GameState)
-                {
-                    if (GameState != null) GameState.Dispose();
-                    GameState = null;
-                }
+                if (GameState != null) GameState.Dispose();
+                GameState = null;
             }
             catch (ArgumentNullException) { }
             catch (NullReferenceException) { }
@@ -71,8 +66,6 @@ namespace Atlasd.Battlenet
             lock (Common.ActiveClients) Common.ActiveClients.Add(this);
 
             GameState = null;
-            NullTimer = null;
-            PingTimer = null;
             ProtocolType = null;
             RemoteEndPoint = client.RemoteEndPoint;
             Socket = client;
@@ -116,51 +109,6 @@ namespace Atlasd.Battlenet
             });
         }
 
-        void ProcessNullTimer(object state)
-        {
-            switch (ProtocolType.Type)
-            {
-                case ProtocolType.Types.Game:
-                    {
-                        new SID_NULL().Invoke(new MessageContext(this, Protocols.MessageDirection.ServerToClient));
-                        break;
-                    }
-                case ProtocolType.Types.Chat:
-                case ProtocolType.Types.Chat_Alt1:
-                case ProtocolType.Types.Chat_Alt2:
-                    {
-                        Send(Encoding.ASCII.GetBytes($"{2000 + (ushort)MessageIds.SID_NULL} NULL\r\n"));
-                        break;
-                    }
-                default:
-                    throw new ProtocolNotSupportedException(ProtocolType.Type, this, $"Unsupported protocol type [0x{(byte)ProtocolType.Type:X2}]");
-            }
-        }
-
-        void ProcessPingTimer(object state)
-        {
-            var clientState = state as ClientState;
-            clientState.GameState.PingDelta = DateTime.Now;
-
-            switch (ProtocolType.Type)
-            {
-                case ProtocolType.Types.Game:
-                    {
-                        new SID_PING().Invoke(new MessageContext(this, Protocols.MessageDirection.ServerToClient, new Dictionary<string, object>(){{ "token", GameState.PingToken }}));
-                        break;
-                    }
-                case ProtocolType.Types.Chat:
-                case ProtocolType.Types.Chat_Alt1:
-                case ProtocolType.Types.Chat_Alt2:
-                    {
-                        Send(Encoding.ASCII.GetBytes($"{2000 + (ushort)MessageIds.SID_PING} PING\r\n"));
-                        break;
-                    }
-                default:
-                    throw new ProtocolNotSupportedException(ProtocolType.Type, this, $"Unsupported protocol type [0x{(byte)ProtocolType.Type:X2}]");
-            }
-        }
-
         public void ProcessReceive(SocketAsyncEventArgs e)
         {
             // check if the remote host closed the connection
@@ -185,6 +133,12 @@ namespace Atlasd.Battlenet
 
             if (ProtocolType == null) ReceiveProtocolType(e);
             ReceiveProtocol(e);
+
+            bool willRaiseEvent = Socket.ReceiveAsync(e);
+            if (!willRaiseEvent)
+            {
+                SocketIOCompleted(this, e);
+            }
         }
 
         public void ProcessSend(SocketAsyncEventArgs e)
@@ -211,8 +165,6 @@ namespace Atlasd.Battlenet
             if (ProtocolType.IsGame() || ProtocolType.IsChat())
             {
                 GameState = new GameState(this);
-                NullTimer = new Timer(ProcessNullTimer, this, 20000, 20000); // every 20 seconds send SID_NULL
-                PingTimer = new Timer(ProcessPingTimer, this, 60000, 60000); // every 60 seconds send SID_PING
             }
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, $"Set protocol type [0x{(byte)ProtocolType.Type:X2}] ({ProtocolType})");

@@ -1,7 +1,11 @@
-﻿using Atlasd.Daemon;
+﻿using Atlasd.Battlenet.Protocols.Game;
+using Atlasd.Battlenet.Protocols.Game.Messages;
+using Atlasd.Daemon;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 
 namespace Atlasd.Battlenet
 {
@@ -19,6 +23,10 @@ namespace Atlasd.Battlenet
         public static IPAddress ListenerAddress { get; private set; }
         public static IPEndPoint ListenerEndPoint { get; private set; }
         public static int ListenerPort { get; private set; }
+        public static Timer NullTimer { get; private set; }
+        public static List<GameState> NullTimerState { get; private set; }
+        public static Timer PingTimer { get; private set; }
+        public static List<GameState> PingTimerState { get; private set; }
 
         public static void Initialize()
         {
@@ -39,6 +47,12 @@ namespace Atlasd.Battlenet
             DefaultPort = 6112;
 
             InitializeListener();
+
+            NullTimerState = new List<GameState>();
+            PingTimerState = new List<GameState>();
+
+            NullTimer = new Timer(ProcessNullTimer, NullTimerState, 100, 100);
+            PingTimer = new Timer(ProcessPingTimer, PingTimerState, 100, 100);
         }
 
         private static void InitializeListener()
@@ -77,6 +91,70 @@ namespace Atlasd.Battlenet
             }
 
             return count;
+        }
+
+        static void ProcessNullTimer(object state)
+        {
+            var clients = state as List<GameState>;
+            var msg = new SID_NULL();
+            var interval = TimeSpan.FromSeconds(20);
+            var now = DateTime.Now;
+
+            lock (clients)
+            {
+                foreach (var client in clients)
+                {
+                    if (client == null)
+                    {
+                        clients.Remove(client);
+                        continue;
+                    }
+
+                    lock (client)
+                    {
+                        if (client.LastNull == null || client.LastNull + interval > now) continue;
+
+                        client.LastNull = now;
+                        msg.Invoke(new MessageContext(client.Client, Protocols.MessageDirection.ServerToClient));
+                        client.Client.Send(msg.ToByteArray());
+                    }
+                }
+            }
+        }
+
+        static void ProcessPingTimer(object state)
+        {
+            var clients = state as List<GameState>;
+            var msg = new SID_PING();
+            var interval = TimeSpan.FromSeconds(60);
+            var now = DateTime.Now;
+            var r = new Random();
+
+            lock (clients)
+            {
+                foreach (var client in clients)
+                {
+                    if (client == null)
+                    {
+                        clients.Remove(client);
+                        continue;
+                    }
+
+                    lock (client)
+                    {
+                        if (client.LastPing == null || client.LastPing + interval > now) continue;
+
+                        now = DateTime.Now;
+                        client.LastPing = now;
+                        client.PingDelta = now;
+                        client.PingToken = (uint)r.Next(0, 0x7FFFFFFF);
+
+                        msg.Invoke(new MessageContext(client.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, object>(){{ "token", client.PingToken }}));
+                        client.Client.Send(msg.ToByteArray());
+                        client.Client.Socket.Poll(0, System.Net.Sockets.SelectMode.SelectWrite);
+                    }
+                }
+            }
         }
     }
 }
