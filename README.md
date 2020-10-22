@@ -30,4 +30,4 @@ Go to [Releases](https://github.com/BNETDocs/Atlas/releases/latest) and download
 
 ## License
 
-Atlas is free software distributed under the [MIT License](./LICENSE.txt). It is not officially affiliated with or endorsed by Blizzard Entertainment, its subsidaries, or business partners. Battle.net, Diablo, StarCraft, and WarCraft are registered trademarks of Blizzard Entertainment in the United States. This software is provided as-is in the hopes that it is useful without warranty of any kind.
+Atlas is free software distributed under the [MIT License](./LICENSE.txt). It is not officially affiliated with or endorsed by Blizzard Entertainment, its subsidiaries, or business partners. Battle.net, Diablo, StarCraft, and WarCraft are registered trademarks of Blizzard Entertainment in the United States. This software is provided as-is in the hopes that it is useful without warranty of any kind.
