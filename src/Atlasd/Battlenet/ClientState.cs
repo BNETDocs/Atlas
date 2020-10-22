@@ -1,12 +1,8 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Battlenet.Protocols.Game;
-using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Daemon;
 using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet
