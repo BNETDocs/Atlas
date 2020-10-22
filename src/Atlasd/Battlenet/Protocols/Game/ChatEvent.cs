@@ -1,4 +1,5 @@
-﻿using Atlasd.Battlenet.Protocols.Game.Messages;
+﻿using Atlasd.Battlenet.Exceptions;
+using Atlasd.Battlenet.Protocols.Game.Messages;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -80,27 +81,105 @@ namespace Atlasd.Battlenet.Protocols.Game
             Text = text;
         }
 
-        public byte[] ToByteArray()
+        public byte[] ToByteArray(ProtocolType protocolType)
         {
-            var buf = new byte[26 + Encoding.ASCII.GetByteCount(Username) + Encoding.UTF8.GetByteCount(Text)];
-            var m = new MemoryStream(buf);
-            var w = new BinaryWriter(m);
+            switch (protocolType) {
+                case ProtocolType.Game:
+                    {
+                        var buf = new byte[26 + Encoding.ASCII.GetByteCount(Username) + Encoding.UTF8.GetByteCount(Text)];
+                        var m = new MemoryStream(buf);
+                        var w = new BinaryWriter(m);
 
-            w.Write((UInt32)EventId);
-            w.Write((UInt32)Flags);
-            w.Write((Int32)Ping);
-            w.Write((UInt32)0); // IP address (Defunct)
-            w.Write((UInt32)0xBAADF00D); // Account number (Defunct)
-            w.Write((UInt32)0xDEADBEEF); // Registration authority (Defunct)
-            w.Write((string)Username);
+                        w.Write((UInt32)EventId);
+                        w.Write((UInt32)Flags);
+                        w.Write((Int32)Ping);
+                        w.Write((UInt32)0); // IP address (Defunct)
+                        w.Write((UInt32)0xBAADF00D); // Account number (Defunct)
+                        w.Write((UInt32)0xDEADBEEF); // Registration authority (Defunct)
+                        w.Write((string)Username);
 
-            w.Write(Encoding.UTF8.GetBytes(Text)); // UTF-8 is needed for localization reasons
-            w.Write((byte)0);
+                        w.Write(Encoding.UTF8.GetBytes(Text)); // UTF-8 is needed for localization reasons
+                        w.Write((byte)0);
 
-            w.Close();
-            m.Close();
+                        w.Close();
+                        m.Close();
 
-            return buf;
+                        return buf;
+                    }
+                case ProtocolType.Chat:
+                case ProtocolType.Chat_Alt1:
+                case ProtocolType.Chat_Alt2:
+                    {
+                        var buf = $"{1000 + EventId} ";
+                        var product = Text.Length < 4 ? "" : Text[0..4];
+
+                        switch (EventId)
+                        {
+                            case EventIds.EID_USERSHOW:
+                            case EventIds.EID_USERUPDATE:
+                                {
+                                    buf += $"USER {Username} {Flags:X4} [{product}]";
+                                    break;
+                                }
+                            case EventIds.EID_USERJOIN:
+                                {
+                                    buf += $"JOIN {Username} {Flags:X4} [{product}]";
+                                    break;
+                                }
+                            case EventIds.EID_USERLEAVE:
+                                {
+                                    buf += $"LEAVE {Username} {Flags:X4}";
+                                    break;
+                                }
+                            case EventIds.EID_WHISPERFROM:
+                            case EventIds.EID_WHISPERTO:
+                                {
+                                    buf += $"WHISPER {Username} {Flags:X4} \"{Text}\"";
+                                    break;
+                                }
+                            case EventIds.EID_TALK:
+                                {
+                                    buf += $"TALK {Username} {Flags:X4} \"{Text}\"";
+                                    break;
+                                }
+                            case EventIds.EID_BROADCAST:
+                                {
+                                    buf += $"BROADCAST \"{Text}\"";
+                                    break;
+                                }
+                            case EventIds.EID_CHANNELJOIN:
+                                {
+                                    buf += $"CHANNEL \"{Text}\"";
+                                    break;
+                                }
+                            case EventIds.EID_INFO:
+                                {
+                                    buf += $"INFO \"{Text}\"";
+                                    break;
+                                }
+                            case EventIds.EID_ERROR:
+                                {
+                                    buf += $"ERROR \"{Text}\"";
+                                    break;
+                                }
+                            case EventIds.EID_EMOTE:
+                                {
+                                    buf += $"EMOTE {Username} {Flags:X4} \"{Text}\"";
+                                    break;
+                                }
+                            default:
+                                {
+                                    buf += $"UNKNOWN {Username} {Flags:X4} \"{Text}\"";
+                                    break;
+                                }
+                        }
+
+                        buf += "\r\n";
+                        return Encoding.ASCII.GetBytes(buf);
+                    }
+                default:
+                    throw new ProtocolNotSupportedException(protocolType, null, $"Unsupported protocol type [0x{(byte)protocolType:X2}]");
+            }
         }
 
         public void WriteTo(ClientState receiver)
