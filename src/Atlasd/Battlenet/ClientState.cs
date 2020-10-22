@@ -87,6 +87,8 @@ namespace Atlasd.Battlenet
 
         private void Invoke(SocketAsyncEventArgs e)
         {
+            if (e.SocketError != SocketError.Success) return;
+
             var context = new MessageContext(this, Protocols.MessageDirection.ClientToServer);
 
             Task.Run(() =>
@@ -165,6 +167,7 @@ namespace Atlasd.Battlenet
 
         protected void ReceiveProtocolType(SocketAsyncEventArgs e)
         {
+            if (e.SocketError != SocketError.Success) return;
             if (ProtocolType != null) return;
 
             ProtocolType = new ProtocolType((ProtocolType.Types)ReceiveBuffer[0]);
@@ -195,6 +198,7 @@ namespace Atlasd.Battlenet
 
         protected void ReceiveProtocolChat(SocketAsyncEventArgs e)
         {
+            if (e.SocketError != SocketError.Success) return;
             Send(System.Text.Encoding.ASCII.GetBytes("The chat gateway is currently unsupported on Atlasd.\r\n"));
             throw new ProtocolNotSupportedException(ProtocolType.Type, this, $"Unsupported protocol type [0x{(byte)ProtocolType.Type:X2}]");
         }
