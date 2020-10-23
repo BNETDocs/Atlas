@@ -44,7 +44,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_CHECKAD => new Messages.SID_CHECKAD(buffer),
                 MessageIds.SID_CLICKAD => new Messages.SID_CLICKAD(buffer),
                 //MessageIds.SID_READMEMORY => new Messages.SID_READMEMORY(buffer),
-                //MessageIds.SID_REGISTRY => new Messages.SID_REGISTRY(buffer),
+                MessageIds.SID_REGISTRY => new Messages.SID_REGISTRY(buffer),
                 MessageIds.SID_MESSAGEBOX => new Messages.SID_MESSAGEBOX(buffer),
                 //MessageIds.SID_STARTADVEX2 => new Messages.SID_STARTADVEX2(buffer),
                 MessageIds.SID_GAMEDATAADDRESS => new Messages.SID_GAMEDATAADDRESS(buffer),
