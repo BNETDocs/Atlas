@@ -17,6 +17,7 @@ namespace Atlasd.Battlenet
         public static Dictionary<string, Account> ActiveAccounts;
         public static Dictionary<string, Channel> ActiveChannels;
         public static List<ClientState> ActiveClients;
+        public static Dictionary<string, GameState> ActiveGameClients;
         public static IPAddress DefaultAddress { get; private set; }
         public static int DefaultPort { get; private set; }
         public static ServerSocket Listener { get; private set; }
@@ -35,6 +36,7 @@ namespace Atlasd.Battlenet
             ActiveAccounts = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClients = new List<ClientState>();
+            ActiveGameClients = new Dictionary<string, GameState>(StringComparer.OrdinalIgnoreCase);
 
             // Channel object adds itself to ActiveChannels during instantiation.
             new Channel(Channel.TheVoid, Channel.TheVoidFlags, -1);
@@ -91,6 +93,14 @@ namespace Atlasd.Battlenet
             }
 
             return count;
+        }
+
+        public static bool GetClientByOnlineName(string target, out GameState client)
+        {
+            lock (ActiveGameClients)
+            {
+                return ActiveGameClients.TryGetValue(target, out client);
+            }
         }
 
         static void ProcessNullTimer(object state)

@@ -30,6 +30,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public DateTime LocalTime { get => DateTime.UtcNow.AddMinutes(0 - TimezoneBias); }
         public LocaleInfo Locale;
         public LogonTypes LogonType;
+        public List<IPAddress> SquelchedIPs;
         public DateTime PingDelta;
         public Platform.PlatformCode Platform;
         public Product.ProductCode Product;
@@ -66,6 +67,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             LocalIPAddress = null;
             Locale = new LocaleInfo();
             LogonType = LogonTypes.OLS;
+            SquelchedIPs = new List<IPAddress>();
             PingDelta = DateTime.Now;
             Platform = Battlenet.Platform.PlatformCode.None;
             Product = Battlenet.Product.ProductCode.None;
@@ -120,6 +122,17 @@ namespace Atlasd.Battlenet.Protocols.Game
             if (ActiveChannel != null)
             {
                 lock (ActiveChannel) ActiveChannel.RemoveUser(this);
+            }
+
+            if (OnlineName != null)
+            {
+                lock (Battlenet.Common.ActiveGameClients)
+                {
+                    if (Battlenet.Common.ActiveGameClients.ContainsKey(OnlineName))
+                    {
+                        Battlenet.Common.ActiveGameClients.Remove(OnlineName);
+                    }
+                }
             }
 
             lock (Battlenet.Common.NullTimerState) Battlenet.Common.NullTimerState.Remove(this);

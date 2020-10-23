@@ -397,6 +397,13 @@ namespace Atlasd.Battlenet
             }
         }
 
+        public void SquelchUpdate(GameState client)
+        {
+            if (client == null) return;
+
+            // TODO
+        }
+
         // This function should only be called if any of the attributes were modified outside of this class.
         public void UpdateUser(GameState client)
         {

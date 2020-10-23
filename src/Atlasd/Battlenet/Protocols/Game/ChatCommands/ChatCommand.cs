@@ -40,10 +40,16 @@ namespace Atlasd.Battlenet.Protocols.Game
                 case "help":
                 case "?":
                     return new HelpCommand(args);
+                case "ignore":
+                case "squelch":
+                    return new SquelchCommand(args);
                 case "kick":
                     return new KickCommand(args);
                 case "time":
                     return new TimeCommand(args);
+                case "unignore":
+                case "unsquelch":
+                    return new UnsquelchCommand(args);
                 case "who":
                     return new WhoCommand(args);
                 case "whoami":

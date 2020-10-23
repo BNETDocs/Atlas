@@ -100,6 +100,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                             context.Client.GameState.Username = (string)account.Get(Account.UsernameKey, context.Client.GameState.Username);
 
+                            lock (Battlenet.Common.ActiveGameClients)
+                            {
+                                Battlenet.Common.ActiveGameClients.Add(context.Client.GameState.OnlineName, context.Client.GameState);
+                            }
+
                             status = Statuses.Success;
                         }
 

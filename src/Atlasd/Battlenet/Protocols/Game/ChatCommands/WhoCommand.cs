@@ -1,6 +1,5 @@
 ﻿using Atlasd.Localization;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
