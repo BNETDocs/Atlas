@@ -97,7 +97,7 @@ namespace Atlasd.Battlenet
         {
             var clients = state as List<GameState>;
             var msg = new SID_NULL();
-            var interval = TimeSpan.FromSeconds(20);
+            var interval = TimeSpan.FromSeconds(60);
             var now = DateTime.Now;
 
             lock (clients)
@@ -126,7 +126,7 @@ namespace Atlasd.Battlenet
         {
             var clients = state as List<GameState>;
             var msg = new SID_PING();
-            var interval = TimeSpan.FromSeconds(60);
+            var interval = TimeSpan.FromSeconds(180);
             var now = DateTime.Now;
             var r = new Random();
 
