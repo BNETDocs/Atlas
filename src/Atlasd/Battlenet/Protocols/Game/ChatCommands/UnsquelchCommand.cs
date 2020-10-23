@@ -18,14 +18,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             string r; // reply
             string t; // target
 
-            if (Arguments.Count > 0)
-            {
-                t = Arguments[0];
-                Arguments.RemoveAt(0);
-            } else
-            {
-                t = "";
-            }
+            t = Arguments.Count == 0 ? "" : Arguments[0];
 
             if (!Battlenet.Common.GetClientByOnlineName(t, out var target) || target == null)
             {
