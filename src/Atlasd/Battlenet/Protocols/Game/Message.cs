@@ -52,7 +52,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_LOGONCHALLENGEEX => new Messages.SID_LOGONCHALLENGEEX(buffer),
                 MessageIds.SID_CLIENTID2 => new Messages.SID_CLIENTID2(buffer),
                 MessageIds.SID_DISPLAYAD => new Messages.SID_DISPLAYAD(buffer),
-                //MessageIds.SID_NOTIFYJOIN => new Messages.SID_NOTIFYJOIN(buffer),
+                MessageIds.SID_NOTIFYJOIN => new Messages.SID_NOTIFYJOIN(buffer),
                 MessageIds.SID_PING => new Messages.SID_PING(buffer),
                 MessageIds.SID_READUSERDATA => new Messages.SID_READUSERDATA(buffer),
                 MessageIds.SID_WRITEUSERDATA => new Messages.SID_WRITEUSERDATA(buffer),
