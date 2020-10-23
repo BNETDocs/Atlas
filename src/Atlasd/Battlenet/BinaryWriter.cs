@@ -5,7 +5,7 @@ namespace Atlasd.Battlenet
 {
     class BinaryWriter : System.IO.BinaryWriter
     {
-        private Encoding _encoding = Encoding.ASCII;
+        private readonly Encoding _encoding = Encoding.ASCII;
 
         public BinaryWriter(Stream output) : base(output) { }
         public BinaryWriter(Stream output, Encoding encoding) : base(output, encoding) { }
