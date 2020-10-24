@@ -36,6 +36,8 @@ namespace Atlasd.Battlenet.Protocols.Game
         public Product.ProductCode Product;
         public VersionInfo Version;
 
+        public string Away;
+        public string DoNotDisturb;
         public UInt32 ClientToken;
         public string KeyOwner;
         public string OnlineName;
@@ -73,6 +75,8 @@ namespace Atlasd.Battlenet.Protocols.Game
             Product = Battlenet.Product.ProductCode.None;
             Version = new VersionInfo();
 
+            Away = null;
+            DoNotDisturb = null;
             ClientToken = 0;
             KeyOwner = null;
             OnlineName = null;

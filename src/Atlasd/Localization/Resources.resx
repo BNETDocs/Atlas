@@ -120,6 +120,12 @@
   <data name="AccountIsAlreadyLoggedOn" xml:space="preserve">
     <value>That account is already logged on.</value>
   </data>
+  <data name="AwayCommandOff" xml:space="preserve">
+    <value>You are no longer marked as away.</value>
+  </data>
+  <data name="AwayCommandOn" xml:space="preserve">
+    <value>You are now marked as being away.</value>
+  </data>
   <data name="ChannelFirstJoinGreeting" xml:space="preserve">
     <value>Welcome to {realm}!
 This server is hosted by {host}.

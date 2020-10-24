@@ -33,6 +33,10 @@ namespace Atlasd.Battlenet.Protocols.Game
 
             switch (cmd)
             {
+                case "admin":
+                    return new AdminCommand(args);
+                case "away":
+                    return new AwayCommand(args);
                 case "channel":
                 case "join":
                 case "j":

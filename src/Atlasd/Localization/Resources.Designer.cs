@@ -70,6 +70,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You are no longer marked as away..
+        /// </summary>
+        public static string AwayCommandOff {
+            get {
+                return ResourceManager.GetString("AwayCommandOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are now marked as being away..
+        /// </summary>
+        public static string AwayCommandOn {
+            get {
+                return ResourceManager.GetString("AwayCommandOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Welcome to {realm}!
         ///This server is hosted by {host}.
         ///There are currently {gameUsers} users playing {gameAds} games of {game}, and {totalUsers} users playing {totalGameAds} games on {realm}..
