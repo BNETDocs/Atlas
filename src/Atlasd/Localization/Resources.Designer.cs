@@ -115,6 +115,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Backstage.
+        /// </summary>
+        public static string Backstage {
+            get {
+                return ResourceManager.GetString("Backstage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Blizzard Tech Support.
+        /// </summary>
+        public static string BlizzardTechSupport {
+            get {
+                return ResourceManager.GetString("BlizzardTechSupport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Welcome to {realm}!
         ///This server is hosted by {host}.
         ///There are currently {gameUsers} users playing {gameAds} games of {game}, and {totalUsers} users playing {totalGameAds} games on {realm}..
@@ -341,12 +359,39 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open Tech Support.
+        /// </summary>
+        public static string OpenTechSupport {
+            get {
+                return ResourceManager.GetString("OpenTechSupport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Void.
+        /// </summary>
+        public static string TheVoid {
+            get {
+                return ResourceManager.GetString("TheVoid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {realm} time: {realmTime}
         ///Your local time: {localTime}.
         /// </summary>
         public static string TimeCommand {
             get {
                 return ResourceManager.GetString("TimeCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Town Square.
+        /// </summary>
+        public static string TownSquare {
+            get {
+                return ResourceManager.GetString("TownSquare", resourceCulture);
             }
         }
         
@@ -455,6 +500,15 @@ namespace Atlasd.Localization {
         public static string UserUnBannedFromChannel {
             get {
                 return ResourceManager.GetString("UserUnBannedFromChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to warez.
+        /// </summary>
+        public static string Warez {
+            get {
+                return ResourceManager.GetString("Warez", resourceCulture);
             }
         }
         

@@ -1,6 +1,7 @@
 ﻿using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Daemon;
+using Atlasd.Localization;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
@@ -39,11 +40,12 @@ namespace Atlasd.Battlenet
             ActiveGameClients = new Dictionary<string, GameState>(StringComparer.OrdinalIgnoreCase);
 
             // Channel object adds itself to ActiveChannels during instantiation.
-            new Channel(Channel.TheVoid, Channel.TheVoidFlags, -1);
-            new Channel("Backstage", Channel.Flags.System | Channel.Flags.Restricted, -1, "Abandon hope, all ye who enter here...");
-            new Channel("Open Tech Support", Channel.Flags.Public | Channel.Flags.TechSupport, -1);
-            new Channel("Blizzard Tech Support", Channel.Flags.Public | Channel.Flags.TechSupport | Channel.Flags.Moderated, -1);
-            new Channel("Town Square", Channel.Flags.Public, 200, "Welcome and enjoy your stay!");
+            new Channel(Resources.TheVoid, Channel.TheVoidFlags, -1);
+            new Channel(Resources.Backstage, Channel.Flags.System, -1, "Abandon hope, all ye who enter here...");
+            new Channel(Resources.BlizzardTechSupport, Channel.Flags.Public | Channel.Flags.TechSupport | Channel.Flags.Global | Channel.Flags.Moderated, -1);
+            new Channel(Resources.OpenTechSupport, Channel.Flags.Public | Channel.Flags.TechSupport | Channel.Flags.Global, -1);
+            new Channel(Resources.Warez, Channel.Flags.Silent | Channel.Flags.Restricted, -1);
+            new Channel(Resources.TownSquare, Channel.Flags.Public, 200, "Welcome and enjoy your stay!");
 
             DefaultAddress = IPAddress.Any;
             DefaultPort = 6112;

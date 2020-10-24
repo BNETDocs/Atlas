@@ -10,7 +10,6 @@ namespace Atlasd.Battlenet
 {
     class Channel
     {
-        public const string TheVoid = "The Void";
         public const Flags TheVoidFlags = Flags.Public | Flags.Silent;
 
         public enum Flags : UInt32
@@ -148,8 +147,8 @@ namespace Atlasd.Battlenet
         {
             if (Users != null)
             {
-                var theVoid = GetChannelByName(TheVoid);
-                if (theVoid == null) theVoid = new Channel(TheVoid, TheVoidFlags, -1);
+                var theVoid = GetChannelByName(Resources.TheVoid);
+                if (theVoid == null) theVoid = new Channel(Resources.TheVoid, TheVoidFlags, -1);
                 foreach (var user in Users) MoveUser(user, theVoid, true);
             }
 
@@ -263,8 +262,8 @@ namespace Atlasd.Battlenet
 
             new ChatEvent(ChatEvent.EventIds.EID_INFO, source.ChannelFlags, source.Ping, source.OnlineName, kickedStr).WriteTo(targetClient.Client);
 
-            var theVoid = GetChannelByName(TheVoid);
-            if (theVoid == null) theVoid = new Channel(TheVoid, TheVoidFlags, -1);
+            var theVoid = GetChannelByName(Resources.TheVoid);
+            if (theVoid == null) theVoid = new Channel(Resources.TheVoid, TheVoidFlags, -1);
             MoveUser(targetClient, theVoid, true);
         }
 
