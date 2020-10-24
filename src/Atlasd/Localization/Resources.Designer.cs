@@ -88,6 +88,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {user} is away ({awayMessage}).
+        /// </summary>
+        public static string AwayCommandStatus {
+            get {
+                return ResourceManager.GetString("AwayCommandStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are away ({awayMessage}).
+        /// </summary>
+        public static string AwayCommandStatusSelf {
+            get {
+                return ResourceManager.GetString("AwayCommandStatusSelf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Welcome to {realm}!
         ///This server is hosted by {host}.
         ///There are currently {gameUsers} users playing {gameAds} games of {game}, and {totalUsers} users playing {totalGameAds} games on {realm}..

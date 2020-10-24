@@ -17,6 +17,11 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             var ch = context.GameState.ActiveChannel;
             var str = ch == null ? Resources.YouAreUsingGameInRealm : Resources.YouAreUsingGameInTheChannel;
 
+            if (context.GameState.Away != null)
+            {
+                str += "\r\n" + Resources.AwayCommandStatusSelf.Replace("{awayMessage}", context.GameState.Away);
+            }
+
             str = str.Replace("{channel}", ch == null ? "(null)" : ch.Name);
             str = str.Replace("{realm}", "BNETDocs");
 

@@ -126,6 +126,12 @@
   <data name="AwayCommandOn" xml:space="preserve">
     <value>You are now marked as being away.</value>
   </data>
+  <data name="AwayCommandStatus" xml:space="preserve">
+    <value>{user} is away ({awayMessage})</value>
+  </data>
+  <data name="AwayCommandStatusSelf" xml:space="preserve">
+    <value>You are away ({awayMessage})</value>
+  </data>
   <data name="ChannelFirstJoinGreeting" xml:space="preserve">
     <value>Welcome to {realm}!
 This server is hosted by {host}.
