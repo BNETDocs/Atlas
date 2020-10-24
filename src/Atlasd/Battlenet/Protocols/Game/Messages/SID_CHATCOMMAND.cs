@@ -65,6 +65,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 { "realm", "Battle.net" },
                 { "realmTime", DateTime.Now.ToString(Common.HumanDateTimeFormat) },
                 { "realmTimezone", $"UTC{DateTime.Now:zzz}" },
+                { "user", context.Client.GameState.OnlineName },
                 { "username", context.Client.GameState.OnlineName },
                 { "userName", context.Client.GameState.OnlineName },
             };

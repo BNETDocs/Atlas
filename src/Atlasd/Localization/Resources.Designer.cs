@@ -70,6 +70,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Forcefully moved {user} to the channel {channel}..
+        /// </summary>
+        public static string AdminMoveUserCommand {
+            get {
+                return ResourceManager.GetString("AdminMoveUserCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You are no longer marked as away..
         /// </summary>
         public static string AwayCommandOff {
@@ -369,6 +378,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {user} is using {game} in {realm}.
+        /// </summary>
+        public static string UserIsUsingGameInRealm {
+            get {
+                return ResourceManager.GetString("UserIsUsingGameInRealm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {user} is using {game} in the channel {channel}..
+        /// </summary>
+        public static string UserIsUsingGameInTheChannel {
+            get {
+                return ResourceManager.GetString("UserIsUsingGameInTheChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {username} is using {game} in game {gameAd}..
         /// </summary>
         public static string UserIsUsingGameInTheGame {
@@ -401,6 +428,15 @@ namespace Atlasd.Localization {
         public static string UserKickedFromChannelWithReason {
             get {
                 return ResourceManager.GetString("UserKickedFromChannelWithReason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to That user is not in a channel..
+        /// </summary>
+        public static string UserNotInChannel {
+            get {
+                return ResourceManager.GetString("UserNotInChannel", resourceCulture);
             }
         }
         

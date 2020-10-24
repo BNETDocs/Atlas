@@ -120,6 +120,9 @@
   <data name="AccountIsAlreadyLoggedOn" xml:space="preserve">
     <value>That account is already logged on.</value>
   </data>
+  <data name="AdminMoveUserCommand" xml:space="preserve">
+    <value>Forcefully moved {user} to the channel {channel}.</value>
+  </data>
   <data name="AwayCommandOff" xml:space="preserve">
     <value>You are no longer marked as away.</value>
   </data>
@@ -239,6 +242,12 @@ Your local time: {localTime}</value>
   <data name="UserIsUsingGameInAPrivateGame" xml:space="preserve">
     <value>{username} is using {game} in a private game.</value>
   </data>
+  <data name="UserIsUsingGameInRealm" xml:space="preserve">
+    <value>{user} is using {game} in {realm}</value>
+  </data>
+  <data name="UserIsUsingGameInTheChannel" xml:space="preserve">
+    <value>{user} is using {game} in the channel {channel}.</value>
+  </data>
   <data name="UserIsUsingGameInTheGame" xml:space="preserve">
     <value>{username} is using {game} in game {gameAd}.</value>
   </data>
@@ -250,6 +259,9 @@ Your local time: {localTime}</value>
   </data>
   <data name="UserKickedFromChannelWithReason" xml:space="preserve">
     <value>{target} was kicked out of the channel by {source} ({reason}).</value>
+  </data>
+  <data name="UserNotInChannel" xml:space="preserve">
+    <value>That user is not in a channel.</value>
   </data>
   <data name="UserNotLoggedOn" xml:space="preserve">
     <value>That user is not logged on.</value>

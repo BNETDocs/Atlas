@@ -54,6 +54,10 @@ namespace Atlasd.Battlenet.Protocols.Game
                 case "unignore":
                 case "unsquelch":
                     return new UnsquelchCommand(args);
+                case "whereis":
+                case "where":
+                case "whois":
+                    return new WhereIsCommand(args);
                 case "who":
                     return new WhoCommand(args);
                 case "whoami":
