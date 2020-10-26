@@ -12,7 +12,6 @@
 
 [![GitHub All Releases](https://img.shields.io/github/downloads/BNETDocs/Atlas/total?style=for-the-badge)](https://github.com/BNETDocs/Atlas/releases/latest)
 [![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/BNETDocs/Atlas?include_prereleases&label=latest%20release&style=for-the-badge)](https://github.com/BNETDocs/Atlas/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/BNETDocs/Atlas?style=for-the-badge)](./LICENSE.txt)
 
 ## Authors
 
