@@ -30,6 +30,23 @@ Atlas is built on the .NET Core 3.1 platform. Linux users may wish to install th
 
 Go to [Releases](https://github.com/BNETDocs/Atlas/releases/latest) and download the correct package for your platform, or build from source if you're savvy enough.
 
+### Compile from source
+
+#### Windows
+
+Users on the Windows platform must install Microsoft Visual Studio 2019 (or equivalent) which provides .NET Core 3.1 development SDK.
+
+#### Linux
+
+For Fedora or other Red Hat based systems:
+
+1. Install .NET: `sudo dnf install dotnet`
+2. Clone this repository: `git clone https://github.com/BNETDocs/Atlas.git`
+3. Change directory: `cd Atlas/src/Atlasd`
+4. Build source: `dotnet build`
+5. Run debugger: `dotnet run`
+6. See `dotnet --help` for other compile options
+
 ## License
 
 Atlas is free software distributed under the [MIT License](./LICENSE.txt). It is not officially affiliated with or endorsed by Blizzard Entertainment, its subsidiaries, or business partners. Battle.net, Diablo, StarCraft, and WarCraft are registered trademarks of Blizzard Entertainment in the United States. This software is provided as-is in the hopes that it is useful without warranty of any kind.
