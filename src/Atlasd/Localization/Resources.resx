@@ -284,6 +284,9 @@ Your local time: {localTime}</value>
   <data name="UserUnBannedFromChannel" xml:space="preserve">
     <value>{target} was unbanned by {source}</value>
   </data>
+  <data name="Warez" xml:space="preserve">
+    <value>warez</value>
+  </data>
   <data name="WhoCommand" xml:space="preserve">
     <value>Users in channel {channel}:
 {users}</value>
