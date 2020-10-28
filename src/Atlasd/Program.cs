@@ -35,6 +35,7 @@ namespace Atlasd
                 Console.WriteLine($"[{DateTime.Now}] Waiting for debugger to attach...");
                 while (!Debugger.IsAttached)
                 {
+                    await Task.Delay(10);
                     await Task.Yield();
                 }
                 Console.WriteLine($"[{DateTime.Now}] Debugger attached: {Debugger.IsAttached}");
@@ -49,6 +50,7 @@ namespace Atlasd
             while (!Exit)
             {
                 await Task.Delay(10);
+                await Task.Yield();
             }
 
             return ExitCode;
