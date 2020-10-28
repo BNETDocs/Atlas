@@ -39,14 +39,6 @@ namespace Atlasd.Battlenet
             ActiveClients = new List<ClientState>();
             ActiveGameClients = new Dictionary<string, GameState>(StringComparer.OrdinalIgnoreCase);
 
-            // Channel object adds itself to ActiveChannels during instantiation.
-            new Channel(Resources.TheVoid, Channel.TheVoidFlags, -1);
-            new Channel(Resources.Backstage, Channel.Flags.System, -1, "Abandon hope, all ye who enter here...");
-            new Channel(Resources.BlizzardTechSupport, Channel.Flags.Public | Channel.Flags.TechSupport | Channel.Flags.Global | Channel.Flags.Moderated, -1);
-            new Channel(Resources.OpenTechSupport, Channel.Flags.Public | Channel.Flags.TechSupport | Channel.Flags.Global, -1);
-            new Channel(Resources.Warez, Channel.Flags.Silent | Channel.Flags.Restricted, -1);
-            new Channel(Resources.TownSquare, Channel.Flags.Public, 200, "Welcome and enjoy your stay!");
-
             DefaultAddress = IPAddress.Any;
             DefaultPort = 6112;
 

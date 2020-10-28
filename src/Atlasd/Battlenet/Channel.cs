@@ -35,17 +35,26 @@ namespace Atlasd.Battlenet
         public string Name { get; protected set; }
         public string Topic { get; protected set; }
         protected List<GameState> Users { get; private set; }
-    
-        public Channel(string name, Flags flags, int maxUsers = -1, string topic = "")
-        {
-            Common.ActiveChannels.Add(name, this);
 
+        public Channel(string name, Flags flags = Flags.None, int maxUsers = -1, string topic = "")
+        {
             ActiveFlags = flags;
             BannedUsers = new List<GameState>();
             MaxUsers = maxUsers;
             Name = name;
             Topic = topic;
             Users = new List<GameState>();
+
+            var isStatic = GetStaticChannel(name, out var staticName, out var staticFlags, out var staticMaxUsers, out var staticTopic, out var staticProducts);
+            if (isStatic)
+            {
+                Name = staticName;
+                if (flags == Flags.None) ActiveFlags = (Flags)staticFlags;
+                if (maxUsers == -1) MaxUsers = staticMaxUsers;
+                if (topic == null || topic.Length == 0) Topic = staticTopic;
+            }
+
+            lock (Common.ActiveChannels) Common.ActiveChannels.Add(name, this);
         }
 
         public void AcceptUser(GameState user, bool ignoreLimits = false, bool extendedErrors = false)
@@ -155,7 +164,65 @@ namespace Atlasd.Battlenet
 
         public static Channel GetChannelByName(string name)
         {
-            return Common.ActiveChannels.TryGetValue(name, out Channel channel) ? channel : null;
+            lock (Common.ActiveChannels)
+            {
+                return Common.ActiveChannels.TryGetValue(name, out Channel channel) ? channel : null;
+            }
+        }
+
+        public static bool GetStaticChannel(string search, out string name, out Flags flags, out int maxUsers, out string topic, out Product.ProductCode[] products)
+        {
+            var searchL = search.ToLower();
+
+            Settings.State.RootElement.TryGetProperty("channel", out var channelJson);
+            channelJson.TryGetProperty("static", out var staticJson);
+
+            foreach (var ch in staticJson.EnumerateArray())
+            {
+                var hasName = ch.TryGetProperty("name", out var chNameJson);
+                var chName = !hasName ? null : chNameJson.GetString();
+                if (chName == null || chName.ToLower() != searchL)
+                {
+                    continue;
+                }
+
+                var hasFlags = ch.TryGetProperty("flags", out var chFlagsJson);
+                var hasMaxUsers = ch.TryGetProperty("max_users", out var chMaxUsersJson);
+                var hasTopic = ch.TryGetProperty("topic", out var chTopicJson);
+                var hasProducts = ch.TryGetProperty("products", out var chProductsJson);
+
+                var chFlags = !hasFlags ? Flags.None : (Flags)chFlagsJson.GetUInt32();
+                var chMaxUsers = !hasMaxUsers ? -1 : chMaxUsersJson.GetInt32();
+                var chTopic = !hasTopic ? "" : chTopicJson.GetString();
+
+                Product.ProductCode[] chProducts = null;
+                if (hasProducts)
+                {
+                    var _list = new List<Product.ProductCode>();
+                    foreach (var productJson in chProductsJson.EnumerateArray())
+                    {
+                        var productStr = productJson.GetString();
+                        _list.Add(Product.StringToProduct(productStr));
+                    }
+                    chProducts = _list.ToArray();
+                }
+
+                name = chName;
+                flags = chFlags;
+                maxUsers = chMaxUsers;
+                topic = chTopic;
+                products = chProducts;
+
+                return true;
+            }
+
+            name = null;
+            flags = 0;
+            maxUsers = -1;
+            topic = null;
+            products = new Product.ProductCode[0];
+
+            return false;
         }
 
         public string GetUsersAsString()
@@ -304,18 +371,21 @@ namespace Atlasd.Battlenet
 
         public string RenderTopic(GameState receiver)
         {
-            var rendered_topic = Topic;
+            var r = Topic;
 
-            rendered_topic.Replace("%channel.name%", Name);
-            rendered_topic.Replace("%channel.maxusers%", MaxUsers.ToString());
-            rendered_topic.Replace("%channel.users%", Users.Count.ToString());
-            rendered_topic.Replace("%user.account%", (string)receiver.ActiveAccount.Get(Account.UsernameKey));
-            rendered_topic.Replace("%user.game%", Product.ProductName(receiver.Product, false));
-            rendered_topic.Replace("%user.gamelong%", Product.ProductName(receiver.Product, true));
-            rendered_topic.Replace("%user.name%", receiver.OnlineName);
-            rendered_topic.Replace("%user.ping%", receiver.Ping.ToString() + "ms");
+            r = r.Replace("{channel}", Name);
+            r = r.Replace("{channelMaxUsers}", MaxUsers.ToString());
+            r = r.Replace("{channelUserCount}", Users.Count.ToString());
+            r = r.Replace("{account}", (string)receiver.ActiveAccount.Get(Account.UsernameKey));
+            r = r.Replace("{game}", Product.ProductName(receiver.Product, false));
+            r = r.Replace("{gameFull}", Product.ProductName(receiver.Product, true));
+            r = r.Replace("{user}", receiver.OnlineName);
+            r = r.Replace("{username}", receiver.OnlineName);
+            r = r.Replace("{userName}", receiver.OnlineName);
+            r = r.Replace("{ping}", receiver.Ping.ToString() + "ms");
+            r = r.Replace("{userPing}", receiver.Ping.ToString() + "ms");
 
-            return rendered_topic;
+            return r;
         }
 
         public void Resync()

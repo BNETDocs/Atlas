@@ -116,5 +116,53 @@ namespace Atlasd.Battlenet
 
             return Encoding.ASCII.GetString(buf);
         }
+
+        public static ProductCode StringToProduct(string product)
+        {
+            switch (product.ToUpper())
+            {
+                case "CHAT":
+                case "TAHC":
+                    return ProductCode.Chat;
+                case "D2DV":
+                case "VD2D":
+                    return ProductCode.DiabloII;
+                case "D2XP":
+                case "PX2D":
+                    return ProductCode.DiabloIILordOfDestruction;
+                case "DRTL":
+                case "LTRD":
+                    return ProductCode.DiabloRetail;
+                case "DSHR":
+                case "RHSD":
+                    return ProductCode.DiabloShareware;
+                case "SEXP":
+                case "PXES":
+                    return ProductCode.StarcraftBroodwar;
+                case "JSTR":
+                case "RTSJ":
+                    return ProductCode.StarcraftJapanese;
+                case "STAR":
+                case "RATS":
+                    return ProductCode.StarcraftOriginal;
+                case "SSHR":
+                case "RHSS":
+                    return ProductCode.StarcraftShareware;
+                case "W2BN":
+                case "NB2W":
+                    return ProductCode.WarcraftII;
+                case "W3DM":
+                case "MD3W":
+                    return ProductCode.WarcraftIIIDemo;
+                case "W3XP":
+                case "PX3W":
+                    return ProductCode.WarcraftIIIFrozenThrone;
+                case "WAR3":
+                case "3RAW":
+                    return ProductCode.WarcraftIIIReignOfChaos;
+                default:
+                    return ProductCode.None;
+            }
+        }
     }
 }

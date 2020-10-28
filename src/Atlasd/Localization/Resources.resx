@@ -138,9 +138,6 @@
   <data name="Backstage" xml:space="preserve">
     <value>Backstage</value>
   </data>
-  <data name="BlizzardTechSupport" xml:space="preserve">
-    <value>Blizzard Tech Support</value>
-  </data>
   <data name="ChannelFirstJoinGreeting" xml:space="preserve">
     <value>Welcome to {realm}!
 This server is hosted by {host}.
@@ -235,18 +232,12 @@ Displays the current {realm} Time ({realmTimezone}).</value>
   <data name="NoOneHearsYou" xml:space="preserve">
     <value>No one hears you.</value>
   </data>
-  <data name="OpenTechSupport" xml:space="preserve">
-    <value>Open Tech Support</value>
-  </data>
   <data name="TheVoid" xml:space="preserve">
     <value>The Void</value>
   </data>
   <data name="TimeCommand" xml:space="preserve">
     <value>{realm} time: {realmTime}
 Your local time: {localTime}</value>
-  </data>
-  <data name="TownSquare" xml:space="preserve">
-    <value>Town Square</value>
   </data>
   <data name="UserBannedFromChannel" xml:space="preserve">
     <value>{target} was banned by {source}</value>
@@ -283,9 +274,6 @@ Your local time: {localTime}</value>
   </data>
   <data name="UserUnBannedFromChannel" xml:space="preserve">
     <value>{target} was unbanned by {source}</value>
-  </data>
-  <data name="Warez" xml:space="preserve">
-    <value>warez</value>
   </data>
   <data name="WhoCommand" xml:space="preserve">
     <value>Users in channel {channel}:
