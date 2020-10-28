@@ -14,6 +14,7 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Atlas, Battle.net, Blizzard, Classic, Diablo, Emulation, Linux, StarCraft, WarCraft, Windows</PackageTags>
     <AssemblyName>atlasd</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
