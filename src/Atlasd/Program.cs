@@ -30,15 +30,14 @@ namespace Atlasd
 
 #if DEBUG
             // wait for debugger to attach to process
-
             if (!Debugger.IsAttached)
             {
                 Console.WriteLine($"[{DateTime.Now}] Waiting for debugger to attach...");
-            }
-
-            while (!Debugger.IsAttached)
-            {
-                await Task.Yield();
+                while (!Debugger.IsAttached)
+                {
+                    await Task.Yield();
+                }
+                Console.WriteLine($"[{DateTime.Now}] Debugger attached: {Debugger.IsAttached}");
             }
 #endif
 
