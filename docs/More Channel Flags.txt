@@ -1,0 +1,51 @@
+        <z:row Name='StarCraft Newbies' Product='STAR' Flags='1'/>
+        <z:row Name='Opponents Wanted' Product='STAR' Flags='1'/>
+        <z:row Name='Ladder Challenges' Product='STAR' Flags='1'/>
+
+        <z:row Name='Brood War Games' Product='SEXP' Flags='1'/>
+        <z:row Name='Brood War Ladder' Product='SEXP' Flags='1'/>
+
+        <z:row Name='Terran Strategy' Product='STARSEXP' Flags='1'/>
+        <z:row Name='Zerg Strategy' Product='STARSEXP' Flags='1'/>
+        <z:row Name='Protoss Strategy' Product='STARSEXP' Flags='1'/>
+        <z:row Name='Custom Maps' Product='STARSEXP' Flags='1'/>
+        <z:row Name='KBK Info' Product='STARSEXP' Flags='1'/>
+        <z:row Name='KBK Singles' Product='STARSEXP' Flags='1'/>
+        <z:row Name='KBK Team' Product='STARSEXP' Flags='1'/>
+        <z:row Name='KBK Beginner' Product='STARSEXP' Flags='1'/>
+        <z:row Name='KBK Zone' Product='STARSEXP' Flags='1'/>
+        <z:row Name='KBK Game Room' Product='STARSEXP' Flags='1'/>
+        <z:row Name='KBK Pro' Product='STARSEXP' Flags='1'/>
+
+        <z:row Name='Human Strategy' Product='W2BN' Flags='1'/>
+        <z:row Name='Orc Strategy' Product='W2BN' Flags='1'/>
+        <z:row Name='Scenario Games' Product='W2BN' Flags='1'/>
+        <z:row Name='Classic Games' Product='W2BN' Flags='1'/>
+        <z:row Name='War2 Ladder Challenges' Product='W2BN' Flags='1'/>
+        <z:row Name='Iron Man Challenges' Product='W2BN' Flags='1'/>
+        <z:row Name='Free For All' Product='W2BN' Flags='1'/>
+        <z:row Name='One vs One' Product='W2BN' Flags='1'/>
+        <z:row Name='Trading' Product='D2DV' Flags='1'/>
+        <z:row Name='Trading Sets' Product='D2DV' Flags='1'/>
+        <z:row Name='Trading Hardcore' Product='D2DV' Flags='1'/>
+        <z:row Name='Trading Gems' Product='D2DV' Flags='1'/>
+
+        <z:row Name='LoD Trading' Product='D2XP' Flags='1'/>
+        <z:row Name='LoD Trading Sets' Product='D2XP' Flags='1'/>
+        <z:row Name='LoD Trading Hardcore' Product='D2XP' Flags='1'/>
+        <z:row Name='LoD Trading Gems' Product='D2XP' Flags='1'/>
+
+        <z:row Name='Starting Strategies' Product='D2DVD2XP' Flags='1'/>
+        <z:row Name='Barbarian Village' Product='D2DVD2XP' Flags='1'/>
+        <z:row Name='Amazon Camp' Product='D2DVD2XP' Flags='1'/>
+        <z:row Name='Necromancer Crypt' Product='D2DVD2XP' Flags='1'/>
+        <z:row Name='Paladin Temple' Product='D2DVD2XP' Flags='1'/>
+        <z:row Name='Sorceress Tower' Product='D2DVD2XP' Flags='1'/>
+        <z:row Name='Assassin Den' Product='D2XP' Flags='1'/>
+        <z:row Name='Druidic Grove' Product='D2XP' Flags='1'/>
+        <z:row Name='Hardcore Players' Product='D2DVD2XP' Flags='1'/>
+        <z:row Name='Cooperative Players' Product='D2DVD2XP' Flags='1'/>
+        <z:row Name='Diablo II PvP' Product='D2DVD2XP' Flags='1'/>
+        <z:row Name='Cow Normal' Product='D2DVD2XP' Flags='1'/>
+        <z:row Name='Cow Nightmare' Product='D2DVD2XP' Flags='1'/>
+        <z:row Name='Cow Hell' Product='D2DVD2XP' Flags='1'/>
