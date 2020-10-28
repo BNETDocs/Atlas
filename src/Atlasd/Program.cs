@@ -48,7 +48,7 @@ namespace Atlasd
 
             while (!Exit)
             {
-                await Task.Yield();
+                await Task.Delay(10);
             }
 
             return ExitCode;
