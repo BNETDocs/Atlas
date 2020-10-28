@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text.Json;
 
 namespace Atlasd.Battlenet
 {
@@ -147,12 +148,25 @@ namespace Atlasd.Battlenet
         {
             account = null;
 
-            var BannedWords = (List<string>)Daemon.Common.Settings["account.disallow_words"];
-            var MaximumAdjacentPunctuation = (uint)Daemon.Common.Settings["account.max_adjacent_punctuation"];
-            var MaximumPunctuation = (uint)Daemon.Common.Settings["account.max_punctuation"];
-            var MaximumUsernameSize = (uint)Daemon.Common.Settings["account.max_length"];
-            var MinimumAlphanumericSize = (uint)Daemon.Common.Settings["account.min_alphanumeric"];
-            var MinimumUsernameSize = (uint)Daemon.Common.Settings["account.min_length"];
+            Settings.State.RootElement.TryGetProperty("account", out var accountJson);
+            accountJson.TryGetProperty("disallow_words", out var disallowWordsJson);
+            accountJson.TryGetProperty("max_adjacent_punctuation", out var maxAdjacentPunctuationJson);
+            accountJson.TryGetProperty("max_length", out var maxLengthJson);
+            accountJson.TryGetProperty("max_punctuation", out var maxPunctuationJson);
+            accountJson.TryGetProperty("min_alphanumeric", out var minAlphanumericJson);
+            accountJson.TryGetProperty("min_length", out var minLengthJson);
+
+            if (!disallowWordsJson.ValueKind.HasFlag(JsonValueKind.Array))
+            {
+                throw new NotSupportedException("Setting [account -> disallow_words] is not an array; check value");
+            }
+
+            var BannedWords = disallowWordsJson;
+            var MaximumAdjacentPunctuation = maxAdjacentPunctuationJson.GetUInt32();
+            var MaximumPunctuation = maxPunctuationJson.GetUInt32();
+            var MaximumUsernameSize = maxLengthJson.GetUInt32();
+            var MinimumAlphanumericSize = minAlphanumericJson.GetUInt32();
+            var MinimumUsernameSize = minLengthJson.GetUInt32();
 
             lock (Common.AccountsProcessing)
             {
@@ -217,9 +231,9 @@ namespace Atlasd.Battlenet
                 return CreateStatus.UsernameShortAlphanumeric;
             }
 
-            foreach (var word in BannedWords)
+            foreach (var word in BannedWords.EnumerateArray())
             {
-                if (username.Contains(word))
+                if (username.ToLower().Contains(word.GetString().ToLower()))
                 {
                     Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{username}] contains a banned word or phrase");
                     return CreateStatus.UsernameBannedWord;

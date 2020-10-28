@@ -13,17 +13,22 @@ namespace Atlasd.Daemon
         private const uint DocumentVersionSupported = 0;
 
         public static JsonDocument State { get; private set; }
-        public static string Path =
-#if DEBUG
-                                    "../../../../../etc/atlasd.json";
-#else
-                                    "../etc/atlasd.json";
-#endif
+        public static string Path { get; private set; } = null;
+
+        public static void Initialize()
+        {
+            if (Path == null || Path.Length == 0)
+            {
+                SetPathToDefault();
+            }
+
+            Load();
+        }
 
         public static void Load()
         {
             Reset();
-            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, "Loading configuration");
+            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, $"Loading configuration from [{Path}]");
 
             try
             {
@@ -81,6 +86,16 @@ namespace Atlasd.Daemon
         {
             Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, "Saving configuration");
             Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, "(Not implemented)");
+        }
+
+        public static void SetPath(string path)
+        {
+            Path = path;
+        }
+
+        public static void SetPathToDefault()
+        {
+            Path = System.IO.Path.GetFullPath(System.IO.Path.Combine(AppContext.BaseDirectory, "atlasd.json"));
         }
     }
 }

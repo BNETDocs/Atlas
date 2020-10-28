@@ -41,10 +41,10 @@ namespace Atlasd
             }
 #endif
 
-            Common.Initialize();
+            ParseCommandLineArgs(args);
+            Settings.Initialize();
             Battlenet.Common.Initialize();
-
-            await Task.Run(() => { Common.Start(); });
+            Battlenet.Common.Listener.Start();
 
             while (!Exit)
             {
@@ -53,5 +53,65 @@ namespace Atlasd
 
             return ExitCode;
         }
+        private static void ParseCommandLineArgs(string[] args)
+        {
+            string arg;
+            string value;
+
+            for (var i = 0; i < args.Length; i++)
+            {
+                arg = args[i];
+
+                if (arg.Contains('='))
+                {
+                    var p = arg.IndexOf('=');
+                    value = arg.Substring(p + 1);
+                    arg = arg.Substring(0, p);
+                }
+                else if (i + 1 < args.Length)
+                {
+                    value = args[++i];
+                }
+                else
+                {
+                    value = "";
+                }
+
+                var r = ParseCommandLineArg(arg, value);
+                if (r != 0)
+                {
+                    Program.ExitCode = r;
+                    Program.Exit = true;
+                    return;
+                }
+            }
+        }
+
+        /**
+         * <returns>Program exit code, return zero (0; success) to continue to next argument.</returns>
+         */
+        private static int ParseCommandLineArg(string arg, string value)
+        {
+            const int EXIT_SUCCESS = 0;
+            const int EXIT_FAILURE = 1;
+
+            switch (arg)
+            {
+                case "-c":
+                case "--config":
+                    {
+                        Daemon.Settings.SetPath(value);
+                        break;
+                    }
+                default:
+                    {
+                        Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Invalid argument [{arg}]");
+                        return EXIT_FAILURE;
+                    }
+            }
+
+            return EXIT_SUCCESS;
+        }
     }
 }
+ 

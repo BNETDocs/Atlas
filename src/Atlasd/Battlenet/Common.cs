@@ -61,15 +61,21 @@ namespace Atlasd.Battlenet
 
         private static void InitializeListener()
         {
-            var listenerAddressStr = (string)Daemon.Common.Settings["battlenet.listener.interface"];
+            Settings.State.RootElement.TryGetProperty("battlenet", out var battlenetJson);
+            battlenetJson.TryGetProperty("listener", out var listenerJson);
+            listenerJson.TryGetProperty("interface", out var interfaceJson);
+            listenerJson.TryGetProperty("port", out var portJson);
+
+            var listenerAddressStr = interfaceJson.GetString();
             if (!IPAddress.TryParse(listenerAddressStr, out IPAddress listenerAddress))
             {
                 Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, $"Unable to parse IP address from [battlenet.listener.interface] with value [{listenerAddressStr}]; using any");
                 listenerAddress = DefaultAddress;
             }
-
             ListenerAddress = listenerAddress;
-            ListenerPort = (int)(Daemon.Common.Settings["battlenet.listener.port"] ?? DefaultPort);
+
+            portJson.TryGetInt32(out var port);
+            ListenerPort = port;
 
             if (!IPEndPoint.TryParse($"{ListenerAddress}:{ListenerPort}", out IPEndPoint listenerEndPoint))
             {

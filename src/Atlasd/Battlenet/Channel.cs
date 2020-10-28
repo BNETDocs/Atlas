@@ -132,12 +132,9 @@ namespace Atlasd.Battlenet
             foreach (var line in topic)
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line).WriteTo(user.Client);
 
-            var autoOp = false;
-            lock (Daemon.Common.Settings)
-            {
-                Daemon.Common.Settings.TryGetValue("channel.auto_op", out object _autoOp);
-                autoOp = (bool)_autoOp;
-            }
+            Settings.State.RootElement.TryGetProperty("channel", out var channelJson);
+            channelJson.TryGetProperty("auto_op", out var autoOpJson);
+            var autoOp = autoOpJson.GetBoolean();
 
             if ((autoOp == true && Count == 1 && IsPrivate()) || Name.ToLower() == "op " + user.OnlineName.ToLower())
                 UpdateUser(user, user.ChannelFlags | Account.Flags.ChannelOp);
@@ -371,10 +368,11 @@ namespace Atlasd.Battlenet
 
         public void SetName(string newName)
         {
+            var oldName = Name;
             Name = newName;
+            if (Users.Count == 0) return;
 
-            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, "The channel was renamed."));
-
+            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, $"The channel {oldName} was renamed to {newName}."));
             Resync();
         }
 
