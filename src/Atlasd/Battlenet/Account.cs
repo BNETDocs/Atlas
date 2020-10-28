@@ -149,6 +149,7 @@ namespace Atlasd.Battlenet
             account = null;
 
             Settings.State.RootElement.TryGetProperty("account", out var accountJson);
+            accountJson.TryGetProperty("auto_admin", out var autoAdminJson);
             accountJson.TryGetProperty("disallow_words", out var disallowWordsJson);
             accountJson.TryGetProperty("max_adjacent_punctuation", out var maxAdjacentPunctuationJson);
             accountJson.TryGetProperty("max_length", out var maxLengthJson);
@@ -161,12 +162,13 @@ namespace Atlasd.Battlenet
                 throw new NotSupportedException("Setting [account -> disallow_words] is not an array; check value");
             }
 
-            var BannedWords = disallowWordsJson;
-            var MaximumAdjacentPunctuation = maxAdjacentPunctuationJson.GetUInt32();
-            var MaximumPunctuation = maxPunctuationJson.GetUInt32();
-            var MaximumUsernameSize = maxLengthJson.GetUInt32();
-            var MinimumAlphanumericSize = minAlphanumericJson.GetUInt32();
-            var MinimumUsernameSize = minLengthJson.GetUInt32();
+            var autoAdmin = autoAdminJson.GetBoolean();
+            var bannedWords = disallowWordsJson;
+            var maximumAdjacentPunctuation = maxAdjacentPunctuationJson.GetUInt32();
+            var maximumPunctuation = maxPunctuationJson.GetUInt32();
+            var maximumUsernameSize = maxLengthJson.GetUInt32();
+            var minimumAlphanumericSize = minAlphanumericJson.GetUInt32();
+            var minimumUsernameSize = minLengthJson.GetUInt32();
 
             lock (Common.AccountsProcessing)
             {
@@ -180,10 +182,10 @@ namespace Atlasd.Battlenet
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, "Processing new account request...");
 
-            if (username.Length < MinimumUsernameSize)
+            if (username.Length < minimumUsernameSize)
                 return CreateStatus.UsernameTooShort;
 
-            if (username.Length > MaximumUsernameSize)
+            if (username.Length > maximumUsernameSize)
                 return CreateStatus.UsernameShortAlphanumeric;
 
             uint total_alphanumeric = 0;
@@ -210,13 +212,13 @@ namespace Atlasd.Battlenet
                         adjacent_punctuation++;
                 }
 
-                if (total_punctuation > MaximumPunctuation)
+                if (total_punctuation > maximumPunctuation)
                 {
                     Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{username}] contains too many punctuation");
                     return CreateStatus.UsernameTooManyPunctuation;
                 }
 
-                if (adjacent_punctuation > MaximumAdjacentPunctuation)
+                if (adjacent_punctuation > maximumAdjacentPunctuation)
                 {
                     Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{username}] contains too many adjacent punctuation");
                     return CreateStatus.UsernameAdjacentPunctuation;
@@ -225,13 +227,13 @@ namespace Atlasd.Battlenet
                 last_c = c;
             }
 
-            if (total_alphanumeric < MinimumAlphanumericSize)
+            if (total_alphanumeric < minimumAlphanumericSize)
             {
                 Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{username}] is too short or contains too few alphanumeric characters");
                 return CreateStatus.UsernameShortAlphanumeric;
             }
 
-            foreach (var word in BannedWords.EnumerateArray())
+            foreach (var word in bannedWords.EnumerateArray())
             {
                 if (username.ToLower().Contains(word.GetString().ToLower()))
                 {
@@ -253,7 +255,8 @@ namespace Atlasd.Battlenet
                 account.Set(Account.UsernameKey, username);
                 account.Set(Account.PasswordKey, passwordHash);
 
-                account.Set(Account.FlagsKey, Common.AccountsDb.Count == 0 ? (Account.Flags.Employee | Account.Flags.Admin) : Account.Flags.None);
+                var makeAdmin = autoAdmin && Common.AccountsDb.Count == 0;
+                account.Set(Account.FlagsKey, makeAdmin ? (Account.Flags.Employee | Account.Flags.Admin) : Account.Flags.None);
 
                 Common.AccountsDb.Add(username, account);
             }
