@@ -1,0 +1,121 @@
+{
+  "account": {
+    "auto_admin": true,
+    "disallow_words": [
+      "ass",
+      "battle.net",
+      "blizzard",
+      "chink",
+      "cracker",
+      "cunt",
+      "fag",
+      "fuck",
+      "idiot",
+      "nigga",
+      "nigger",
+      "niglet",
+      "twat",
+      "wetback"
+    ],
+    "max_adjacent_punctuation": 0,
+    "max_length": 15,
+    "max_punctuation": 7,
+    "min_alphanumeric": 1,
+    "min_length": 3
+  },
+  "battlenet": {
+    "listener": {
+      "interface": "0.0.0.0",
+      "port": 6112
+    }
+  },
+  "channel": {
+    "auto_op": true,
+    "max_length": 31,
+    "max_users": 40,
+    "static": [
+      {
+        "name": "The Void",
+        "flags": 9
+      },
+      {
+        "name": "warez",
+        "flags": 12
+      },
+      {
+        "name": "Backstage",
+        "flags": 16,
+        "topic": "Abandon hope, all ye who enter here..."
+      },
+      {
+        "name": "Blizzard Tech Support",
+        "flags": 69635,
+        "topic": "This channel is provided for nostalgic purposes. No support is given here."
+      },
+      {
+        "name": "Open Tech Support",
+        "flags": 69633,
+        "topic": "This is an open channel where you can get help on technical problems from other users.\nIf you need to contact Blizzard Technical Support for any legacy game issue, please visit their Technical Support forum located at: http://forums.battle.net/board.html?forumId=12014&sid=3000"
+      },
+      {
+        "name": "Town Square",
+        "flags": 1,
+        "topic": "Welcome {user}, your ping is {ping}, have fun!"
+      },
+      {
+        "name": "Blizzard Chat",
+        "flags": 4097
+      },
+      {
+        "name": "Clan Recruitment",
+        "flags": 1,
+        "topic": "Looking for a clan? Looking for members? Clan Recruitment allows you to find both."
+      },
+      {
+        "name": "Public Chat",
+        "flags": 33
+      },
+      {
+        "name": "Starcraft",
+        "flags": 33,
+        "products": [
+          "STAR"
+        ]
+      },
+      {
+        "name": "Brood War",
+        "flags": 33,
+        "products": [
+          "SEXP"
+        ]
+      },
+      {
+        "name": "Diablo II",
+        "flags": 33,
+        "products": [
+          "D2DV"
+        ]
+      },
+      {
+        "name": "Lord of Destruction",
+        "flags": 33,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "24423lkn",
+        "flags": 3
+      }
+    ]
+  },
+  "document_version": 0,
+  "mysql": {
+    "charset": "utf8mb4",
+    "connect_timeout": 3,
+    "database": "atlasd",
+    "hostname":  "localhost",
+    "password": "atlasdev",
+    "username": "atlasd"
+  }
+}
