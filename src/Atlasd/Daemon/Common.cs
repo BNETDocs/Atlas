@@ -44,6 +44,8 @@ namespace Atlasd.Daemon
                 { "channel.max_length", 31 },
                 { "channel.max_users", 40 },
             };
+
+            Daemon.Settings.Load();
         }
 
         public static void Start()
