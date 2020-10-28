@@ -341,3 +341,6 @@ healthchecksdb
 
 # VSCode config files
 .vscode
+
+# Local launch settings
+src/*/Properties/launchSettings.json
