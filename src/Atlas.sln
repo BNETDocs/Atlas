@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atlas", "Atlas\Atlas.csproj", "{4CF2A1D8-3B91-4A49-88BA-E8291CBC554B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atlasd", "Atlasd\Atlasd.csproj", "{E6E0DA5F-CDF0-41F6-A3B3-66EAEF70B9EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MBNCSUtil", "MBNCSUtil\MBNCSUtil.csproj", "{F66D19F8-4F97-4E87-9E18-444ECF289A83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MBNCSUtil", "MBNCSUtil\MBNCSUtil.csproj", "{F66D19F8-4F97-4E87-9E18-444ECF289A83}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4CF2A1D8-3B91-4A49-88BA-E8291CBC554B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4CF2A1D8-3B91-4A49-88BA-E8291CBC554B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4CF2A1D8-3B91-4A49-88BA-E8291CBC554B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4CF2A1D8-3B91-4A49-88BA-E8291CBC554B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E6E0DA5F-CDF0-41F6-A3B3-66EAEF70B9EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E6E0DA5F-CDF0-41F6-A3B3-66EAEF70B9EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6E0DA5F-CDF0-41F6-A3B3-66EAEF70B9EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
