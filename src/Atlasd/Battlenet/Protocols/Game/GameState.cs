@@ -65,12 +65,12 @@ namespace Atlasd.Battlenet.Protocols.Game
             GameKeys = new List<GameKey>();
             LastLogon = DateTime.Now;
             LastNull = DateTime.Now;
-            LastPing = DateTime.Now;
+            LastPing = DateTime.Parse("1970-01-01T00:00:00+00:00");
             LocalIPAddress = null;
             Locale = new LocaleInfo();
             LogonType = LogonTypes.OLS;
             SquelchedIPs = new List<IPAddress>();
-            PingDelta = DateTime.Now;
+            PingDelta = LastPing;
             Platform = Battlenet.Platform.PlatformCode.None;
             Product = Battlenet.Product.ProductCode.None;
             Version = new VersionInfo();

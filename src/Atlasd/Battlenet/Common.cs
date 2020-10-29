@@ -156,7 +156,7 @@ namespace Atlasd.Battlenet
                         client.PingDelta = now;
                         client.PingToken = (uint)r.Next(0, 0x7FFFFFFF);
 
-                        msg.Invoke(new MessageContext(client.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, object>(){{ "token", client.PingToken }}));
+                        msg.Invoke(new MessageContext(client.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){{ "token", client.PingToken }}));
                         client.Client.Send(msg.ToByteArray());
                         client.Client.Socket.Poll(0, System.Net.Sockets.SelectMode.SelectWrite);
                     }

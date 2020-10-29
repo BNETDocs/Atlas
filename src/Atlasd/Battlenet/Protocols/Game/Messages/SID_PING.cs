@@ -2,6 +2,7 @@
 using Atlasd.Daemon;
 using System;
 using System.IO;
+using System.Security.Principal;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -25,35 +26,38 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             if (context.Arguments != null && context.Arguments.ContainsKey("token"))
             {
-                // cheaper to do the math here than instantiate BinaryReader/BinaryWriter and MemoryStream objects
-                var t     = (UInt32)context.Arguments["token"];
-                Buffer    = new byte[4];
-                Buffer[0] = (byte)(t >> 24);
-                Buffer[1] = (byte)(t >> 16);
-                Buffer[2] = (byte)(t >> 8);
-                Buffer[3] = (byte)t;
+                var t = (UInt32)context.Arguments["token"];
+
+                Buffer = new byte[4];
+
+                using var _m = new MemoryStream(Buffer);
+                using var _w = new BinaryWriter(_m);
+                _w.Write(t);
             }
 
             if (Buffer.Length != 4)
                 throw new GameProtocolViolationException(context.Client, "SID_PING buffer must be 4 bytes");
 
-            var token = (UInt32)((Buffer[3] << 24) + (Buffer[2] << 16) + (Buffer[1] << 8) + Buffer[0]);
-            var serverToken = (UInt32)0;
+            using var m = new MemoryStream(Buffer);
+            using var r = new BinaryReader(m);
+            var token = r.ReadUInt32();
 
-            lock (context.Client.GameState) serverToken = context.Client.GameState.PingToken;
-
-            if (context.Direction == MessageDirection.ClientToServer && token == serverToken)
+            lock (context.Client.GameState)
             {
-                lock (context.Client.GameState)
+                var serverToken = context.Client.GameState.PingToken;
+
+                if (context.Direction == MessageDirection.ClientToServer && token == serverToken)
                 {
                     var delta = DateTime.Now - context.Client.GameState.PingDelta;
                     context.Client.GameState.Ping = (int)Math.Round(delta.TotalMilliseconds);
+
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Ping: {context.Client.GameState.Ping}ms");
+
+                    if (context.Client.GameState.ActiveChannel != null)
+                    {
+                        context.Client.GameState.ActiveChannel.UpdateUser(context.Client.GameState, context.Client.GameState.Ping);
+                    }
                 }
-
-                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Ping: {context.Client.GameState.Ping}ms");
-
-                if (context.Client.GameState.ActiveChannel != null)
-                    context.Client.GameState.ActiveChannel.UpdateUser(context.Client.GameState, context.Client.GameState.Ping);
             }
 
             return true;
