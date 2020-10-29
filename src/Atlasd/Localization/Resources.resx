@@ -123,6 +123,12 @@
   <data name="AdminMoveUserCommand" xml:space="preserve">
     <value>Forcefully moved {user} to the channel {channel}.</value>
   </data>
+  <data name="AdminReloadCommandFailure" xml:space="preserve">
+    <value>An {exception} occurred while reloading the server configuration. Server stability is now at risk, notify a system administrator immediately.</value>
+  </data>
+  <data name="AdminReloadCommandSuccess" xml:space="preserve">
+    <value>The server configuration has been reloaded.</value>
+  </data>
   <data name="AwayCommandOff" xml:space="preserve">
     <value>You are no longer marked as away.</value>
   </data>

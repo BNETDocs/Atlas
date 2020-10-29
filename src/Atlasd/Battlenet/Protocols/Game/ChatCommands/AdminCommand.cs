@@ -62,6 +62,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 case "moveuser":
                 case "move":
                     new AdminMoveUserCommand(Arguments).Invoke(context); return;
+                case "reload":
+                    new AdminReloadCommand(Arguments).Invoke(context); return;
                 case "spoofuserflag":
                 case "spoofuserflags":
                     r = "/admin spoofuserflags <user> <flags>";

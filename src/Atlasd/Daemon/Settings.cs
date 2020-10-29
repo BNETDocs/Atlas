@@ -17,17 +17,17 @@ namespace Atlasd.Daemon
 
         public static void Initialize()
         {
-            if (Path == null || Path.Length == 0)
+            if (string.IsNullOrEmpty(Path))
             {
                 SetPathToDefault();
             }
 
+            Reset();
             Load();
         }
 
         public static void Load()
         {
-            Reset();
             Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, $"Loading configuration from [{Path}]");
 
             try

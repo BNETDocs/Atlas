@@ -79,6 +79,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An {exception} occurred while reloading the server configuration. Server stability is now at risk, notify a system administrator immediately..
+        /// </summary>
+        public static string AdminReloadCommandFailure {
+            get {
+                return ResourceManager.GetString("AdminReloadCommandFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The server configuration has been reloaded..
+        /// </summary>
+        public static string AdminReloadCommandSuccess {
+            get {
+                return ResourceManager.GetString("AdminReloadCommandSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You are no longer marked as away..
         /// </summary>
         public static string AwayCommandOff {
