@@ -36,6 +36,8 @@ namespace Atlasd.Battlenet.Protocols.Game
             Ladder = 0x01,
             IronManLadder = 0x03,
         };
+
+        [Flags]
         public enum StateFlags : UInt32
         {
             None = 0x00,

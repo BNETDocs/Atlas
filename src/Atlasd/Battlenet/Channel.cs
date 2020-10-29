@@ -13,6 +13,7 @@ namespace Atlasd.Battlenet
     {
         public const Flags TheVoidFlags = Flags.Public | Flags.Silent;
 
+        [Flags]
         public enum Flags : UInt32
         {
             None            = 0x00000, // aka "Private"

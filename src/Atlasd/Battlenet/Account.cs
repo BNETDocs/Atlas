@@ -40,6 +40,7 @@ namespace Atlasd.Battlenet
             UsernameTooManyPunctuation = 8,
         };
 
+        [Flags]
         public enum Flags : UInt32
         {
             None = 0x00,
