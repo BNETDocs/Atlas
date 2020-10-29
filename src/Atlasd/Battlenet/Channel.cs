@@ -557,7 +557,7 @@ namespace Atlasd.Battlenet
             var strGame = Product.ProductName(receiver.GameState.Product, true);
             var numGameOnline = Common.GetActiveClientCountByProduct(receiver.GameState.Product);
             var numGameAdvertisements = 0;
-            var numTotalOnline = Common.ActiveClients.Count;
+            var numTotalOnline = Common.ActiveClientStates.Count;
             var numTotalAdvertisements = 0;
 
             var str = Resources.ChannelFirstJoinGreeting;

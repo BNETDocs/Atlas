@@ -2,7 +2,6 @@
 using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Daemon;
 using Atlasd.Localization;
-using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -12,12 +11,11 @@ namespace Atlasd.Battlenet
 {
     class Common
     {
-
         public static Dictionary<string, Account> AccountsDb;
         public static List<string> AccountsProcessing;
         public static Dictionary<string, Account> ActiveAccounts;
         public static Dictionary<string, Channel> ActiveChannels;
-        public static List<ClientState> ActiveClients;
+        public static List<ClientState> ActiveClientStates;
         public static Dictionary<string, GameState> ActiveGameClients;
         public static IPAddress DefaultAddress { get; private set; }
         public static int DefaultPort { get; private set; }
@@ -36,7 +34,7 @@ namespace Atlasd.Battlenet
             AccountsProcessing = new List<string>();
             ActiveAccounts = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
-            ActiveClients = new List<ClientState>();
+            ActiveClientStates = new List<ClientState>();
             ActiveGameClients = new Dictionary<string, GameState>(StringComparer.OrdinalIgnoreCase);
 
             DefaultAddress = IPAddress.Any;
@@ -83,9 +81,9 @@ namespace Atlasd.Battlenet
         {
             var count = (uint)0;
 
-            lock (ActiveClients)
+            lock (ActiveClientStates)
             {
-                foreach (var client in ActiveClients)
+                foreach (var client in ActiveClientStates)
                 {
                     if (client == null || client.GameState == null || client.GameState.Product == Product.ProductCode.None) continue;
                     if (client.GameState.Product == productCode) count++;

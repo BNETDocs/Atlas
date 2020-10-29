@@ -43,7 +43,7 @@ namespace Atlasd.Battlenet
                 Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection forcefully closed by server");
             }
 
-            lock (Common.ActiveClients) Common.ActiveClients.Remove(this);
+            lock (Common.ActiveClientStates) Common.ActiveClientStates.Remove(this);
 
             try
             {
@@ -59,7 +59,7 @@ namespace Atlasd.Battlenet
 
         protected void Initialize(Socket client)
         {
-            lock (Common.ActiveClients) Common.ActiveClients.Add(this);
+            lock (Common.ActiveClientStates) Common.ActiveClientStates.Add(this);
 
             GameState = null;
             ProtocolType = null;
