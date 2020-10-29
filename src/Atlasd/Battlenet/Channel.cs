@@ -82,7 +82,7 @@ namespace Atlasd.Battlenet
                     }
                 }
 
-                if (ActiveFlags.HasFlag(Flags.Restricted))
+                if (ActiveFlags.HasFlag(Flags.Restricted) || ActiveFlags.HasFlag(Flags.System))
                 {
                     Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Channel, $"[{Name}] Rejecting user [{user.OnlineName}] for reason [Restricted]");
 
@@ -149,8 +149,11 @@ namespace Atlasd.Battlenet
                 foreach (var user in Users) MoveUser(user, theVoid, true);
             }
 
-            if (Common.ActiveChannels.ContainsKey(Name))
-                Common.ActiveChannels.Remove(Name);
+            lock (Common.ActiveChannels)
+            {
+                if (Common.ActiveChannels.ContainsKey(Name))
+                    Common.ActiveChannels.Remove(Name);
+            }
         }
 
         public static Channel GetChannelByName(string name, bool autoCreate)
