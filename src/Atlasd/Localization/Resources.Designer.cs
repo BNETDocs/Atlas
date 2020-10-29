@@ -97,29 +97,20 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A server shutdown has been scheduled in {period}..
+        ///   Looks up a localized string similar to The server shutdown was cancelled..
         /// </summary>
-        public static string AdminShutdownCommandAnnouncement {
+        public static string AdminShutdownCommandCancelled {
             get {
-                return ResourceManager.GetString("AdminShutdownCommandAnnouncement", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A server shutdown has been scheduled in {period} ({message})..
-        /// </summary>
-        public static string AdminShutdownCommandAnnouncementWithMessage {
-            get {
-                return ResourceManager.GetString("AdminShutdownCommandAnnouncementWithMessage", resourceCulture);
+                return ResourceManager.GetString("AdminShutdownCommandCancelled", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The server shutdown was scheduled..
         /// </summary>
-        public static string AdminShutdownCommandReply {
+        public static string AdminShutdownCommandScheduled {
             get {
-                return ResourceManager.GetString("AdminShutdownCommandReply", resourceCulture);
+                return ResourceManager.GetString("AdminShutdownCommandScheduled", resourceCulture);
             }
         }
         
@@ -391,6 +382,42 @@ namespace Atlasd.Localization {
         public static string NoOneHearsYou {
             get {
                 return ResourceManager.GetString("NoOneHearsYou", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A server shutdown has been rescheduled in {period}..
+        /// </summary>
+        public static string ServerShutdownRescheduled {
+            get {
+                return ResourceManager.GetString("ServerShutdownRescheduled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A server shutdown has been rescheduled in {period} ({message})..
+        /// </summary>
+        public static string ServerShutdownRescheduledWithMessage {
+            get {
+                return ResourceManager.GetString("ServerShutdownRescheduledWithMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A server shutdown has been scheduled in {period}..
+        /// </summary>
+        public static string ServerShutdownScheduled {
+            get {
+                return ResourceManager.GetString("ServerShutdownScheduled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A server shutdown has been scheduled in {period} ({message})..
+        /// </summary>
+        public static string ServerShutdownScheduledWithMessage {
+            get {
+                return ResourceManager.GetString("ServerShutdownScheduledWithMessage", resourceCulture);
             }
         }
         

@@ -185,8 +185,10 @@ namespace Atlasd.Battlenet
 
         public static void ScheduleShutdown(TimeSpan period, string message = null, ChatCommandContext command = null)
         {
+            var rescheduled = false;
             if (ScheduledShutdown.EventTimer != null)
             {
+                rescheduled = true;
                 Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, "Stopping previously scheduled shutdown event");
                 ScheduledShutdown.EventTimer.Dispose();
             }
@@ -203,8 +205,29 @@ namespace Atlasd.Battlenet
 
             tsStr = tsStr.Replace("0 hours ", "");
             tsStr = tsStr.Replace("0 minutes ", "");
+            tsStr = tsStr.Replace(" 0 seconds", "");
 
-            var m = string.IsNullOrEmpty(message) ? Resources.AdminShutdownCommandAnnouncement : Resources.AdminShutdownCommandAnnouncementWithMessage;
+            string m;
+            if (string.IsNullOrEmpty(message) && !rescheduled)
+            {
+                m = Resources.ServerShutdownScheduled;
+            }
+            else if (string.IsNullOrEmpty(message) && rescheduled)
+            {
+                m = Resources.ServerShutdownRescheduled;
+            }
+            else if (!string.IsNullOrEmpty(message) && !rescheduled)
+            {
+                m = Resources.ServerShutdownScheduledWithMessage;
+            }
+            else if (!string.IsNullOrEmpty(message) && rescheduled)
+            {
+                m = Resources.ServerShutdownRescheduledWithMessage;
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot set server shutdown message from localized resource");
+            }
 
             m = m.Replace("{period}", tsStr);
             m = m.Replace("{message}", message);
@@ -225,7 +248,7 @@ namespace Atlasd.Battlenet
 
                 if (command != null)
                 {
-                    var r = Resources.AdminShutdownCommandReply;
+                    var r = Resources.AdminShutdownCommandScheduled;
 
                     foreach (var kv in command.Environment)
                     {

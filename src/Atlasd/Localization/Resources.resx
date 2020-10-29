@@ -129,13 +129,10 @@
   <data name="AdminReloadCommandSuccess" xml:space="preserve">
     <value>The server configuration has been reloaded.</value>
   </data>
-  <data name="AdminShutdownCommandAnnouncement" xml:space="preserve">
-    <value>A server shutdown has been scheduled in {period}.</value>
+  <data name="AdminShutdownCommandCancelled" xml:space="preserve">
+    <value>The server shutdown was cancelled.</value>
   </data>
-  <data name="AdminShutdownCommandAnnouncementWithMessage" xml:space="preserve">
-    <value>A server shutdown has been scheduled in {period} ({message}).</value>
-  </data>
-  <data name="AdminShutdownCommandReply" xml:space="preserve">
+  <data name="AdminShutdownCommandScheduled" xml:space="preserve">
     <value>The server shutdown was scheduled.</value>
   </data>
   <data name="AwayCommandOff" xml:space="preserve">
@@ -246,6 +243,18 @@ Displays the current {realm} Time ({realmTimezone}).</value>
   </data>
   <data name="NoOneHearsYou" xml:space="preserve">
     <value>No one hears you.</value>
+  </data>
+  <data name="ServerShutdownRescheduled" xml:space="preserve">
+    <value>A server shutdown has been rescheduled in {period}.</value>
+  </data>
+  <data name="ServerShutdownRescheduledWithMessage" xml:space="preserve">
+    <value>A server shutdown has been rescheduled in {period} ({message}).</value>
+  </data>
+  <data name="ServerShutdownScheduled" xml:space="preserve">
+    <value>A server shutdown has been scheduled in {period}.</value>
+  </data>
+  <data name="ServerShutdownScheduledWithMessage" xml:space="preserve">
+    <value>A server shutdown has been scheduled in {period} ({message}).</value>
   </data>
   <data name="TheVoid" xml:space="preserve">
     <value>The Void</value>

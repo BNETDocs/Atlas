@@ -142,8 +142,9 @@ namespace Atlasd.Battlenet
 
                 tsStr = tsStr.Replace("0 hours ", "");
                 tsStr = tsStr.Replace("0 minutes ", "");
+                tsStr = tsStr.Replace(" 0 seconds", "");
 
-                var m = string.IsNullOrEmpty(Common.ScheduledShutdown.AdminMessage) ? Resources.AdminShutdownCommandAnnouncement : Resources.AdminShutdownCommandAnnouncementWithMessage;
+                var m = string.IsNullOrEmpty(Common.ScheduledShutdown.AdminMessage) ? Resources.ServerShutdownScheduled : Resources.ServerShutdownScheduledWithMessage;
 
                 m = m.Replace("{period}", tsStr);
                 m = m.Replace("{message}", Common.ScheduledShutdown.AdminMessage);
