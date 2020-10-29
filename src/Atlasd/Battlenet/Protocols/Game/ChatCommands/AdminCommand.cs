@@ -45,17 +45,20 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             switch (cmd.ToLower())
             {
-                case "disconnect":
-                    r = "/admin disconnect <user>";
-                    break;
                 case "help":
                 case "?":
                     r = string.Join("\r\n", new List<string>() {
-                        { "/admin disconnect" },
-                        { "/admin help" },
-                        { "/admin spoofuserflag" },
-                        { "/admin spoofuserflags" },
-                        { "/admin spoofusergame" },
+                        { "/admin disconnect <user>" },
+                        { "/admin evacuate <channel>" },
+                        { "/admin help (this text)" },
+                        { "/admin move (alias: /admin moveuser)" },
+                        { "/admin moveuser <user> <channel>" },
+                        { "/admin shutdown [seconds] [message]" },
+                        { "/admin spoofuserflag (alias: /admin spoofuserflags)" },
+                        { "/admin spoofuserflags <user> <flags>" },
+                        { "/admin spoofusergame <user> <game>\r\n(This will preserve their statstring!)" },
+                        { "/admin spoofusername <oldname> <newname>" },
+                        { "/admin spoofuserping <user> <ping>" },
                         { "" },
                     });
                     break;
@@ -64,20 +67,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                     new AdminMoveUserCommand(Arguments).Invoke(context); return;
                 case "reload":
                     new AdminReloadCommand(Arguments).Invoke(context); return;
-                case "spoofuserflag":
-                case "spoofuserflags":
-                    r = "/admin spoofuserflags <user> <flags>";
-                    break;
-                case "spoofusergame":
-                    r = "/admin spoofusergame <user> <game>\r\n"
-                      + "(This will preserve their statstring!)";
-                    break;
-                case "spoofusername":
-                    r = "/admin spoofusername <oldname> <newname>";
-                    break;
-                case "spoofuserping":
-                    r = "/admin spoofuserping <user> <ping>";
-                    break;
+                case "shutdown":
+                    new AdminShutdownCommand(Arguments).Invoke(context); return;
                 default:
                     r = "That is not a valid admin command. Type /admin help or /admin ? for more info.";
                     break;

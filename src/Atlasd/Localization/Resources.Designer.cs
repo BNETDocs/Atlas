@@ -97,6 +97,33 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A server shutdown has been scheduled in {period}..
+        /// </summary>
+        public static string AdminShutdownCommandAnnouncement {
+            get {
+                return ResourceManager.GetString("AdminShutdownCommandAnnouncement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A server shutdown has been scheduled in {period} ({message})..
+        /// </summary>
+        public static string AdminShutdownCommandAnnouncementWithMessage {
+            get {
+                return ResourceManager.GetString("AdminShutdownCommandAnnouncementWithMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The server shutdown was scheduled..
+        /// </summary>
+        public static string AdminShutdownCommandReply {
+            get {
+                return ResourceManager.GetString("AdminShutdownCommandReply", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You are no longer marked as away..
         /// </summary>
         public static string AwayCommandOff {

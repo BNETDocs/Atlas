@@ -129,6 +129,15 @@
   <data name="AdminReloadCommandSuccess" xml:space="preserve">
     <value>The server configuration has been reloaded.</value>
   </data>
+  <data name="AdminShutdownCommandAnnouncement" xml:space="preserve">
+    <value>A server shutdown has been scheduled in {period}.</value>
+  </data>
+  <data name="AdminShutdownCommandAnnouncementWithMessage" xml:space="preserve">
+    <value>A server shutdown has been scheduled in {period} ({message}).</value>
+  </data>
+  <data name="AdminShutdownCommandReply" xml:space="preserve">
+    <value>The server shutdown was scheduled.</value>
+  </data>
   <data name="AwayCommandOff" xml:space="preserve">
     <value>You are no longer marked as away.</value>
   </data>
