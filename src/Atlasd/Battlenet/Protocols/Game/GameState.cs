@@ -130,11 +130,11 @@ namespace Atlasd.Battlenet.Protocols.Game
 
             if (OnlineName != null)
             {
-                lock (Battlenet.Common.ActiveGameClients)
+                lock (Battlenet.Common.ActiveGameStates)
                 {
-                    if (Battlenet.Common.ActiveGameClients.ContainsKey(OnlineName))
+                    if (Battlenet.Common.ActiveGameStates.ContainsKey(OnlineName))
                     {
-                        Battlenet.Common.ActiveGameClients.Remove(OnlineName);
+                        Battlenet.Common.ActiveGameStates.Remove(OnlineName);
                     }
                 }
             }
