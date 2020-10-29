@@ -29,7 +29,7 @@ namespace Atlasd.Battlenet
         };
 
         public Flags ActiveFlags { get; protected set; }
-        public bool AllowNewUsers { get; protected set; } 
+        public bool AllowNewUsers { get; protected set; }
         protected List<GameState> BannedUsers { get; private set; }
         public int Count { get => Users.Count; }
         public int MaxUsers { get; protected set; }
@@ -40,6 +40,7 @@ namespace Atlasd.Battlenet
         private Channel(string name, Flags flags = Flags.None, int maxUsers = -1, string topic = "")
         {
             ActiveFlags = flags;
+            AllowNewUsers = true;
             BannedUsers = new List<GameState>();
             MaxUsers = maxUsers;
             Name = name;
@@ -124,7 +125,7 @@ namespace Atlasd.Battlenet
             }
             else
             {
-                new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, "This channel does not have chat privileges.").WriteTo(user.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, Resources.ChannelIsChatRestricted).WriteTo(user.Client);
             }
 
             var topic = RenderTopic(user).Split("\n");
