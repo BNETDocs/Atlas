@@ -1,4 +1,6 @@
-﻿namespace Atlasd.Battlenet
+﻿using Atlasd.Daemon;
+
+namespace Atlasd.Battlenet
 {
     public class ProtocolType
     {
@@ -68,6 +70,20 @@
                 Types.IPC       => "IPC",
                 _ => $"Unknown (0x{(byte)type:X2})",
             };
+        }
+
+        public static uint ProtocolTypeToLogType(Types type)
+        {
+            return (uint)(type switch
+            {
+                Types.Game => Logging.LogType.Client_Game,
+                Types.BNFTP => Logging.LogType.Client_BNFTP,
+                Types.Chat => Logging.LogType.Client_Chat,
+                Types.Chat_Alt1 => Logging.LogType.Client_Chat,
+                Types.Chat_Alt2 => Logging.LogType.Client_Chat,
+                Types.IPC => Logging.LogType.Client_IPC,
+                _ => Logging.LogType.Client,
+            });
         }
 
         public override string ToString()

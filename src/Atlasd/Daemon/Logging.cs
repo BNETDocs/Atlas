@@ -7,7 +7,7 @@ namespace Atlasd.Daemon
     {
         public static LogLevel CurrentLogLevel = LogLevel.Debug;
 
-        public enum LogLevel
+        public enum LogLevel : uint
         {
             Error,
             Warning,
@@ -15,7 +15,7 @@ namespace Atlasd.Daemon
             Debug,
         };
 
-        public enum LogType
+        public enum LogType : uint
         {
             Account,
             Channel,

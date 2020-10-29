@@ -1,7 +1,6 @@
 ﻿using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Daemon;
-using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
 using System.Net;

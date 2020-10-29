@@ -282,17 +282,7 @@ namespace Atlasd.Battlenet
             }
             catch (GameProtocolViolationException ex)
             {
-                var log_type = ex.ProtocolType switch
-                {
-                    ProtocolType.Types.Game => Logging.LogType.Client_Game,
-                    ProtocolType.Types.BNFTP => Logging.LogType.Client_BNFTP,
-                    ProtocolType.Types.Chat => Logging.LogType.Client_Chat,
-                    ProtocolType.Types.Chat_Alt1 => Logging.LogType.Client_Chat,
-                    ProtocolType.Types.Chat_Alt2 => Logging.LogType.Client_Chat,
-                    ProtocolType.Types.IPC => Logging.LogType.Client_IPC,
-                    _ => Logging.LogType.Client,
-                };
-                Logging.WriteLine(Logging.LogLevel.Warning, log_type, clientState.RemoteEndPoint, "Protocol violation encountered!" + (ex.Message.Length > 0 ? $" {ex.Message}" : ""));
+                Logging.WriteLine(Logging.LogLevel.Warning, (Logging.LogType)ProtocolType.ProtocolTypeToLogType(ex.ProtocolType), clientState.RemoteEndPoint, "Protocol violation encountered!" + (ex.Message.Length > 0 ? $" {ex.Message}" : ""));
                 clientState.Dispose();
             }
             catch (Exception ex)
