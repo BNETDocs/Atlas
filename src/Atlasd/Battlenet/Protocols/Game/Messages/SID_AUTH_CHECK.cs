@@ -75,7 +75,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                                 var gameKey = new GameKey(keyLength, productValue, publicValue, hashedKeyData);
                                 context.Client.GameState.GameKeys.Append(gameKey);
                             }
-                            catch (GameProtocolViolationException ex)
+                            catch (GameProtocolViolationException)
                             {
                                 Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "Received invalid game key");
                                 return false;
