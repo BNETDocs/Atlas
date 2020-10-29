@@ -1,4 +1,5 @@
-﻿using Atlasd.Daemon;
+﻿using Atlasd.Battlenet.Exceptions;
+using Atlasd.Daemon;
 using System;
 using System.IO;
 using System.Linq;
@@ -67,10 +68,18 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             var hashedKeyData = r.ReadBytes(20);
 
                             if (unknownValue != 0)
-                                throw new Exceptions.GameProtocolViolationException(context.Client, "Invalid game key unknown value");
+                                throw new GameProtocolViolationException(context.Client, "Invalid game key unknown value");
 
-                            var gameKey = new GameKey(keyLength, productValue, publicValue, hashedKeyData);
-                            context.Client.GameState.GameKeys.Append(gameKey);
+                            try
+                            {
+                                var gameKey = new GameKey(keyLength, productValue, publicValue, hashedKeyData);
+                                context.Client.GameState.GameKeys.Append(gameKey);
+                            }
+                            catch (GameProtocolViolationException ex)
+                            {
+                                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "Received invalid game key");
+                                return false;
+                            }
                         }
 
                         context.Client.GameState.Version.EXEInformation = r.ReadString();
