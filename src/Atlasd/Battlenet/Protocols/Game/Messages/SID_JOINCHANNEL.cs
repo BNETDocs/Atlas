@@ -67,7 +67,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             var userFlags = (Account.Flags)context.Client.GameState.ActiveAccount.Get(Account.FlagsKey);
             var ignoreLimits = userFlags.HasFlag(Account.Flags.Employee);
 
-            var channel = Channel.GetChannelByName(channelName);
+            var channel = Channel.GetChannelByName(channelName, false);
 
             if (channel == null && flags == Flags.NoCreate)
             {
@@ -75,7 +75,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 return true;
             }
 
-            if (channel == null) channel = new Channel(channelName, firstJoin ? Channel.Flags.Public | Channel.Flags.ProductSpecific : Channel.Flags.None);
+            if (channel == null) channel = Channel.GetChannelByName(channelName, true);
             channel.AcceptUser(context.Client.GameState, ignoreLimits, true);
 
             if (firstJoin)

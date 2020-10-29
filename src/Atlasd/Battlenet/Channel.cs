@@ -5,6 +5,7 @@ using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Atlasd.Battlenet
 {
@@ -33,10 +34,11 @@ namespace Atlasd.Battlenet
         public int Count { get => Users.Count; }
         public int MaxUsers { get; protected set; }
         public string Name { get; protected set; }
+        private static Semaphore SigCreatingChannel;
         public string Topic { get; protected set; }
         protected List<GameState> Users { get; private set; }
 
-        public Channel(string name, Flags flags = Flags.None, int maxUsers = -1, string topic = "")
+        private Channel(string name, Flags flags = Flags.None, int maxUsers = -1, string topic = "")
         {
             ActiveFlags = flags;
             BannedUsers = new List<GameState>();
@@ -44,17 +46,6 @@ namespace Atlasd.Battlenet
             Name = name;
             Topic = topic;
             Users = new List<GameState>();
-
-            var isStatic = GetStaticChannel(name, out var staticName, out var staticFlags, out var staticMaxUsers, out var staticTopic, out var staticProducts);
-            if (isStatic)
-            {
-                Name = staticName;
-                if (flags == Flags.None) ActiveFlags = (Flags)staticFlags;
-                if (maxUsers == -1) MaxUsers = staticMaxUsers;
-                if (topic == null || topic.Length == 0) Topic = staticTopic;
-            }
-
-            lock (Common.ActiveChannels) Common.ActiveChannels.Add(name, this);
         }
 
         public void AcceptUser(GameState user, bool ignoreLimits = false, bool extendedErrors = false)
@@ -153,8 +144,7 @@ namespace Atlasd.Battlenet
         {
             if (Users != null)
             {
-                var theVoid = GetChannelByName(Resources.TheVoid);
-                if (theVoid == null) theVoid = new Channel(Resources.TheVoid, TheVoidFlags, -1);
+                var theVoid = GetChannelByName(Resources.TheVoid, true);
                 foreach (var user in Users) MoveUser(user, theVoid, true);
             }
 
@@ -162,12 +152,34 @@ namespace Atlasd.Battlenet
                 Common.ActiveChannels.Remove(Name);
         }
 
-        public static Channel GetChannelByName(string name)
+        public static Channel GetChannelByName(string name, bool autoCreate)
         {
+            Channel channel = null;
+
             lock (Common.ActiveChannels)
             {
-                return Common.ActiveChannels.TryGetValue(name, out Channel channel) ? channel : null;
+                Common.ActiveChannels.TryGetValue(name, out channel);
             }
+
+            if (channel != null || !autoCreate) return channel;
+
+            lock (Common.ActiveChannels)
+            {
+                var isStatic = GetStaticChannel(name, out var staticName, out var staticFlags, out var staticMaxUsers, out var staticTopic, out var staticProducts);
+
+                if (!isStatic)
+                {
+                    channel = new Channel(name, Flags.None);
+                }
+                else
+                {
+                    channel = new Channel(staticName, staticFlags, staticMaxUsers, staticTopic);
+                }
+
+                Common.ActiveChannels.Add(channel.Name, channel);
+            }
+
+            return channel;
         }
 
         public static bool GetStaticChannel(string search, out string name, out Flags flags, out int maxUsers, out string topic, out Product.ProductCode[] products)
@@ -326,15 +338,13 @@ namespace Atlasd.Battlenet
 
             new ChatEvent(ChatEvent.EventIds.EID_INFO, source.ChannelFlags, source.Ping, source.OnlineName, kickedStr).WriteTo(targetClient.Client);
 
-            var theVoid = GetChannelByName(Resources.TheVoid);
-            if (theVoid == null) theVoid = new Channel(Resources.TheVoid, TheVoidFlags, -1);
+            var theVoid = GetChannelByName(Resources.TheVoid, true);
             MoveUser(targetClient, theVoid, true);
         }
 
         public static void MoveUser(GameState client, string name, bool ignoreLimits = true)
         {
-            var channel = GetChannelByName(name);
-            if (channel == null) channel = new Channel(name, 0);
+            var channel = GetChannelByName(name, true);
             MoveUser(client, channel, ignoreLimits);
         }
 

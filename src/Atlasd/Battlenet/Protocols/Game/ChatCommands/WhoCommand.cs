@@ -15,7 +15,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
         public override void Invoke(ChatCommandContext context)
         {
             var channelName = string.Join(" ", Arguments);
-            var ch = channelName.Length > 0 ? Channel.GetChannelByName(channelName) : context.GameState.ActiveChannel;
+            var ch = channelName.Length > 0 ? Channel.GetChannelByName(channelName, false) : context.GameState.ActiveChannel;
             string r; // reply
 
             if (ch == null)
