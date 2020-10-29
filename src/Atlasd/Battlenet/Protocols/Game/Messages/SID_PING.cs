@@ -2,7 +2,6 @@
 using Atlasd.Daemon;
 using System;
 using System.IO;
-using System.Security.Principal;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -37,6 +36,26 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             if (Buffer.Length != 4)
                 throw new GameProtocolViolationException(context.Client, "SID_PING buffer must be 4 bytes");
+
+            bool autoRefreshPings = false;
+            try
+            {
+                Settings.State.RootElement.TryGetProperty("battlenet", out var battlenetJson);
+                battlenetJson.TryGetProperty("emulation", out var emulationJson);
+                emulationJson.TryGetProperty("auto_refresh_pings", out var autoRefreshPingsJson);
+                autoRefreshPings = autoRefreshPingsJson.GetBoolean();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is InvalidOperationException || ex is ArgumentNullException))
+                {
+                    throw ex;
+                }
+
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, "Setting [battlenet] -> [emulation] -> [auto_refresh_pings] is invalid; check value");
+            }
+
+            if (!autoRefreshPings) return true;
 
             using var m = new MemoryStream(Buffer);
             using var r = new BinaryReader(m);

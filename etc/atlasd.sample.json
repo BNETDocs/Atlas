@@ -24,6 +24,9 @@
     "min_length": 3
   },
   "battlenet": {
+    "emulation": {
+      "auto_refresh_pings": true
+    },
     "listener": {
       "interface": "0.0.0.0",
       "port": 6112
