@@ -119,7 +119,9 @@ namespace Atlasd.Battlenet
 
                             // Tell everyone else about this user entering the channel:
                             if (subuser != user)
+                            {
                                 new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, user.ChannelFlags, user.Ping, user.OnlineName, Product.ProductToStatstring(user.Product)).WriteTo(subuser.Client);
+                            }
                         }
                     }
                 }
