@@ -137,9 +137,17 @@ namespace Atlasd.Battlenet
 
             if (Common.ScheduledShutdown.EventDate > DateTime.Now)
             {
+                var ts = Common.ScheduledShutdown.EventDate - DateTime.Now;
+                var tsStr = $"{ts.Hours} hour{(ts.Hours == 1 ? "" : "s")} {ts.Minutes} minute{(ts.Minutes == 1 ? "" : "s")} {ts.Seconds} second{(ts.Seconds == 1 ? "" : "s")}";
+
+                tsStr = tsStr.Replace("0 hours ", "");
+                tsStr = tsStr.Replace("0 minutes ", "");
+
                 var m = string.IsNullOrEmpty(Common.ScheduledShutdown.AdminMessage) ? Resources.AdminShutdownCommandAnnouncement : Resources.AdminShutdownCommandAnnouncementWithMessage;
-                m = m.Replace("{period}", (Common.ScheduledShutdown.EventDate - DateTime.Now).ToString());
+
+                m = m.Replace("{period}", tsStr);
                 m = m.Replace("{message}", Common.ScheduledShutdown.AdminMessage);
+
                 new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, Account.Flags.Admin, -1, "Battle.net", m).WriteTo(user.Client);
             }
 

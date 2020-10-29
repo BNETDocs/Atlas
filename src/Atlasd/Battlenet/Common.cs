@@ -191,8 +191,22 @@ namespace Atlasd.Battlenet
                 ScheduledShutdown.EventTimer.Dispose();
             }
 
+            ScheduledShutdown = new ShutdownEvent(message, DateTime.Now + period,
+                new Timer((object state) =>
+                {
+                    Program.ExitCode = 0;
+                    Program.Exit = true;
+                }, command, period, period)
+            );
+
+            var tsStr = $"{period.Hours} hour{(period.Hours == 1 ? "" : "s")} {period.Minutes} minute{(period.Minutes == 1 ? "" : "s")} {period.Seconds} second{(period.Seconds == 1 ? "" : "s")}";
+
+            tsStr = tsStr.Replace("0 hours ", "");
+            tsStr = tsStr.Replace("0 minutes ", "");
+
             var m = string.IsNullOrEmpty(message) ? Resources.AdminShutdownCommandAnnouncement : Resources.AdminShutdownCommandAnnouncementWithMessage;
-            m = m.Replace("{period}", period.ToString("g"));
+
+            m = m.Replace("{period}", tsStr);
             m = m.Replace("{message}", message);
 
             Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, m);
@@ -222,14 +236,6 @@ namespace Atlasd.Battlenet
                         new ChatEvent(ChatEvent.EventIds.EID_INFO, command.GameState.ChannelFlags, command.GameState.Ping, command.GameState.OnlineName, line).WriteTo(command.GameState.Client);
                 }
             });
-
-            ScheduledShutdown = new ShutdownEvent(message, DateTime.Now + period,
-                new Timer((object state) =>
-                {
-                    Program.ExitCode = 0;
-                    Program.Exit = true;
-                }, command, period, period)
-            );
         }
     }
 }
