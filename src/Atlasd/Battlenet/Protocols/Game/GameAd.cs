@@ -6,17 +6,6 @@ namespace Atlasd.Battlenet.Protocols.Game
 {
     class GameAd
     {
-        public enum StateFlags : UInt32
-        {
-            None = 0x00,
-            Private = 0x01,
-            Full = 0x02,
-            HasPlayers = 0x04,
-            InProgress = 0x08,
-            DisconnectIsLoss = 0x10,
-            Replay = 0x80,
-        };
-
         public enum GameTypes : UInt16
         {
             Melee = 0x02,
@@ -46,6 +35,16 @@ namespace Atlasd.Battlenet.Protocols.Game
             None = 0x00,
             Ladder = 0x01,
             IronManLadder = 0x03,
+        };
+        public enum StateFlags : UInt32
+        {
+            None = 0x00,
+            Private = 0x01,
+            Full = 0x02,
+            HasPlayers = 0x04,
+            InProgress = 0x08,
+            DisconnectIsLoss = 0x10,
+            Replay = 0x80,
         };
 
         public StateFlags ActiveStateFlags { get; private set; }
