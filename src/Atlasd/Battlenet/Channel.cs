@@ -34,7 +34,6 @@ namespace Atlasd.Battlenet
         public int Count { get => Users.Count; }
         public int MaxUsers { get; protected set; }
         public string Name { get; protected set; }
-        private static Semaphore SigCreatingChannel;
         public string Topic { get; protected set; }
         protected List<GameState> Users { get; private set; }
 
