@@ -39,7 +39,10 @@ namespace Atlasd.Daemon
                     MaxDepth = 10
                 };
 
-                var fileState = JsonDocument.Parse(new StreamReader(Path).ReadToEnd(), jsonOpts);
+                string json;
+                using (var r = new StreamReader(Path))
+                json = r.ReadToEnd();
+                var fileState = JsonDocument.Parse(json, jsonOpts);
 
                 if (!fileState.RootElement.TryGetProperty("document_version", out var documentVersionJson))
                 {
