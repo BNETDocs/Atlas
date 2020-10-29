@@ -84,8 +84,30 @@ namespace Atlasd.Daemon
 
         public static void Save()
         {
-            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, "Saving configuration");
-            Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, "(Not implemented)");
+            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, $"Saving configuration to [{Path}]");
+
+            byte[] jsonUtf8Bytes;
+
+            try
+            {
+                var jsonOpts = new JsonSerializerOptions
+                {
+                    MaxDepth = 10,
+                    WriteIndented = true,
+                };
+                jsonUtf8Bytes = JsonSerializer.SerializeToUtf8Bytes(State, jsonOpts);
+
+                using (var stream = new StreamWriter(Path))
+                {
+                    stream.Write(jsonUtf8Bytes);
+                }
+
+                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, "Saved configuration");
+            }
+            catch (IOException)
+            {
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, "Failed to save configuration due to IOException");
+            }
         }
 
         public static void SetPath(string path)
