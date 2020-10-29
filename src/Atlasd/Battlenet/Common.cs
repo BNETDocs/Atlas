@@ -1,15 +1,31 @@
 ﻿using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Daemon;
+using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet
 {
     class Common
     {
+        public struct ShutdownEvent
+        {
+            public string AdminMessage { get; private set; }
+            public DateTime EventDate { get; private set; }
+            public Timer EventTimer { get; private set; }
+
+            public ShutdownEvent(string adminMessage, DateTime eventDate, Timer eventTimer)
+            {
+                AdminMessage = adminMessage;
+                EventDate = eventDate;
+                EventTimer = eventTimer;
+            }
+        };
+
         public static Dictionary<string, Account> AccountsDb;
         public static List<string> AccountsProcessing;
         public static Dictionary<string, Account> ActiveAccounts;
@@ -26,6 +42,7 @@ namespace Atlasd.Battlenet
         public static List<GameState> NullTimerState { get; private set; }
         public static Timer PingTimer { get; private set; }
         public static List<GameState> PingTimerState { get; private set; }
+        public static ShutdownEvent ScheduledShutdown { get; private set; }
 
         public static void Initialize()
         {
@@ -46,6 +63,8 @@ namespace Atlasd.Battlenet
 
             NullTimer = new Timer(ProcessNullTimer, NullTimerState, 100, 100);
             PingTimer = new Timer(ProcessPingTimer, PingTimerState, 100, 100);
+
+            ScheduledShutdown = new ShutdownEvent(null, DateTime.MinValue, null);
         }
 
         private static void InitializeListener()
@@ -162,6 +181,55 @@ namespace Atlasd.Battlenet
                     }
                 }
             }
+        }
+
+        public static void ScheduleShutdown(TimeSpan period, string message = null, ChatCommandContext command = null)
+        {
+            if (ScheduledShutdown.EventTimer != null)
+            {
+                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, "Stopping previously scheduled shutdown event");
+                ScheduledShutdown.EventTimer.Dispose();
+            }
+
+            var m = string.IsNullOrEmpty(message) ? Resources.AdminShutdownCommandAnnouncement : Resources.AdminShutdownCommandAnnouncementWithMessage;
+            m = m.Replace("{period}", period.ToString("g"));
+            m = m.Replace("{message}", message);
+
+            Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, m);
+
+            Task.Run(() =>
+            {
+                var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, Account.Flags.Admin, -1, "Battle.net", m);
+
+                lock (ActiveGameStates)
+                {
+                    foreach (var pair in ActiveGameStates)
+                    {
+                        chatEvent.WriteTo(pair.Value.Client);
+                    }
+                }
+
+                if (command != null)
+                {
+                    var r = Resources.AdminShutdownCommandReply;
+
+                    foreach (var kv in command.Environment)
+                    {
+                        r = r.Replace("{" + kv.Key + "}", kv.Value);
+                    }
+
+                    foreach (var line in r.Split("\r\n"))
+                        new ChatEvent(ChatEvent.EventIds.EID_INFO, command.GameState.ChannelFlags, command.GameState.Ping, command.GameState.OnlineName, line).WriteTo(command.GameState.Client);
+                }
+            });
+
+            ScheduledShutdown = new ShutdownEvent(message, DateTime.Now + period,
+                new Timer((object state) =>
+                {
+                    Program.ExitCode = 0;
+                    Program.Exit = true;
+                }, command, period, period)
+            );
         }
     }
 }

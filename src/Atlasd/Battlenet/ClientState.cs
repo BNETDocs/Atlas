@@ -97,7 +97,13 @@ namespace Atlasd.Battlenet
                 {
                     while (BattlenetGameFrame.Messages.Count > 0)
                     {
-                        if (!BattlenetGameFrame.Messages.Dequeue().Invoke(context))
+                        if (!BattlenetGameFrame.Messages.TryDequeue(out var msg))
+                        {
+                            Dispose();
+                            return;
+                        }
+
+                        if (!msg.Invoke(context))
                         {
                             Dispose();
                             return;

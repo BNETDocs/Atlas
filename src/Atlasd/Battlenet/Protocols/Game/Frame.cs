@@ -1,18 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Atlasd.Battlenet.Protocols.Game
 {
     class Frame
     {
-        public Queue<Message> Messages { get; protected set; }
+        public ConcurrentQueue<Message> Messages { get; protected set; }
 
         public Frame()
         {
-            Messages = new Queue<Message>();
+            Messages = new ConcurrentQueue<Message>();
         }
 
-        public Frame(Queue<Message> messages)
+        public Frame(ConcurrentQueue<Message> messages)
         {
             Messages = messages;
         }
@@ -20,15 +20,17 @@ namespace Atlasd.Battlenet.Protocols.Game
         public byte[] ToByteArray()
         {
             var framebuf = new byte[0];
-            var msgs = new Queue<Message>(Messages); // Clone Messages into local variable
+            var msgs = new ConcurrentQueue<Message>(Messages); // Clone Messages into local variable
 
             while (msgs.Count > 0)
             {
-                var messagebuf = msgs.Dequeue().ToByteArray();
+                if (!msgs.TryDequeue(out var msg)) break;
+
+                var messagebuf = msg.ToByteArray();
                 var buf = new byte[framebuf.Length + messagebuf.Length];
 
-                System.Buffer.BlockCopy(framebuf, 0, buf, 0, framebuf.Length);
-                System.Buffer.BlockCopy(messagebuf, 0, buf, framebuf.Length, messagebuf.Length);
+                Buffer.BlockCopy(framebuf, 0, buf, 0, framebuf.Length);
+                Buffer.BlockCopy(messagebuf, 0, buf, framebuf.Length, messagebuf.Length);
 
                 framebuf = buf;
             }

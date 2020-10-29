@@ -135,6 +135,14 @@ namespace Atlasd.Battlenet
             foreach (var line in topic)
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line).WriteTo(user.Client);
 
+            if (Common.ScheduledShutdown.EventDate > DateTime.Now)
+            {
+                var m = string.IsNullOrEmpty(Common.ScheduledShutdown.AdminMessage) ? Resources.AdminShutdownCommandAnnouncement : Resources.AdminShutdownCommandAnnouncementWithMessage;
+                m = m.Replace("{period}", (Common.ScheduledShutdown.EventDate - DateTime.Now).ToString());
+                m = m.Replace("{message}", Common.ScheduledShutdown.AdminMessage);
+                new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, Account.Flags.Admin, -1, "Battle.net", m).WriteTo(user.Client);
+            }
+
             Settings.State.RootElement.TryGetProperty("channel", out var channelJson);
             channelJson.TryGetProperty("auto_op", out var autoOpJson);
             var autoOp = autoOpJson.GetBoolean();
