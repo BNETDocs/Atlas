@@ -109,6 +109,295 @@
       {
         "name": "24423lkn",
         "flags": 3
+      },
+      {
+        "name": "StarCraft Newbies",
+        "flags": 1,
+        "products": [
+          "STAR"
+        ]
+      },
+      {
+        "name": "Opponents Wanted",
+        "flags": 1,
+        "products": [
+          "STAR"
+        ]
+      },
+      {
+        "name": "Ladder Challenges",
+        "flags": 1,
+        "products": [
+          "STAR"
+        ]
+      },
+      {
+        "name": "Brood War Games",
+        "flags": 1,
+        "products": [
+          "SEXP"
+        ]
+      },
+      {
+        "name": "Brood War Ladder",
+        "flags": 1,
+        "products": [
+          "SEXP"
+        ]
+      },
+      {
+        "name": "Terran Strategy",
+        "flags": 1,
+        "products": [
+          "SEXP",
+          "STAR"
+        ]
+      },
+      {
+        "name": "Zerg Strategy",
+        "flags": 1,
+        "products": [
+          "SEXP",
+          "STAR"
+        ]
+      },
+      {
+        "name": "Protoss Strategy",
+        "flags": 1,
+        "products": [
+          "SEXP",
+          "STAR"
+        ]
+      },
+      {
+        "name": "Custom Maps",
+        "flags": 1,
+        "products": [
+          "SEXP",
+          "STAR"
+        ]
+      },
+      {
+        "name": "Human Strategy",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "Orc Strategy",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "Scenario Games",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "Classic Games",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "War2 Ladder Challenges",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "Iron Man Challenges",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "Free For All",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "One vs One",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "Trading",
+        "flags": 1,
+        "products": [
+          "D2DV"
+        ]
+      },
+      {
+        "name": "Trading Sets",
+        "flags": 1,
+        "products": [
+          "D2DV"
+        ]
+      },
+      {
+        "name": "Trading Hardcore",
+        "flags": 1,
+        "products": [
+          "D2DV"
+        ]
+      },
+      {
+        "name": "Trading Gems",
+        "flags": 1,
+        "products": [
+          "D2DV"
+        ]
+      },
+      {
+        "name": "LoD Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Trading Sets",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Trading Hardcore",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Trading Gems",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Starting Strategies",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Barbarian Village",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Amazon Camp",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Necromancer Crypt",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Paladin Temple",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Sorceress Tower",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Assassin Den",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Druidic Grove",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Hardcore Players",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Cooperative Players",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Diablo II PvP",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Cow Normal",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Cow Nightmare",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Cow Hell",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
       }
     ]
   },
