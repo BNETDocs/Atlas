@@ -117,7 +117,7 @@
     "charset": "utf8mb4",
     "connect_timeout": 3,
     "database": "atlasd",
-    "hostname":  "localhost",
+    "hostname": "localhost",
     "password": "atlasdev",
     "username": "atlasd"
   }
