@@ -76,6 +76,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] Error setting client locale to [{(int)context.Client.GameState.Locale.UserLocaleId}], using default");
                         }
 
+                        // SID_PING is not sent here in this handshake. Instead, that process relies on
+                        // the low resolution period of Battlenet.Common.PingTimer, the minimum value of
+                        // a DateTime, and having the flexibility of executing asynchronously.
+
                         return new SID_AUTH_INFO().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
                     }
                 case MessageDirection.ServerToClient:
