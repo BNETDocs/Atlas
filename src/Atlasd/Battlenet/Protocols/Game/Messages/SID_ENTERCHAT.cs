@@ -37,10 +37,15 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (STRING) Statstring
                          */
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
-                        context.Client.GameState.OnlineName = r.ReadString();
+                        var username = r.ReadString();
+                        if (username.ToLower() != context.Client.GameState.Username.ToLower())
+                        {
+                            throw new GameProtocolViolationException(context.Client, $"Client tried entering chat with differnet username [{username}] than their account name [{context.Client.GameState.Username}]");
+                        }
+
                         context.Client.GameState.Statstring = Encoding.ASCII.GetBytes(r.ReadString());
 
                         var productId = (UInt32)context.Client.GameState.Product;
@@ -49,13 +54,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         {
                             context.Client.GameState.Statstring = new byte[4];
 
-                            var _m = new MemoryStream(context.Client.GameState.Statstring);
-                            var _w = new BinaryWriter(_m);
+                            using var _m = new MemoryStream(context.Client.GameState.Statstring);
+                            using var _w = new BinaryWriter(_m);
 
                             _w.Write(productId);
-
-                            _w.Close();
-                            _m.Close();
                         }
 
                         // Statstring length is between 4-128 bytes, not including the null-terminator.
@@ -64,18 +66,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         if (context.Client.GameState.Statstring.Length >= 4)
                         {
-                            var _m = new MemoryStream(context.Client.GameState.Statstring);
-                            var _r = new BinaryReader(_m);
+                            using var _m = new MemoryStream(context.Client.GameState.Statstring);
+                            using var _r = new BinaryReader(_m);
 
                             if (_r.ReadUInt32() != productId)
                                 throw new GameProtocolViolationException(context.Client, "Client attempted to set different product id in statstring");
-
-                            _m.Close();
-                            _r.Close();
                         }
-
-                        r.Close();
-                        m.Close();
 
                         return new SID_ENTERCHAT().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
                     }
@@ -89,15 +85,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[3 + context.Client.GameState.OnlineName.Length + context.Client.GameState.Statstring.Length + context.Client.GameState.Username.Length];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((string)context.Client.GameState.OnlineName);
                         w.Write((string)Encoding.ASCII.GetString(context.Client.GameState.Statstring));
                         w.Write((string)context.Client.GameState.Username);
-
-                        w.Close();
-                        m.Close();
 
                         lock (context.Client.GameState)
                         {
