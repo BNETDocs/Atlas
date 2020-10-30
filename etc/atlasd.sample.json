@@ -262,28 +262,147 @@
         ]
       },
       {
+        "name": "LoD",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Amazon Camp",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Amazon Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Assassin Den",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Assassin Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Barbarian Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Barbarian Village",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Druid Grove",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Druid Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Hardcore",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Hardcore Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Ladder",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Ladder Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Necro Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Necromancer Crypt",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Paladin Temple",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Paladin Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD PvP",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Sorceress Tower",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Sorceress Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
         "name": "LoD Trading",
-        "flags": 1,
-        "products": [
-          "D2XP"
-        ]
-      },
-      {
-        "name": "LoD Trading Sets",
-        "flags": 1,
-        "products": [
-          "D2XP"
-        ]
-      },
-      {
-        "name": "LoD Trading Hardcore",
-        "flags": 1,
-        "products": [
-          "D2XP"
-        ]
-      },
-      {
-        "name": "LoD Trading Gems",
         "flags": 1,
         "products": [
           "D2XP"
