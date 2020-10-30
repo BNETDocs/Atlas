@@ -48,8 +48,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (STRING) Key owner name *
                          */
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         context.Client.GameState.ClientToken = r.ReadUInt32();
                         context.Client.GameState.Version.EXERevision = r.ReadUInt32();
@@ -84,9 +84,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         context.Client.GameState.Version.EXEInformation = r.ReadString();
                         context.Client.GameState.KeyOwner = r.ReadString();
-
-                        r.Close();
-                        m.Close();
 
                         return new SID_AUTH_CHECK().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
                     }
