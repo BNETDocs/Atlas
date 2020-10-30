@@ -85,7 +85,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             ProtocolId = 0;
             ServerToken = (uint)r.Next(0, 0x7FFFFFFF);
             SpawnKey = false;
-            Statstring = new byte[4];
+            Statstring = null;
             TimezoneBias = 0;
             UDPSupported = false;
             UDPToken = (uint)r.Next(0, 0x7FFFFFFF);

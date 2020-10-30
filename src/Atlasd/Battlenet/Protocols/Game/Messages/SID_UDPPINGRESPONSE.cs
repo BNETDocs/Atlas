@@ -33,7 +33,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             // before or after.Technically, we could allow this while in chat and proceed then
             // by sending a chat event for the update, but the server by convention is not
             // supposed to allow it and should instead disconnect the client.
-            if (context.Client.GameState.OnlineName != null)
+            if (!(context.Client.GameState.Statstring == null || context.Client.GameState.Statstring.Length == 0))
                 throw new GameProtocolViolationException(context.Client, "SID_UDPPINGRESPONSE cannot be sent while in chat");
 
             UInt32 udpToken;
