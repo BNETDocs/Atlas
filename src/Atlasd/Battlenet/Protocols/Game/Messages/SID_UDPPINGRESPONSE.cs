@@ -1,6 +1,7 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
 using System;
+using System.IO;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -28,7 +29,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length != 4)
                 throw new GameProtocolViolationException(context.Client, "SID_UDPPINGRESPONSE buffer must be 4 bytes");
 
-            context.Client.GameState.UDPSupported = (Buffer.ToString() == "tenb");
+            UInt32 udpToken;
+            using (var m = new MemoryStream(Buffer))
+            using (var r = new BinaryReader(m))
+                udpToken = r.ReadUInt32();
+
+            context.Client.GameState.UDPSupported = udpToken == 0x626E6574; // "bnet"
             return true;
         }
     }

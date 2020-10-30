@@ -102,6 +102,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         lock (context.Client.GameState)
                         {
                             context.Client.GameState.ChannelFlags = (Account.Flags)context.Client.GameState.ActiveAccount.Get(Account.FlagsKey);
+
+                            if (Product.IsUDPSupported(context.Client.GameState.Product)
+                                && !context.Client.GameState.UDPSupported)
+                            {
+                                context.Client.GameState.ChannelFlags |= Account.Flags.NoUDP;
+                            }
                         }
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_ENTERCHAT ({4 + Buffer.Length} bytes)");

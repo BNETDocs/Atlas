@@ -50,6 +50,21 @@ namespace Atlasd.Battlenet
             };
         }
 
+        public static bool IsUDPSupported(ProductCode code)
+        {
+            return code switch
+            {
+                ProductCode.DiabloRetail => true,
+                ProductCode.DiabloShareware => true,
+                ProductCode.StarcraftBroodwar => true,
+                ProductCode.StarcraftJapanese => true,
+                ProductCode.StarcraftOriginal => true,
+                ProductCode.StarcraftShareware => true,
+                ProductCode.WarcraftII => true,
+                _ => false,
+            };
+        }
+
         public static bool IsWarcraftIII(ProductCode code)
         {
             return code switch
