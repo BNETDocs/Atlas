@@ -41,7 +41,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         using var r = new BinaryReader(m);
 
                         var username = r.ReadString();
-                        if (username.ToLower() != context.Client.GameState.Username.ToLower())
+                        if (username.Length > 0 && username.ToLower() != context.Client.GameState.Username.ToLower())
                         {
                             throw new GameProtocolViolationException(context.Client, $"Client tried entering chat with differnet username [{username}] than their account name [{context.Client.GameState.Username}]");
                         }
