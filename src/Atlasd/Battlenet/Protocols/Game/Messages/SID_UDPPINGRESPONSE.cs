@@ -29,6 +29,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length != 4)
                 throw new GameProtocolViolationException(context.Client, "SID_UDPPINGRESPONSE buffer must be 4 bytes");
 
+            // Technically we could set this while in channel, but the server by convention is not supposed to allow it.
+            if (context.Client.GameState.ActiveChannel != null)
+                throw new GameProtocolViolationException(context.Client, "SID_UDPPINGRESPONSE cannot be sent while in an active channel");
+
             UInt32 udpToken;
             using (var m = new MemoryStream(Buffer))
             using (var r = new BinaryReader(m))
