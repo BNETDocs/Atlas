@@ -1,6 +1,6 @@
 ﻿namespace Atlasd.Battlenet.Protocols.Game
 {
-    enum MessageIds : byte
+    public enum MessageIds : byte
     {
         SID_NULL = 0x00,
         SID_STOPADV = 0x02,
