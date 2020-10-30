@@ -31,7 +31,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_STARTVERSIONING => new Messages.SID_STARTVERSIONING(buffer),
                 MessageIds.SID_REPORTVERSION => new Messages.SID_REPORTVERSION(buffer),
                 //MessageIds.SID_STARTADVEX => new Messages.SID_STARTADVEX(buffer),
-                //MessageIds.SID_GETADVLISTEX => new Messages.SID_GETADVLISTEX(buffer),
+                MessageIds.SID_GETADVLISTEX => new Messages.SID_GETADVLISTEX(buffer),
                 MessageIds.SID_ENTERCHAT => new Messages.SID_ENTERCHAT(buffer),
                 MessageIds.SID_GETCHANNELLIST => new Messages.SID_GETCHANNELLIST(buffer),
                 MessageIds.SID_JOINCHANNEL => new Messages.SID_JOINCHANNEL(buffer),
