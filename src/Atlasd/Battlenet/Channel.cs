@@ -115,12 +115,12 @@ namespace Atlasd.Battlenet
                         foreach (var subuser in Users)
                         {
                             // Tell this user about everyone in the channel:
-                            new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, subuser.ChannelFlags, subuser.Ping, subuser.OnlineName, Product.ProductToStatstring(subuser.Product)).WriteTo(user.Client);
+                            new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, subuser.ChannelFlags, subuser.Ping, subuser.OnlineName, Encoding.ASCII.GetString(subuser.Statstring)).WriteTo(user.Client);
 
                             // Tell everyone else about this user entering the channel:
                             if (subuser != user)
                             {
-                                new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, user.ChannelFlags, user.Ping, user.OnlineName, Product.ProductToStatstring(user.Product)).WriteTo(subuser.Client);
+                                new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, user.ChannelFlags, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring)).WriteTo(subuser.Client);
                             }
                         }
                     }

@@ -119,19 +119,6 @@ namespace Atlasd.Battlenet
             };
         }
 
-        public static string ProductToStatstring(ProductCode product)
-        {
-            var buf = new byte[4];
-            var p = (UInt32)product;
-
-            buf[0] = (byte)p;
-            buf[1] = (byte)(p >> 8);
-            buf[2] = (byte)(p >> 16);
-            buf[3] = (byte)(p >> 24);
-
-            return Encoding.ASCII.GetString(buf);
-        }
-
         public static ProductCode StringToProduct(string product)
         {
             switch (product.ToUpper())
