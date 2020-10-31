@@ -179,6 +179,9 @@ namespace Atlasd.Battlenet
         {
             Channel channel = null;
 
+            if (string.IsNullOrEmpty(name)) return channel;
+            if (name[0] == '#') name = name.Substring(1);
+
             lock (Common.ActiveChannels)
             {
                 Common.ActiveChannels.TryGetValue(name, out channel);
