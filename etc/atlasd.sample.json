@@ -33,6 +33,13 @@
     },
     {
       "enabled": true,
+      "filename": "ad-20201030-discord.smk",
+      "url": "http://bnetdocs.org/discord",
+      "products": null,
+      "locales": null
+    },
+    {
+      "enabled": true,
       "filename": "ad-20201030-ghacv.smk",
       "url": "http://bnetdocs.org",
       "products": null,
@@ -49,6 +56,13 @@
       "enabled": true,
       "filename": "ad-20201030-nobtry.smk",
       "url": "http://bnetdocs.org",
+      "products": null,
+      "locales": null
+    },
+    {
+      "enabled": true,
+      "filename": "ad-20201031-vl.smk",
+      "url": "http://www.valhallalegends.com",
       "products": null,
       "locales": null
     }
