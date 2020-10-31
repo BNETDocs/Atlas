@@ -23,14 +23,47 @@
     "min_alphanumeric": 1,
     "min_length": 3
   },
+  "ads": [
+    {
+      "enabled": true,
+      "filename": "ad-20201030-3days.smk",
+      "url": "http://bnetdocs.org",
+      "products": null,
+      "locales": null
+    },
+    {
+      "enabled": true,
+      "filename": "ad-20201030-ghacv.smk",
+      "url": "http://bnetdocs.org",
+      "products": null,
+      "locales": null
+    },
+    {
+      "enabled": true,
+      "filename": "ad-20201030-ktbpa.smk",
+      "url": "http://bnetdocs.org",
+      "products": null,
+      "locales": null
+    },
+    {
+      "enabled": true,
+      "filename": "ad-20201030-nobtry.smk",
+      "url": "http://bnetdocs.org",
+      "products": null,
+      "locales": null
+    }
+  ],
   "battlenet": {
     "emulation": {
-      "auto_refresh_pings": true
+      "auto_refresh_pings": false
     },
     "listener": {
       "interface": "0.0.0.0",
       "port": 6112
     }
+  },
+  "bnftp": {
+    "root": "G:\\Projects\\Visual Studio\\Atlas\\etc\\bnftp"
   },
   "channel": {
     "auto_op": true,

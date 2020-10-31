@@ -5,6 +5,7 @@ using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,8 +30,10 @@ namespace Atlasd.Battlenet
         public static Dictionary<string, Account> AccountsDb;
         public static List<string> AccountsProcessing;
         public static Dictionary<string, Account> ActiveAccounts;
+        public static List<Advertisement> ActiveAds;
         public static Dictionary<string, Channel> ActiveChannels;
         public static List<ClientState> ActiveClientStates;
+        public static List<GameAd> ActiveGameAds;
         public static Dictionary<string, GameState> ActiveGameStates;
         public static IPAddress DefaultAddress { get; private set; }
         public static int DefaultPort { get; private set; }
@@ -46,12 +49,17 @@ namespace Atlasd.Battlenet
 
         public static void Initialize()
         {
+            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, "Initializing Battle.net common state");
+
             AccountsDb = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             AccountsProcessing = new List<string>();
             ActiveAccounts = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClientStates = new List<ClientState>();
+            ActiveGameAds = new List<GameAd>();
             ActiveGameStates = new Dictionary<string, GameState>(StringComparer.OrdinalIgnoreCase);
+
+            InitializeAds();
 
             DefaultAddress = IPAddress.Any;
             DefaultPort = 6112;
@@ -65,6 +73,56 @@ namespace Atlasd.Battlenet
             PingTimer = new Timer(ProcessPingTimer, PingTimerState, 100, 100);
 
             ScheduledShutdown = new ShutdownEvent(null, DateTime.MinValue, null);
+        }
+
+        public static void InitializeAds()
+        {
+            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, "Initializing advertisements");
+
+            if (ActiveAds == null || ActiveAds.Count != 0)
+            {
+                ActiveAds = new List<Advertisement>();
+            }
+
+            Settings.State.RootElement.TryGetProperty("ads", out var adsJson);
+
+            foreach (var adJson in adsJson.EnumerateArray())
+            {
+                adJson.TryGetProperty("enabled", out var enabledJson);
+                adJson.TryGetProperty("filename", out var filenameJson);
+                adJson.TryGetProperty("url", out var urlJson);
+                adJson.TryGetProperty("product", out var productsJson);
+                adJson.TryGetProperty("locale", out var localesJson);
+
+                var enabled = enabledJson.GetBoolean();
+                var filename = filenameJson.GetString();
+                var url = urlJson.GetString();
+
+                List<Product.ProductCode> products = null;
+                List<uint> locales = null;
+
+                if (productsJson.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var productJson in productsJson.EnumerateArray())
+                    {
+                        var productStr = productJson.GetString();
+                    }
+                }
+
+                if (localesJson.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var localeJson in localesJson.EnumerateArray())
+                    {
+                        var localeId = localeJson.GetUInt32();
+                    }
+                }
+
+                var ad = new Advertisement(filename, url, products, locales);
+
+                lock (ActiveAds) ActiveAds.Add(ad);
+            }
+
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Config, $"Initialized {ActiveAds.Count} advertisements");
         }
 
         private static void InitializeListener()

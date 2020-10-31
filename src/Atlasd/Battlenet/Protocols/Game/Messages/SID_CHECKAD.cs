@@ -1,7 +1,9 @@
 using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -30,40 +32,44 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (Buffer.Length != 16)
                             throw new GameProtocolViolationException(context.Client, "SID_CHECKAD buffer must be 16 bytes");
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
-                        var platformID            = r.ReadUInt32();
-                        var productID             = r.ReadUInt32();
-                        var lastDisplayedBannerID = r.ReadUInt32();
-                        var currentTime           = r.ReadUInt32();
+                        var platformID    = r.ReadUInt32();
+                        var productID     = r.ReadUInt32();
+                        var lastShownAdId = r.ReadUInt32();
+                        var currentTime   = r.ReadUInt32();
 
-                        r.Close();
-                        m.Close();
-
-                        return true;
+                        return new SID_CHECKAD().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object>(){
+                            { "platformId", platformID },
+                            { "productId", productID },
+                            { "lastShownAdId", lastShownAdId },
+                            { "currentTime", currentTime },
+                        }));
                     }
                 case MessageDirection.ServerToClient:
                     {
-                        var adId          = (UInt32)0;
-                        var fileExtension = (UInt32)0;
-                        var filetime      = (UInt64)0;
-                        var filename      = "";
-                        var linkUrl       = "";
+                        var rand = new Random();
+                        uint adId;
+                        Advertisement ad;
 
-                        Buffer = new byte[18];
+                        // Get random advertisement
+                        lock (Battlenet.Common.ActiveAds)
+                        {
+                            adId = (uint)rand.Next(0, Battlenet.Common.ActiveAds.Count - 1);
+                            ad = Battlenet.Common.ActiveAds[(int)adId];
+                        }
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        Buffer = new byte[18 + Encoding.ASCII.GetByteCount(ad.Filename) + Encoding.ASCII.GetByteCount(ad.Url)];
 
-                        w.Write(adId);
-                        w.Write(fileExtension);
-                        w.Write(filetime);
-                        w.Write(filename);
-                        w.Write(linkUrl);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
-                        w.Close();
-                        m.Close();
+                        w.Write((UInt32)adId);
+                        w.Write((UInt32)0); // File extension
+                        w.Write(ad.Filetime.ToFileTimeUtc());
+                        w.Write(ad.Filename);
+                        w.Write(ad.Url);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CHECKAD ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray());
