@@ -44,8 +44,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length < 36)
                 throw new GameProtocolViolationException(context.Client, "SID_LOCALEINFO buffer must be at least 36 bytes");
 
-            var m = new MemoryStream(Buffer);
-            var r = new BinaryReader(m);
+            using var m = new MemoryStream(Buffer);
+            using var r = new BinaryReader(m);
 
             var systemTime = r.ReadUInt64();
             var localTime = r.ReadUInt64();
@@ -58,20 +58,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             context.Client.GameState.Locale.CountryNameAbbreviated = r.ReadString();
             context.Client.GameState.Locale.CountryName = r.ReadString();
 
-            try
-            {
-                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] Setting client locale...");
-                Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo((int)context.Client.GameState.Locale.UserLocaleId);
-            }
-            catch (Exception ex)
-            {
-                if (!(ex is ArgumentOutOfRangeException || ex is CultureNotFoundException)) throw;
-
-                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] Error setting client locale to [{(int)context.Client.GameState.Locale.UserLocaleId}], using default");
-            }
-
-            r.Close();
-            m.Close();
+            context.Client.GameState.SetLocale();
 
             return true;
         }

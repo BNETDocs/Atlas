@@ -46,8 +46,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (STRING) Country
                          */
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         context.Client.GameState.ProtocolId = r.ReadUInt32();
                         context.Client.GameState.Platform = (Platform.PlatformCode)r.ReadUInt32();
@@ -60,21 +60,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         context.Client.GameState.Locale.UserLanguageId = r.ReadUInt32();
                         context.Client.GameState.Locale.CountryNameAbbreviated = r.ReadString();
                         context.Client.GameState.Locale.CountryName = r.ReadString();
-
-                        r.Close();
-                        m.Close();
-
-                        try
-                        {
-                            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] Setting client locale...");
-                            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo((int)context.Client.GameState.Locale.UserLocaleId);
-                        }
-                        catch (Exception ex)
-                        {
-                            if (!(ex is ArgumentOutOfRangeException || ex is CultureNotFoundException)) throw;
-
-                            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] Error setting client locale to [{(int)context.Client.GameState.Locale.UserLocaleId}], using default");
-                        }
 
                         // SID_PING is not sent here in this handshake. Instead, that process relies on
                         // the low resolution period of Battlenet.Common.PingTimer, the minimum value of
@@ -102,8 +87,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[22 + MPQFilename.Length + Formula.Length + (Product.IsWarcraftIII(context.Client.GameState.Product) ? 128 : 0)];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)context.Client.GameState.LogonType);
                         w.Write((UInt32)context.Client.GameState.ServerToken);
@@ -115,8 +100,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (Product.IsWarcraftIII(context.Client.GameState.Product))
                             w.Write(new byte[128]);
 
-                        w.Close();
-                        m.Close();
+                        context.Client.GameState.SetLocale();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_AUTH_INFO ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray());

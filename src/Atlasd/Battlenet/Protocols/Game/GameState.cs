@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Atlasd.Daemon;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet.Protocols.Game
@@ -143,6 +146,24 @@ namespace Atlasd.Battlenet.Protocols.Game
             lock (Battlenet.Common.PingTimerState) Battlenet.Common.PingTimerState.Remove(this);
 
             IsDisposing = false;
+        }
+
+        public void SetLocale()
+        {
+            // UserLocaleId is converted to (int) because CultureInfo uses a signed int for "culture"
+            var localeId = (int)Locale.UserLocaleId;
+
+            try
+            {
+                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, Client.RemoteEndPoint, $"Setting client locale to [{localeId}]...");
+                Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(localeId);
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentOutOfRangeException || ex is CultureNotFoundException)) throw;
+
+                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, Client.RemoteEndPoint, $"Error setting client locale to [{localeId}], using default");
+            }
         }
     }
 }
