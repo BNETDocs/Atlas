@@ -252,15 +252,18 @@ namespace Atlasd.Battlenet
         {
             if (Socket == null) return;
 
-            var e = new SocketAsyncEventArgs();
-            e.Completed += new EventHandler<SocketAsyncEventArgs>(SocketIOCompleted);
-            e.SetBuffer(buffer, 0, buffer.Length);
-            e.UserToken = this;
-
-            bool willRaiseEvent = Socket.SendAsync(e);
-            if (!willRaiseEvent)
+            lock (Socket)
             {
-                SocketIOCompleted(this, e);
+                var e = new SocketAsyncEventArgs();
+                e.Completed += new EventHandler<SocketAsyncEventArgs>(SocketIOCompleted);
+                e.SetBuffer(buffer, 0, buffer.Length);
+                e.UserToken = this;
+
+                bool willRaiseEvent = Socket.SendAsync(e);
+                if (!willRaiseEvent)
+                {
+                    SocketIOCompleted(this, e);
+                }
             }
         }
 
