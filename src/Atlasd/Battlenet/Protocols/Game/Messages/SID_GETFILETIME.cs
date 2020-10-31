@@ -50,15 +50,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (Buffer.Length < 9)
                             throw new GameProtocolViolationException(context.Client, "SID_GETFILETIME buffer must be at least 9 bytes");
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         var requestId = r.ReadUInt32();
                         var unknown = r.ReadUInt32();
                         var filename = r.ReadString();
-
-                        r.Close();
-                        m.Close();
 
                         return new SID_GETFILETIME().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {
                             { "requestId", requestId }, { "unknown", unknown }, { "filename", filename }
@@ -80,16 +77,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[17 + Encoding.UTF8.GetByteCount(filename)];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)requestId);
                         w.Write((UInt32)unknown);
                         w.Write((UInt64)filetime);
                         w.Write((string)filename);
-
-                        w.Close();
-                        m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_GETFILETIME ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray());
