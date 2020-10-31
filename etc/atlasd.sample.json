@@ -66,6 +66,11 @@
         "topic": "Welcome {user}, your ping is {ping}, have fun!"
       },
       {
+        "name": "ktbpa",
+        "flags": 1,
+        "topic": "Keeping the Battle.net pride alive."
+      },
+      {
         "name": "Blizzard Chat",
         "flags": 4097
       },
