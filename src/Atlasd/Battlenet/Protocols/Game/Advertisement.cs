@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game
 {
@@ -17,7 +15,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public Advertisement(string filename, string url, List<Product.ProductCode> products = null, List<uint> locales = null)
         {
             Filename = filename;
-            Filetime = new FileInfo(filename).LastWriteTimeUtc;
+            Filetime = File.GetLastWriteTime(filename);
             Url = url;
             Products = products;
             Locales = locales;
