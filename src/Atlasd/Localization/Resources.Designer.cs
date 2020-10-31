@@ -115,6 +115,30 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Set {user}&apos;s active channel flags to {flags}..
+        /// </summary>
+        public static string AdminSpoofUserFlagsCommand {
+            get {
+                return ResourceManager.GetString("AdminSpoofUserFlagsCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to parse the flags into an unsigned 32-bit integer.
+        ///Supported number prefixes:
+        ///- Binary: 0b, 0B, &amp;b, &amp;B
+        ///- Hex: 0x, 0X, &amp;h, &amp;H
+        ///- Octal: 0
+        ///- Decimal: Any whole number, not prefixed with zero (octal indication)
+        ///Example: 0x10 = 16 decimal.
+        /// </summary>
+        public static string AdminSpoofUserFlagsCommandBadNumber {
+            get {
+                return ResourceManager.GetString("AdminSpoofUserFlagsCommandBadNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You are no longer marked as away..
         /// </summary>
         public static string AwayCommandOff {
