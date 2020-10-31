@@ -40,7 +40,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          */
 
                         if (Buffer.Length < 19)
-                            throw new GameProtocolViolationException(context.Client, "SID_QUERYADURL buffer must be at least 19 bytes");
+                            throw new GameProtocolViolationException(context.Client, "SID_GETADVLISTEX buffer must be at least 19 bytes");
 
                         var m = new MemoryStream(Buffer);
                         var r = new BinaryReader(m);
