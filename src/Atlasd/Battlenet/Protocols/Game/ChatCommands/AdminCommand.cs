@@ -69,6 +69,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                     new AdminReloadCommand(Arguments).Invoke(context); return;
                 case "shutdown":
                     new AdminShutdownCommand(Arguments).Invoke(context); return;
+                case "spoofuserflag":
+                case "spoofuserflags":
+                    new AdminSpoofUserFlagsCommand(Arguments).Invoke(context); return;
                 default:
                     r = "That is not a valid admin command. Type /admin help or /admin ? for more info.";
                     break;
