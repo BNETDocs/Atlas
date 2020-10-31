@@ -29,14 +29,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length != 8)
                 throw new GameProtocolViolationException(context.Client, "SID_CLICKAD buffer must be 8 bytes");
 
-            var m = new MemoryStream(Buffer);
-            var r = new BinaryReader(m);
+            using var m = new MemoryStream(Buffer);
+            using var r = new BinaryReader(m);
 
             var adId = r.ReadUInt32();
             var requestType = r.ReadUInt32();
-
-            r.Close();
-            m.Close();
 
             return true;
         }
