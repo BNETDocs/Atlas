@@ -55,7 +55,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, "Setting [battlenet] -> [emulation] -> [auto_refresh_pings] is invalid; check value");
             }
 
-            if (!autoRefreshPings) return true;
+            if (!autoRefreshPings && context.Client.GameState.Ping != -1) return true;
 
             using var m = new MemoryStream(Buffer);
             using var r = new BinaryReader(m);
