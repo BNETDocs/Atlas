@@ -186,6 +186,9 @@ There are currently {gameUsers} users playing {gameAds} games of {game}, and {to
   <data name="ChatCommandUnavailable" xml:space="preserve">
     <value>That command is not available at the moment.</value>
   </data>
+  <data name="DisconnectedByAdmin" xml:space="preserve">
+    <value>You have been disconnected by a system administrator.</value>
+  </data>
   <data name="ErrorCaption" xml:space="preserve">
     <value>Error</value>
   </data>

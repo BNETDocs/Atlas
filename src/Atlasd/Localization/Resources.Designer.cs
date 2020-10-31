@@ -250,6 +250,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You have been disconnected by a system administrator..
+        /// </summary>
+        public static string DisconnectedByAdmin {
+            get {
+                return ResourceManager.GetString("DisconnectedByAdmin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         public static string ErrorCaption {

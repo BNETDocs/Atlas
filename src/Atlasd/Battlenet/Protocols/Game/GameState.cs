@@ -104,11 +104,27 @@ namespace Atlasd.Battlenet.Protocols.Game
             });
         }
 
-        public void Dispose() /* part of IDisposable */
+        public void Close()
         {
-            if (IsDisposing) return;
-            IsDisposing = true;
+            // Remove this GameState from ActiveChannel
+            if (ActiveChannel != null)
+            {
+                ActiveChannel.RemoveUser(this); // will change this.ActiveChannel to null.
+            }
 
+            // Remove this GameState from ActiveGameStates
+            if (OnlineName != null)
+            {
+                lock (Battlenet.Common.ActiveGameStates)
+                {
+                    if (Battlenet.Common.ActiveGameStates.ContainsKey(OnlineName))
+                    {
+                        Battlenet.Common.ActiveGameStates.Remove(OnlineName);
+                    }
+                }
+            }
+
+            // Remove this ActiveAccount from ActiveAccounts
             if (ActiveAccount != null)
             {
                 lock (ActiveAccount)
@@ -126,24 +142,17 @@ namespace Atlasd.Battlenet.Protocols.Game
                 }
             }
 
-            if (ActiveChannel != null)
-            {
-                lock (ActiveChannel) ActiveChannel.RemoveUser(this);
-            }
-
-            if (OnlineName != null)
-            {
-                lock (Battlenet.Common.ActiveGameStates)
-                {
-                    if (Battlenet.Common.ActiveGameStates.ContainsKey(OnlineName))
-                    {
-                        Battlenet.Common.ActiveGameStates.Remove(OnlineName);
-                    }
-                }
-            }
-
+            // Remove this GameState from the NullTimer and PingTimer
             lock (Battlenet.Common.NullTimerState) Battlenet.Common.NullTimerState.Remove(this);
             lock (Battlenet.Common.PingTimerState) Battlenet.Common.PingTimerState.Remove(this);
+        }
+
+        public void Dispose() /* part of IDisposable */
+        {
+            if (IsDisposing) return;
+            IsDisposing = true;
+
+            Close(); // call our public cleanup method
 
             IsDisposing = false;
         }

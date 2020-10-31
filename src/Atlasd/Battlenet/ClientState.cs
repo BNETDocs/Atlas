@@ -1,6 +1,7 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Daemon;
+using Atlasd.Localization;
 using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -26,33 +27,62 @@ namespace Atlasd.Battlenet
             Initialize(client);
         }
 
+        public void Close()
+        {
+            Disconnect();
+        }
+
+        public void Disconnect(string reason = "")
+        {
+            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection forcefully closed by server");
+
+            // If reason was provided, send it to this client
+            if (!string.IsNullOrEmpty(reason))
+            {
+                if (GameState != null)
+                {
+                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, GameState.ChannelFlags, GameState.Ping, GameState.OnlineName, Resources.DisconnectedByAdmin).WriteTo(this);
+                }
+            }
+
+            // Close the GameState
+            try
+            {
+                if (GameState != null)
+                {
+                    GameState.Close();
+                    GameState = null;
+                }
+            }
+            catch (ObjectDisposedException) { }
+
+            // Remove this from ActiveClientStates
+            lock (Common.ActiveClientStates) Common.ActiveClientStates.Remove(this);
+
+            // Close the connection
+            try
+            {
+                Socket.Shutdown(SocketShutdown.Send);
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is SocketException || ex is ObjectDisposedException)) throw;
+            }
+            finally
+            {
+                if (Socket != null)
+                {
+                    Socket.Close();
+                }
+            }
+        }
+
         public void Dispose() /* part of IDisposable */
         {
             if (IsDisposing) return;
             IsDisposing = true;
 
-            if (Socket != null)
-            {
-                try
-                {
-                    Socket.Shutdown(SocketShutdown.Send);
-                }
-                catch (Exception) { }
-                Socket.Close();
-
-                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection forcefully closed by server");
-            }
-
-            lock (Common.ActiveClientStates) Common.ActiveClientStates.Remove(this);
-
-            try
-            {
-                if (GameState != null) GameState.Dispose();
-                GameState = null;
-            }
-            catch (ArgumentNullException) { }
-            catch (NullReferenceException) { }
-            catch (ObjectDisposedException) { }
+            Disconnect();
 
             IsDisposing = false;
         }
