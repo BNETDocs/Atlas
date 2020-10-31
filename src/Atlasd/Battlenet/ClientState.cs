@@ -10,6 +10,7 @@ namespace Atlasd.Battlenet
 {
     class ClientState : IDisposable
     {
+        public bool Connected { get => Socket != null && Socket.Connected; }
         public bool IsDisposing { get; private set; } = false;
 
         public GameState GameState { get; private set; }
@@ -32,16 +33,18 @@ namespace Atlasd.Battlenet
             Disconnect();
         }
 
-        public void Disconnect(string reason = "")
+        public void Disconnect(string reason = null)
         {
             Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, RemoteEndPoint, "TCP connection forcefully closed by server");
 
             // If reason was provided, send it to this client
-            if (!string.IsNullOrEmpty(reason))
+            if (reason != null)
             {
                 if (GameState != null)
                 {
-                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, GameState.ChannelFlags, GameState.Ping, GameState.OnlineName, Resources.DisconnectedByAdmin).WriteTo(this);
+                    var r = reason.Length == 0 ? Resources.DisconnectedByAdmin : Resources.DisconnectedByAdminWithReason;
+
+                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, GameState.ChannelFlags, GameState.Ping, GameState.OnlineName, r).WriteTo(this);
                 }
             }
 
@@ -129,13 +132,13 @@ namespace Atlasd.Battlenet
                     {
                         if (!BattlenetGameFrame.Messages.TryDequeue(out var msg))
                         {
-                            Dispose();
+                            Disconnect();
                             return;
                         }
 
                         if (!msg.Invoke(context))
                         {
-                            Dispose();
+                            Disconnect();
                             return;
                         }
                     }
@@ -167,9 +170,6 @@ namespace Atlasd.Battlenet
 
             if (ProtocolType == null) ReceiveProtocolType(e);
             ReceiveProtocol(e);
-
-            // Start the next read
-            ReceiveAsync();
         }
 
         public void ProcessSend(SocketAsyncEventArgs e)
@@ -188,13 +188,24 @@ namespace Atlasd.Battlenet
 
         public void ReceiveAsync()
         {
+            if (Socket == null) return;
+
             var readEventArgs = new SocketAsyncEventArgs();
             readEventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(SocketIOCompleted);
             readEventArgs.SetBuffer(new byte[1024], 0, 1024);
             readEventArgs.UserToken = this;
 
             // As soon as the client is connected, post a receive to the connection
-            bool willRaiseEvent = Socket.ReceiveAsync(readEventArgs);
+            bool willRaiseEvent;
+            try
+            {
+                willRaiseEvent = Socket.ReceiveAsync(readEventArgs);
+            }
+            catch (ObjectDisposedException)
+            {
+                return;
+            }
+
             if (!willRaiseEvent)
             {
                 SocketIOCompleted(this, readEventArgs);
@@ -282,18 +293,24 @@ namespace Atlasd.Battlenet
         {
             if (Socket == null) return;
 
-            lock (Socket)
-            {
-                var e = new SocketAsyncEventArgs();
-                e.Completed += new EventHandler<SocketAsyncEventArgs>(SocketIOCompleted);
-                e.SetBuffer(buffer, 0, buffer.Length);
-                e.UserToken = this;
+            var e = new SocketAsyncEventArgs();
+            e.Completed += new EventHandler<SocketAsyncEventArgs>(SocketIOCompleted);
+            e.SetBuffer(buffer, 0, buffer.Length);
+            e.UserToken = this;
 
-                bool willRaiseEvent = Socket.SendAsync(e);
-                if (!willRaiseEvent)
-                {
-                    SocketIOCompleted(this, e);
-                }
+            bool willRaiseEvent;
+            try
+            {
+                willRaiseEvent = Socket.SendAsync(e);
+            }
+            catch (ObjectDisposedException)
+            {
+                return;
+            }
+
+            if (!willRaiseEvent)
+            {
+                SocketIOCompleted(this, e);
             }
         }
 
@@ -315,9 +332,6 @@ namespace Atlasd.Battlenet
                     default:
                         throw new ArgumentException("The last operation completed on the socket was not a receive or send");
                 }
-
-                // Start the next read
-                clientState.ReceiveAsync();
             }
             catch (GameProtocolViolationException ex)
             {
@@ -328,6 +342,16 @@ namespace Atlasd.Battlenet
             {
                 Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, clientState.RemoteEndPoint, $"{ex.GetType().Name} error encountered!" + (ex.Message.Length > 0 ? $" {ex.Message}" : ""));
                 clientState.Dispose();
+            }
+            finally
+            {
+                if (e.LastOperation == SocketAsyncOperation.Receive)
+                {
+                    Task.Run(() =>
+                    {
+                        ReceiveAsync();
+                    });
+                }
             }
         }
 

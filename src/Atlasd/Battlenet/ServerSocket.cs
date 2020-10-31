@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet
 {
@@ -52,25 +53,14 @@ namespace Atlasd.Battlenet
         {
             var clientState = new ClientState(e.AcceptSocket);
 
-            // Start the read loop
-            StartReceiveAsync(clientState);
+            // Start the read loop on a new stack
+            Task.Run(() =>
+            {
+                clientState.ReceiveAsync();
+            });
 
             // Accept the next connection request
             StartAccept(e);
-        }
-
-        private void StartReceiveAsync(ClientState clientState) {
-            var readEventArgs = new SocketAsyncEventArgs();
-            readEventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(SocketIOCompleted);
-            readEventArgs.SetBuffer(new byte[1024], 0, 1024);
-            readEventArgs.UserToken = clientState;
-
-            // As soon as the client is connected, post a receive to the connection
-            bool willRaiseEvent = clientState.Socket.ReceiveAsync(readEventArgs);
-            if (!willRaiseEvent)
-            {
-                clientState.SocketIOCompleted_External(this, readEventArgs);
-            }
         }
 
         public void SetLocalEndPoint(IPEndPoint localEndPoint)
@@ -93,12 +83,6 @@ namespace Atlasd.Battlenet
                 NoDelay = true,
                 UseOnlyOverlappedIO = true,
             };
-        }
-
-        void SocketIOCompleted(object sender, SocketAsyncEventArgs e)
-        {
-            var clientState = e.UserToken as ClientState;
-            clientState.SocketIOCompleted_External(sender, e);
         }
 
         public void Start(int backlog = 100)

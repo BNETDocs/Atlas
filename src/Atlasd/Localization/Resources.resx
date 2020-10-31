@@ -189,6 +189,9 @@ There are currently {gameUsers} users playing {gameAds} games of {game}, and {to
   <data name="DisconnectedByAdmin" xml:space="preserve">
     <value>You have been disconnected by a system administrator.</value>
   </data>
+  <data name="DisconnectedByAdminWithReason" xml:space="preserve">
+    <value>You have been disconnected by a system administrator ({reason}).</value>
+  </data>
   <data name="ErrorCaption" xml:space="preserve">
     <value>Error</value>
   </data>
