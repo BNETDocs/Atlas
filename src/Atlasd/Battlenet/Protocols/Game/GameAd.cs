@@ -102,6 +102,11 @@ namespace Atlasd.Battlenet.Protocols.Game
             Password = newPassword;
         }
 
+        public void SetPort(UInt32 newPort)
+        {
+            GamePort = newPort;
+        }
+
         public void SetStatstring(string newStatstring)
         {
             Statstring = newStatstring;
