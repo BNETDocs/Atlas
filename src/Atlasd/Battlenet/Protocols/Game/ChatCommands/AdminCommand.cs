@@ -45,6 +45,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             switch (cmd.ToLower())
             {
+                case "announce":
+                case "broadcast":
+                    new AdminBroadcastCommand(Arguments).Invoke(context); return;
                 case "disconnect":
                 case "dc":
                     new AdminDisconnectCommand(Arguments).Invoke(context); return;
