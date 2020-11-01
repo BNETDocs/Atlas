@@ -95,7 +95,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CDKEY2 ({4 + Buffer.Length} bytes)");
-                        context.Client.Send(ToByteArray());
+                        context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }
             }

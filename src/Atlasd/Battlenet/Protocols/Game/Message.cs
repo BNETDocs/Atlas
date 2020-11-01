@@ -1,5 +1,7 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using System;
+using System.Reflection;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game
 {
@@ -78,19 +80,83 @@ namespace Atlasd.Battlenet.Protocols.Game
             };
         }
 
-        public byte[] ToByteArray()
+        public static string MessageName(byte messageId)
         {
-            var size = (UInt16)(4 + Buffer.Length);
-            var buffer = new byte[size];
+            return (MessageIds)messageId switch
+            {
+                MessageIds.SID_NULL => "SID_NULL",
+                MessageIds.SID_CLIENTID => "SID_CLIENTID",
+                MessageIds.SID_STARTVERSIONING => "SID_STARTVERSIONING",
+                MessageIds.SID_REPORTVERSION => "SID_REPORTVERSION",
+                MessageIds.SID_STARTADVEX => "SID_STARTADVEX",
+                MessageIds.SID_GETADVLISTEX => "SID_GETADVLISTEX",
+                MessageIds.SID_ENTERCHAT => "SID_ENTERCHAT",
+                MessageIds.SID_GETCHANNELLIST => "SID_GETCHANNELLIST",
+                MessageIds.SID_JOINCHANNEL => "SID_JOINCHANNEL",
+                MessageIds.SID_CHATCOMMAND => "SID_CHATCOMMAND",
+                MessageIds.SID_CHATEVENT => "SID_CHATEVENT",
+                MessageIds.SID_LEAVECHAT => "SID_LEAVECHAT",
+                MessageIds.SID_LOCALEINFO => "SID_LOCALEINFO",
+                MessageIds.SID_FLOODDETECTED => "SID_FLOODDETECTED",
+                MessageIds.SID_UDPPINGRESPONSE => "SID_UDPPINGRESPONSE",
+                MessageIds.SID_CHECKAD => "SID_CHECKAD",
+                MessageIds.SID_CLICKAD => "SID_CLICKAD",
+                MessageIds.SID_READMEMORY => "SID_READMEMORY",
+                MessageIds.SID_REGISTRY => "SID_REGISTRY",
+                MessageIds.SID_MESSAGEBOX => "SID_MESSAGEBOX",
+                MessageIds.SID_STARTADVEX2 => "SID_STARTADVEX2",
+                MessageIds.SID_GAMEDATAADDRESS => "SID_GAMEDATAADDRESS",
+                MessageIds.SID_STARTADVEX3 => "SID_STARTADVEX3",
+                MessageIds.SID_LOGONCHALLENGEEX => "SID_LOGONCHALLENGEEX",
+                MessageIds.SID_CLIENTID2 => "SID_CLIENTID2",
+                MessageIds.SID_DISPLAYAD => "SID_DISPLAYAD",
+                MessageIds.SID_NOTIFYJOIN => "SID_NOTIFYJOIN",
+                MessageIds.SID_PING => "SID_PING",
+                MessageIds.SID_READUSERDATA => "SID_READUSERDATA",
+                MessageIds.SID_WRITEUSERDATA => "SID_WRITEUSERDATA",
+                MessageIds.SID_LOGONCHALLENGE => "SID_LOGONCHALLENGE",
+                MessageIds.SID_LOGONRESPONSE => "SID_LOGONRESPONSE",
+                MessageIds.SID_CREATEACCOUNT => "SID_CREATEACCOUNT",
+                MessageIds.SID_SYSTEMINFO => "SID_SYSTEMINFO",
+                MessageIds.SID_GETICONDATA => "SID_GETICONDATA",
+                MessageIds.SID_CDKEY => "SID_CDKEY",
+                MessageIds.SID_GETFILETIME => "SID_GETFILETIME",
+                MessageIds.SID_CDKEY2 => "SID_CDKEY2",
+                MessageIds.SID_LOGONRESPONSE2 => "SID_LOGONRESPONSE2",
+                MessageIds.SID_CREATEACCOUNT2 => "SID_CREATEACCOUNT2",
+                MessageIds.SID_QUERYADURL => "SID_QUERYADURL",
+                MessageIds.SID_NEWS_INFO => "SID_NEWS_INFO",
+                MessageIds.SID_AUTH_INFO => "SID_AUTH_INFO",
+                MessageIds.SID_AUTH_CHECK => "SID_AUTH_CHECK",
+                MessageIds.SID_FRIENDSLIST => "SID_FRIENDSLIST",
+                _ => null,
+            };
+        }
 
-            buffer[0] = 0xFF;
-            buffer[1] = Id;
-            buffer[2] = (byte)(size);
-            buffer[3] = (byte)(size >> 8);
+        public byte[] ToByteArray(ProtocolType protocolType)
+        {
+            if (protocolType.IsGame())
+            {
+                var size = (UInt16)(4 + Buffer.Length);
+                var buffer = new byte[size];
 
-            System.Buffer.BlockCopy(Buffer, 0, buffer, 4, Buffer.Length);
+                buffer[0] = 0xFF;
+                buffer[1] = Id;
+                buffer[2] = (byte)(size);
+                buffer[3] = (byte)(size >> 8);
 
-            return buffer;
+                System.Buffer.BlockCopy(Buffer, 0, buffer, 4, Buffer.Length);
+
+                return buffer;
+            }
+            else if (protocolType.IsChat())
+            {
+                return Encoding.UTF8.GetBytes($"{2000 + Id} {MessageName(Id).Replace("SID_", "")}");
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
         }
 
         public abstract bool Invoke(MessageContext context);

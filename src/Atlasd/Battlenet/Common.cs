@@ -202,7 +202,7 @@ namespace Atlasd.Battlenet
 
                         client.LastNull = now;
                         msg.Invoke(new MessageContext(client.Client, Protocols.MessageDirection.ServerToClient));
-                        client.Client.Send(msg.ToByteArray());
+                        client.Client.Send(msg.ToByteArray(client.Client.ProtocolType));
                     }
                 }
             }
@@ -237,7 +237,7 @@ namespace Atlasd.Battlenet
                     client.PingToken = (uint)r.Next(0, 0x7FFFFFFF);
 
                     msg.Invoke(new MessageContext(client.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){{ "token", client.PingToken }}));
-                    client.Client.Send(msg.ToByteArray());
+                    client.Client.Send(msg.ToByteArray(client.Client.ProtocolType));
                 }
             }
         }

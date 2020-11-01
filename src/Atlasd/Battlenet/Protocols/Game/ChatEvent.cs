@@ -235,7 +235,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             var msg = new SID_CHATEVENT();
 
             msg.Invoke(new MessageContext(receiver, MessageDirection.ServerToClient, args));
-            receiver.Send(msg.ToByteArray());
+            receiver.Send(msg.ToByteArray(receiver.ProtocolType));
         }
     }
 }

@@ -4,8 +4,10 @@ using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet
@@ -276,8 +278,32 @@ namespace Atlasd.Battlenet
 
         protected void ReceiveProtocolChat(SocketAsyncEventArgs e)
         {
-            Send(System.Text.Encoding.ASCII.GetBytes("The chat gateway is currently unsupported on Atlasd.\r\n"));
-            throw new ProtocolNotSupportedException(ProtocolType.Type, this, $"Unsupported protocol type [0x{(byte)ProtocolType.Type:X2}]");
+            if (ReceiveBuffer.Length == 0) return;
+            string text;
+            try
+            {
+                text = Encoding.UTF8.GetString(ReceiveBuffer);
+            }
+            catch (DecoderFallbackException)
+            {
+                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Chat, RemoteEndPoint, "Failed to decode UTF-8 text");
+                Disconnect("Failed to decode UTF-8 text");
+                return;
+            }
+
+            if (!text.Contains("\r\n"))
+            {
+                // The caret-return/line-feed character(s) have not yet been received, wait for more data
+                return;
+            }
+
+            var pos = text.IndexOf("\r\n");
+            ReceiveBuffer = ReceiveBuffer[(pos + 2)..];
+            var line = text.Substring(0, pos);
+
+            if (string.IsNullOrEmpty(line)) return;
+
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Chat, line);
         }
 
         protected void ReceiveProtocolGame(SocketAsyncEventArgs e)

@@ -17,7 +17,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             Messages = messages;
         }
 
-        public byte[] ToByteArray()
+        public byte[] ToByteArray(ProtocolType protocolType)
         {
             var framebuf = new byte[0];
             var msgs = new ConcurrentQueue<Message>(Messages); // Clone Messages into local variable
@@ -26,7 +26,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             {
                 if (!msgs.TryDequeue(out var msg)) break;
 
-                var messagebuf = msg.ToByteArray();
+                var messagebuf = msg.ToByteArray(protocolType);
                 var buf = new byte[framebuf.Length + messagebuf.Length];
 
                 Buffer.BlockCopy(framebuf, 0, buf, 0, framebuf.Length);

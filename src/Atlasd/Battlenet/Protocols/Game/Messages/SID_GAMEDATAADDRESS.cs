@@ -42,7 +42,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             r.Close();
             m.Close();
 
-            context.Client.Send(ToByteArray());
+            context.Client.Send(ToByteArray(context.Client.ProtocolType));
             return true;
         }
     }

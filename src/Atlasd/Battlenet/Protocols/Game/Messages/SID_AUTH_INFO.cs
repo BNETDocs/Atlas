@@ -103,7 +103,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         context.Client.GameState.SetLocale();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_AUTH_INFO ({4 + Buffer.Length} bytes)");
-                        context.Client.Send(ToByteArray());
+                        context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }
             }

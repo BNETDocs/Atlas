@@ -72,7 +72,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write(ad.Url);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CHECKAD ({4 + Buffer.Length} bytes)");
-                        context.Client.Send(ToByteArray());
+                        context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }
             }

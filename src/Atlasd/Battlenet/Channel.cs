@@ -568,7 +568,7 @@ namespace Atlasd.Battlenet
                     }
 
                     msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
-                    user.Client.Send(msg.ToByteArray());
+                    user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
                 }
             }
         }

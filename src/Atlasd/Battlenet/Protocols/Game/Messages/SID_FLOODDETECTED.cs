@@ -31,7 +31,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length != 0)
                 throw new GameProtocolViolationException(context.Client, "SID_FLOODDETECTED buffer must be 0 bytes");
 
-            context.Client.Send(ToByteArray());
+            context.Client.Send(ToByteArray(context.Client.ProtocolType));
             return true;
         }
     }
