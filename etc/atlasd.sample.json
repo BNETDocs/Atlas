@@ -76,7 +76,9 @@
   ],
   "battlenet": {
     "emulation": {
-      "auto_refresh_pings": false
+      "auto_refresh_pings": false,
+      "mask_admins_in_ban_message": true,
+      "mask_admins_in_kick_message": true
     },
     "listener": {
       "interface": "0.0.0.0",

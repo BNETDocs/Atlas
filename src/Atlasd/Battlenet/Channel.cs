@@ -346,18 +346,31 @@ namespace Atlasd.Battlenet
                 return;
             }
 
-            string sourceName;
-            if (source.ChannelFlags.HasFlag(Account.Flags.Employee))
+            bool maskAdminsInKickMessage = true;
+            try
             {
-                sourceName = $"a {Resources.BlizzardRepresentative}";
+                Settings.State.RootElement.TryGetProperty("battlenet", out var battlenetJson);
+                battlenetJson.TryGetProperty("emulation", out var emulationJson);
+                emulationJson.TryGetProperty("mask_admins_in_kick_message", out var maskAdminsInKickMessageJson);
+                maskAdminsInKickMessage = maskAdminsInKickMessageJson.GetBoolean();
             }
-            else if (source.ChannelFlags.HasFlag(Account.Flags.Admin))
+            catch (Exception ex)
             {
-                sourceName = $"a {Resources.BattlenetAdministrator}";
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, "Setting [battlenet] -> [emulation] -> [mask_admins_in_kick_message] is not a boolean; check value");
             }
-            else
+
+            var sourceName = source.OnlineName;
+            if (maskAdminsInKickMessage)
             {
-                sourceName = source.OnlineName;
+                if (source.ChannelFlags.HasFlag(Account.Flags.Employee))
+                {
+                    sourceName = $"a {Resources.BlizzardRepresentative}";
+                }
+                else if (source.ChannelFlags.HasFlag(Account.Flags.Admin))
+                {
+                    sourceName = $"a {Resources.BattlenetAdministrator}";
+                }
             }
 
             var kickedStr = reason.Length > 0 ? Resources.UserKickedFromChannelWithReason : Resources.UserKickedFromChannel;

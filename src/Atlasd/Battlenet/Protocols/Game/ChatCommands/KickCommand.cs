@@ -1,5 +1,4 @@
 ﻿using Atlasd.Localization;
-using System;
 using System.Collections.Generic;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
