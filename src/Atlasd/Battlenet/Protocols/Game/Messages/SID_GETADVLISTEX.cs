@@ -42,8 +42,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (Buffer.Length < 19)
                             throw new GameProtocolViolationException(context.Client, "SID_GETADVLISTEX buffer must be at least 19 bytes");
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         var gameType = r.ReadUInt16();
                         var subGameType = r.ReadUInt16();
@@ -53,9 +53,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var gameName = r.ReadString();
                         var gamePassword = r.ReadString();
                         var gameStatstring = r.ReadString();
-
-                        r.Close();
-                        m.Close();
 
                         return true;
                     }
@@ -85,14 +82,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[8];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)0); // number of games
                         w.Write((UInt32)0); // status 0 = success
-
-                        w.Close();
-                        m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_GETADVLISTEX ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray());
