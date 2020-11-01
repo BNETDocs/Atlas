@@ -1,11 +1,14 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Battlenet.Protocols.BNFTP;
 using Atlasd.Battlenet.Protocols.Game;
+using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
+using System.Collections;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -249,6 +252,12 @@ namespace Atlasd.Battlenet
             }
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, $"Set protocol type [0x{(byte)ProtocolType.Type:X2}] ({ProtocolType})");
+
+            if (ProtocolType.IsChat())
+            {
+                GameState.Platform = Platform.PlatformCode.Windows;
+                GameState.Product = Product.ProductCode.Chat;
+            }
         }
 
         protected void ReceiveProtocol(SocketAsyncEventArgs e)
@@ -278,7 +287,6 @@ namespace Atlasd.Battlenet
 
         protected void ReceiveProtocolChat(SocketAsyncEventArgs e)
         {
-            if (ReceiveBuffer.Length == 0) return;
             string text;
             try
             {
@@ -293,7 +301,7 @@ namespace Atlasd.Battlenet
 
             if (!text.Contains("\r\n"))
             {
-                // The caret-return/line-feed character(s) have not yet been received, wait for more data
+                // need more data
                 return;
             }
 
@@ -301,9 +309,115 @@ namespace Atlasd.Battlenet
             ReceiveBuffer = ReceiveBuffer[(pos + 2)..];
             var line = text.Substring(0, pos);
 
+            if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username) && string.IsNullOrEmpty(line))
+            {
+                Send(Encoding.UTF8.GetBytes("Enter your login name and password.\r\n"));
+                GameState.Username = line;
+                Send(Encoding.UTF8.GetBytes($"Username: "));
+                return;
+            }
+
+            if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username))
+            {
+                GameState.Username = line;
+                Send(Encoding.UTF8.GetBytes($"Password: \x01"));
+                return;
+            }
+
+            if (GameState.ActiveAccount == null)
+            {
+                var inPasswordHash = MBNCSUtil.XSha1.CalculateHash(Encoding.UTF8.GetBytes(line));
+
+                Common.AccountsDb.TryGetValue(GameState.Username, out Account account);
+
+                if (account == null)
+                {
+                    GameState.Username = null;
+                    Send(Encoding.UTF8.GetBytes("Incorrect username/password.\r\n"));
+                    return;
+                }
+
+                var dbPasswordHash = (byte[])account.Get(Account.PasswordKey, new byte[20]);
+                if (!inPasswordHash.SequenceEqual(dbPasswordHash))
+                {
+                    GameState.Username = null;
+                    Send(Encoding.UTF8.GetBytes("Incorrect username/password.\r\n"));
+                    return;
+                }
+
+                var flags = (Account.Flags)account.Get(Account.FlagsKey, Account.Flags.None);
+                if ((flags & Account.Flags.Closed) != 0)
+                {
+                    GameState.Username = null;
+                    Send(Encoding.UTF8.GetBytes("Account closed.\r\n"));
+                    return;
+                }
+
+                GameState.ActiveAccount = account;
+                GameState.LastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
+
+                account.Set(Account.IPAddressKey, RemoteEndPoint.ToString().Split(":")[0]);
+                account.Set(Account.LastLogonKey, DateTime.Now);
+                account.Set(Account.PortKey, RemoteEndPoint.ToString().Split(":")[1]);
+
+                lock (Common.ActiveAccounts)
+                {
+                    var serial = 1;
+                    var onlineName = GameState.Username;
+
+                    while (Common.ActiveAccounts.ContainsKey(onlineName))
+                    {
+                        onlineName = $"{GameState.Username}#{++serial}";
+                    }
+
+                    GameState.OnlineName = onlineName;
+                    Common.ActiveAccounts.Add(onlineName, account);
+                }
+
+                GameState.Username = (string)account.Get(Account.UsernameKey, GameState.Username);
+
+                lock (Common.ActiveGameStates)
+                {
+                    Common.ActiveGameStates.Add(GameState.OnlineName, GameState);
+                }
+
+                Send(Encoding.UTF8.GetBytes($"Connection from [{RemoteEndPoint}]\r\n"));
+
+                using var m1 = new MemoryStream(128);
+                using var w1 = new BinaryWriter(m1);
+                {
+                    w1.Write(GameState.OnlineName);
+                    w1.Write(GameState.Statstring);
+
+                    new SID_ENTERCHAT(m1.ToArray()).Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer));
+                }
+
+                using var m2 = new MemoryStream(128);
+                using var w2 = new BinaryWriter(m2);
+                {
+                    w2.Write((UInt32)SID_JOINCHANNEL.Flags.First);
+                    w2.Write(Product.ProductChannelName(GameState.Product));
+
+                    new SID_JOINCHANNEL(m2.ToArray()).Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer));
+                }
+            }
+
+            if (!text.Contains("\r\n"))
+            {
+                // The caret-return/line-feed character(s) have not yet been received, wait for more data
+                return;
+            }
+
             if (string.IsNullOrEmpty(line)) return;
 
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Chat, line);
+            using var m3 = new MemoryStream(1 + Encoding.UTF8.GetByteCount(line));
+            using var w3 = new BinaryWriter(m3);
+            {
+                w3.Write(Encoding.UTF8.GetBytes(line));
+                w3.Write((byte)0);
+
+                new SID_CHATCOMMAND(m3.ToArray()).Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer));
+            }
         }
 
         protected void ReceiveProtocolGame(SocketAsyncEventArgs e)
