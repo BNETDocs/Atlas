@@ -120,6 +120,9 @@
   <data name="AccountIsAlreadyLoggedOn" xml:space="preserve">
     <value>That account is already logged on.</value>
   </data>
+  <data name="AdminDisconnectCommand" xml:space="preserve">
+    <value>{user} was disconnected.</value>
+  </data>
   <data name="AdminMoveUserCommand" xml:space="preserve">
     <value>Forcefully moved {user} to the channel {channel}.</value>
   </data>
@@ -188,6 +191,9 @@ There are currently {gameUsers} users playing {gameAds} games of {game}, and {to
   </data>
   <data name="DisconnectedByAdmin" xml:space="preserve">
     <value>You have been disconnected by a system administrator.</value>
+  </data>
+  <data name="DisconnectedByAdminCaption" xml:space="preserve">
+    <value>Disconnected by Admin</value>
   </data>
   <data name="DisconnectedByAdminWithReason" xml:space="preserve">
     <value>You have been disconnected by a system administrator ({reason}).</value>

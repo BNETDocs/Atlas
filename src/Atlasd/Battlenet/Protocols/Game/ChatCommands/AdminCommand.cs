@@ -45,11 +45,17 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             switch (cmd.ToLower())
             {
+                case "disconnect":
+                case "dc":
+                    new AdminDisconnectCommand(Arguments).Invoke(context); return;
                 case "help":
                 case "?":
                     r = string.Join("\r\n", new List<string>() {
-                        { "/admin disconnect <user>" },
-                        { "/admin evacuate <channel>" },
+                        { "/admin ? (alias: /admin help)" },
+                        { "/admin announce (alias: /admin broadcast)" },
+                        { "/admin broadcast <message>" },
+                        { "/admin dc (alias: /admin disconnect)" },
+                        { "/admin disconnect <user> [reason]" },
                         { "/admin help (this text)" },
                         { "/admin move (alias: /admin moveuser)" },
                         { "/admin moveuser <user> <channel>" },

@@ -70,6 +70,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {user} was disconnected..
+        /// </summary>
+        public static string AdminDisconnectCommand {
+            get {
+                return ResourceManager.GetString("AdminDisconnectCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Forcefully moved {user} to the channel {channel}..
         /// </summary>
         public static string AdminMoveUserCommand {
@@ -255,6 +264,15 @@ namespace Atlasd.Localization {
         public static string DisconnectedByAdmin {
             get {
                 return ResourceManager.GetString("DisconnectedByAdmin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disconnected by Admin.
+        /// </summary>
+        public static string DisconnectedByAdminCaption {
+            get {
+                return ResourceManager.GetString("DisconnectedByAdminCaption", resourceCulture);
             }
         }
         

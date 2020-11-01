@@ -36,17 +36,14 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             Buffer = new byte[6 + Encoding.UTF8.GetByteCount(text) + Encoding.UTF8.GetByteCount(caption)];
 
-            var m = new MemoryStream(Buffer);
-            var w = new BinaryWriter(m);
+            using var m = new MemoryStream(Buffer);
+            using var w = new BinaryWriter(m);
 
             w.Write((UInt32)style);
             w.Write(Encoding.UTF8.GetBytes(text));
             w.Write((byte)0);
             w.Write(Encoding.UTF8.GetBytes(caption));
             w.Write((byte)0);
-
-            w.Close();
-            m.Close();
 
             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_MESSAGEBOX ({4 + Buffer.Length} bytes)");
             context.Client.Send(ToByteArray(context.Client.ProtocolType));
