@@ -108,20 +108,20 @@ namespace Atlasd.Battlenet
 
             if (!ActiveFlags.HasFlag(Flags.Silent))
             {
+                GameState[] users;
+                lock (Users) users = Users.ToArray();
+
                 lock (user)
                 {
-                    lock (Users)
+                    foreach (var subuser in users)
                     {
-                        foreach (var subuser in Users)
-                        {
-                            // Tell this user about everyone in the channel:
-                            new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, subuser.ChannelFlags, subuser.Ping, subuser.OnlineName, Encoding.ASCII.GetString(subuser.Statstring)).WriteTo(user.Client);
+                        // Tell this user about everyone in the channel:
+                        new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, subuser.ChannelFlags, subuser.Ping, subuser.OnlineName, Encoding.ASCII.GetString(subuser.Statstring)).WriteTo(user.Client);
 
-                            // Tell everyone else about this user entering the channel:
-                            if (subuser != user)
-                            {
-                                new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, user.ChannelFlags, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring)).WriteTo(subuser.Client);
-                            }
+                        // Tell everyone else about this user entering the channel:
+                        if (subuser != user)
+                        {
+                            new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, user.ChannelFlags, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring)).WriteTo(subuser.Client);
                         }
                     }
                 }
@@ -383,23 +383,33 @@ namespace Atlasd.Battlenet
 
         public void RemoveUser(GameState user)
         {
-            lock (user)
+            bool notify = false;
+            GameState[] users;
+
+            lock (Users)
             {
-                lock (Users)
+                if (Users.Contains(user))
                 {
-                    if (!Users.Contains(user)) return;
-
                     Users.Remove(user);
-                    user.ActiveChannel = null;
+                    notify = true;
+                }
 
-                    foreach (var subuser in Users)
+                users = Users.ToArray();
+            }
+
+            if (notify)
+            {
+                lock (user)
+                {
+                    user.ActiveChannel = null;
+                    user.ChannelFlags &= ~Account.Flags.ChannelOp;
+
+                    foreach (var subuser in users)
                     {
                         // Tell everyone else about this user leaving the channel:
                         new ChatEvent(ChatEvent.EventIds.EID_USERLEAVE, user.ChannelFlags, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring)).WriteTo(subuser.Client);
                     }
                 }
-
-                user.ChannelFlags &= ~Account.Flags.ChannelOp;
             }
 
             if (Count == 0 && !ActiveFlags.HasFlag(Flags.Public)) Dispose();
