@@ -1,0 +1,33 @@
+﻿using Atlasd.Localization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
+{
+    class EmoteCommand : ChatCommand
+    {
+        public EmoteCommand(List<string> arguments) : base(arguments) { }
+
+        public override bool CanInvoke(ChatCommandContext context)
+        {
+            return context != null && context.GameState != null && context.GameState.ActiveAccount != null;
+        }
+
+        public override void Invoke(ChatCommandContext context)
+        {
+            if (context.GameState.ActiveChannel == null)
+            {
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, (uint)0, context.GameState.Ping, context.GameState.OnlineName, Resources.InvalidChatCommand).WriteTo(context.GameState.Client);
+                return;
+            }
+
+            context.GameState.ActiveChannel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_EMOTE, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, string.Join(' ', context.Command.Arguments)), context.GameState);
+
+            if (context.GameState.ActiveChannel.Count <= 1 || context.GameState.ActiveChannel.ActiveFlags.HasFlag(Channel.Flags.Silent))
+            {
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ActiveChannel.ActiveFlags, 0, context.GameState.ActiveChannel.Name, Resources.NoOneHearsYou).WriteTo(context.GameState.Client);
+            }
+        }
+    }
+}

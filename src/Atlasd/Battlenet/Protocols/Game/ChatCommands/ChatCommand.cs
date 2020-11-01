@@ -47,6 +47,9 @@ namespace Atlasd.Battlenet.Protocols.Game
                 case "join":
                 case "j":
                     return new JoinCommand(args);
+                case "emote":
+                case "me":
+                    return new EmoteCommand(args);
                 case "help":
                 case "?":
                     return new HelpCommand(args);
