@@ -84,7 +84,7 @@
     }
   },
   "bnftp": {
-    "root": "G:\\Projects\\Visual Studio\\Atlas\\etc\\bnftp"
+    "root": "G:\\Projects\\Visual Studio\\Atlas\\var\\bnftp"
   },
   "channel": {
     "auto_op": true,
