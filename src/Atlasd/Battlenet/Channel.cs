@@ -146,8 +146,8 @@ namespace Atlasd.Battlenet
 
                 var m = string.IsNullOrEmpty(Common.ScheduledShutdown.AdminMessage) ? Resources.ServerShutdownScheduled : Resources.ServerShutdownScheduledWithMessage;
 
-                m = m.Replace("{period}", tsStr);
                 m = m.Replace("{message}", Common.ScheduledShutdown.AdminMessage);
+                m = m.Replace("{period}", tsStr);
 
                 new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, Account.Flags.Admin, -1, "Battle.net", m).WriteTo(user.Client);
             }
@@ -419,16 +419,16 @@ namespace Atlasd.Battlenet
         {
             var r = Topic;
 
+            r = r.Replace("{account}", (string)receiver.ActiveAccount.Get(Account.UsernameKey));
             r = r.Replace("{channel}", Name);
             r = r.Replace("{channelMaxUsers}", MaxUsers.ToString());
             r = r.Replace("{channelUserCount}", Users.Count.ToString());
-            r = r.Replace("{account}", (string)receiver.ActiveAccount.Get(Account.UsernameKey));
             r = r.Replace("{game}", Product.ProductName(receiver.Product, false));
             r = r.Replace("{gameFull}", Product.ProductName(receiver.Product, true));
+            r = r.Replace("{ping}", receiver.Ping.ToString() + "ms");
             r = r.Replace("{user}", receiver.OnlineName);
             r = r.Replace("{username}", receiver.OnlineName);
             r = r.Replace("{userName}", receiver.OnlineName);
-            r = r.Replace("{ping}", receiver.Ping.ToString() + "ms");
             r = r.Replace("{userPing}", receiver.Ping.ToString() + "ms");
 
             return r;
@@ -598,11 +598,11 @@ namespace Atlasd.Battlenet
 
             var str = Resources.ChannelFirstJoinGreeting;
 
-            str = str.Replace("{realm}", "Battle.net");
             str = str.Replace("{host}", "BNETDocs");
             str = str.Replace("{game}", strGame);
             str = str.Replace("{gameUsers}", numGameOnline.ToString("#,0"));
             str = str.Replace("{gameAds}", numGameAdvertisements.ToString("#,0"));
+            str = str.Replace("{realm}", "Battle.net");
             str = str.Replace("{totalUsers}", numTotalOnline.ToString("#,0"));
             str = str.Replace("{totalGameAds}", numTotalAdvertisements.ToString("#,0"));
 
