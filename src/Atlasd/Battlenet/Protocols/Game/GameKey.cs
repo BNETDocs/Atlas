@@ -61,6 +61,20 @@ namespace Atlasd.Battlenet.Protocols.Game
             SetPublicValue(publicValue);
         }
 
+        public GameKey(string keyString)
+        {
+            var m_gameKey = new MBNCSUtil.CdKey(keyString);
+
+            if (m_gameKey == null || !m_gameKey.IsValid)
+            {
+                throw new GameProtocolViolationException(null, "Cannot parse invalid game key");
+            }
+
+            SetPrivateValue(m_gameKey.GetValue2());
+            SetProductValue((uint)m_gameKey.Product);
+            SetPublicValue((uint)m_gameKey.Value1);
+        }
+
         public bool IsValidProductValue()
         {
             return GameKey.IsValidProductValue((ProductValues)ProductValue);

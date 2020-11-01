@@ -23,7 +23,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 throw new GameProtocolViolationException(context.Client, "Client is not allowed to send SID_CHATEVENT");
 
             var chatEvent = (ChatEvent)context.Arguments["chatEvent"];
-
             Buffer = chatEvent.ToByteArray(context.Client.ProtocolType.Type);
 
             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, string.Format("[{0}] SID_CHATEVENT: {1} ({2:D} bytes)", Common.DirectionToString(context.Direction), ChatEvent.EventIdToString(chatEvent.EventId), 4 + Buffer.Length));
