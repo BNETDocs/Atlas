@@ -124,26 +124,23 @@ namespace Atlasd.Battlenet
 
             var context = new MessageContext(this, Protocols.MessageDirection.ClientToServer);
 
-            Task.Run(() =>
+            lock (BattlenetGameFrame.Messages)
             {
-                lock (BattlenetGameFrame.Messages)
+                while (BattlenetGameFrame.Messages.Count > 0)
                 {
-                    while (BattlenetGameFrame.Messages.Count > 0)
+                    if (!BattlenetGameFrame.Messages.TryDequeue(out var msg))
                     {
-                        if (!BattlenetGameFrame.Messages.TryDequeue(out var msg))
-                        {
-                            Disconnect();
-                            return;
-                        }
+                        Disconnect();
+                        return;
+                    }
 
-                        if (!msg.Invoke(context))
-                        {
-                            Disconnect();
-                            return;
-                        }
+                    if (!msg.Invoke(context))
+                    {
+                        Disconnect();
+                        return;
                     }
                 }
-            });
+            }
         }
 
         public void ProcessReceive(SocketAsyncEventArgs e)

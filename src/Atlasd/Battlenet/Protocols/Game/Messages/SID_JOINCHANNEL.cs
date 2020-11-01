@@ -61,17 +61,39 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 if ((uint)c < 31) throw new GameProtocolViolationException(context.Client, "Channel name must not have ASCII control characters");
             }
 
+            var userCountryAbbr = (string)null;
+            var userFlags = Account.Flags.None;
+            var userPing = (int)-1;
+            var userName = (string)null;
+            var userGame = Product.ProductCode.None;
+
+            try
+            {
+                lock (context.Client.GameState)
+                {
+                    userCountryAbbr = context.Client.GameState.Locale.CountryNameAbbreviated;
+                    userFlags = (Account.Flags)context.Client.GameState.ActiveAccount.Get(Account.FlagsKey);
+                    userPing = context.Client.GameState.Ping;
+                    userName = context.Client.GameState.OnlineName;
+                    userGame = context.Client.GameState.Product;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is NullReferenceException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, ex.GetType().Name + " error occurred while processing SID_JOINCHANNEL for GameState object");
+                return false;
+            }
+
             var firstJoin = flags == Flags.First || flags == Flags.First_D2;
-            if (firstJoin) channelName = $"{Product.ProductChannelName(context.Client.GameState.Product)} {context.Client.GameState.Locale.CountryNameAbbreviated}-1";
+            if (firstJoin) channelName = $"{Product.ProductChannelName(userGame)} {userCountryAbbr}-1";
 
-            var userFlags = (Account.Flags)context.Client.GameState.ActiveAccount.Get(Account.FlagsKey);
             var ignoreLimits = userFlags.HasFlag(Account.Flags.Employee);
-
             var channel = Channel.GetChannelByName(channelName, false);
 
             if (channel == null && flags == Flags.NoCreate)
             {
-                new ChatEvent(ChatEvent.EventIds.EID_CHANNELFULL, Channel.Flags.None, context.Client.GameState.Ping, context.Client.GameState.OnlineName, channelName).WriteTo(context.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_CHANNELFULL, Channel.Flags.None, userPing, userName, channelName).WriteTo(context.Client);
                 return true;
             }
 
@@ -80,17 +102,35 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             if (firstJoin)
             {
-                var gameState = context.Client.GameState;
+                Account account;
+                Account.Flags activeUserFlags;
+                int activeUserPing;
+                DateTime lastLogon;
+                string onlineName;
 
-                var account = gameState.ActiveAccount;
-                var activeUserFlags = gameState.ChannelFlags;
-                var activeUserPing = gameState.Ping;
-                var lastLogon = gameState.LastLogon;
-                var onlineName = gameState.OnlineName;
+                try
+                {
+                    var gameState = context.Client.GameState;
+
+                    lock (gameState)
+                    {
+                        account = gameState.ActiveAccount;
+                        activeUserFlags = gameState.ChannelFlags;
+                        activeUserPing = gameState.Ping;
+                        lastLogon = gameState.LastLogon;
+                        onlineName = gameState.OnlineName;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (!(ex is ArgumentNullException || ex is NullReferenceException)) throw;
+                    Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, ex.GetType().Name + " error occurred while processing SID_JOINCHANNEL for GameState object");
+                    return false;
+                }
 
                 Channel.WriteServerStats(context.Client);
 
-                if (Product.IsChatRestricted(gameState.Product))
+                if (Product.IsChatRestricted(userGame))
                     new ChatEvent(ChatEvent.EventIds.EID_ERROR, activeUserFlags, activeUserPing, onlineName, Resources.GameProductIsChatRestricted).WriteTo(context.Client);
 
                 var lastLogonTimestamp = lastLogon.ToString(Common.HumanDateTimeFormat);

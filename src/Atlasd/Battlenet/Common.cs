@@ -209,35 +209,34 @@ namespace Atlasd.Battlenet
 
         static void ProcessPingTimer(object state)
         {
-            var clients = state as List<GameState>;
+            var stateL = state as List<GameState>;
             var msg = new SID_PING();
             var interval = TimeSpan.FromSeconds(180);
             var now = DateTime.Now;
             var r = new Random();
 
-            lock (clients)
+            GameState[] clients;
+            lock (stateL) clients = stateL.ToArray();
+
+            foreach (var client in clients)
             {
-                foreach (var client in clients)
+                if (client == null)
                 {
-                    if (client == null)
-                    {
-                        clients.Remove(client);
-                        continue;
-                    }
+                    lock (stateL) stateL.Remove(client);
+                    continue;
+                }
 
-                    lock (client)
-                    {
-                        if (client.LastPing == null || client.LastPing + interval > now) continue;
+                lock (client)
+                {
+                    if (client.LastPing == null || client.LastPing + interval > now) continue;
 
-                        now = DateTime.Now;
-                        client.LastPing = now;
-                        client.PingDelta = now;
-                        client.PingToken = (uint)r.Next(0, 0x7FFFFFFF);
+                    now = DateTime.Now;
+                    client.LastPing = now;
+                    client.PingDelta = now;
+                    client.PingToken = (uint)r.Next(0, 0x7FFFFFFF);
 
-                        msg.Invoke(new MessageContext(client.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){{ "token", client.PingToken }}));
-                        client.Client.Send(msg.ToByteArray());
-                        client.Client.Socket.Poll(0, System.Net.Sockets.SelectMode.SelectWrite);
-                    }
+                    msg.Invoke(new MessageContext(client.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){{ "token", client.PingToken }}));
+                    client.Client.Send(msg.ToByteArray());
                 }
             }
         }

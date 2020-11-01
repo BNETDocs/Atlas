@@ -55,7 +55,15 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, "Setting [battlenet] -> [emulation] -> [auto_refresh_pings] is invalid; check value");
             }
 
-            if (!autoRefreshPings && context.Client.GameState.Ping != -1) return true;
+            int ping = -1;
+            try
+            {
+                lock (context.Client.GameState) ping = context.Client.GameState.Ping;
+            }
+            catch (ArgumentNullException) { }
+            catch (NullReferenceException) { }
+
+            if (!autoRefreshPings && ping != -1) return true;
 
             using var m = new MemoryStream(Buffer);
             using var r = new BinaryReader(m);
@@ -67,14 +75,17 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                 if (context.Direction == MessageDirection.ClientToServer && token == serverToken)
                 {
-                    var delta = DateTime.Now - context.Client.GameState.PingDelta;
-                    context.Client.GameState.Ping = (int)Math.Round(delta.TotalMilliseconds);
-
-                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Ping: {context.Client.GameState.Ping}ms");
-
-                    if (context.Client.GameState.ActiveChannel != null)
+                    lock (context.Client.GameState)
                     {
-                        context.Client.GameState.ActiveChannel.UpdateUser(context.Client.GameState, context.Client.GameState.Ping);
+                        var delta = DateTime.Now - context.Client.GameState.PingDelta;
+                        context.Client.GameState.Ping = (int)Math.Round(delta.TotalMilliseconds);
+
+                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Ping: {context.Client.GameState.Ping}ms");
+
+                        if (context.Client.GameState.ActiveChannel != null)
+                        {
+                            context.Client.GameState.ActiveChannel.UpdateUser(context.Client.GameState, context.Client.GameState.Ping);
+                        }
                     }
                 }
             }
