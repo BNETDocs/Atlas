@@ -1,6 +1,7 @@
 using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -28,34 +29,52 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     {
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_QUERYADURL ({4 + Buffer.Length} bytes)");
 
+                        /**
+                         * (UINT32) Ad Id
+                         */
+
                         if (Buffer.Length != 4)
                             throw new GameProtocolViolationException(context.Client, "SID_QUERYADURL buffer must be 4 bytes");
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         var adId = r.ReadUInt32();
 
-                        r.Close();
-                        m.Close();
+                        Advertisement ad;
+                        try
+                        {
+                            lock (Battlenet.Common.ActiveAds) ad = Battlenet.Common.ActiveAds[(int)adId];
+                            if (ad == null) throw new ArgumentOutOfRangeException();
+                        }
+                        catch (ArgumentOutOfRangeException)
+                        {
+                            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Received url query request for out of bounds ad id [0x{adId:X8}]");
+                            return false;
+                        }
 
-                        return true;
+                        return new SID_QUERYADURL().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){
+                            { "adId", adId }, { "adUrl", ad.Url }
+                        }));
                     }
                 case MessageDirection.ServerToClient:
                     {
                         var adId = (UInt32)context.Arguments["adId"];
                         var adUrl = (string)context.Arguments["adUrl"];
 
-                        Buffer = new byte[5 + Encoding.ASCII.GetByteCount(adUrl)];
+                        /**
+                         * (UINT32) Ad Id
+                         * (STRING) Ad Url
+                         */
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        Buffer = new byte[5 + Encoding.UTF8.GetByteCount(adUrl)];
+
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write(adId);
-                        w.Write(adUrl);
-
-                        w.Close();
-                        m.Close();
+                        w.Write(Encoding.UTF8.GetBytes(adUrl));
+                        w.Write((byte)0);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_QUERYADURL ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray());
