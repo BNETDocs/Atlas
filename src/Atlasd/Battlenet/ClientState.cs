@@ -1,8 +1,10 @@
 ﻿using Atlasd.Battlenet.Exceptions;
+using Atlasd.Battlenet.Protocols.BNFTP;
 using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -10,6 +12,7 @@ namespace Atlasd.Battlenet
 {
     class ClientState : IDisposable
     {
+        public BNFTPState BNFTPState;
         public bool Connected { get => Socket != null && Socket.Connected; }
         public bool IsDisposing { get; private set; } = false;
 
@@ -94,6 +97,7 @@ namespace Atlasd.Battlenet
         {
             lock (Common.ActiveClientStates) Common.ActiveClientStates.Add(this);
 
+            BNFTPState.Client = this;
             GameState = null;
             ProtocolType = null;
             RemoteEndPoint = client.RemoteEndPoint;
@@ -231,12 +235,122 @@ namespace Atlasd.Battlenet
             {
                 case ProtocolType.Types.Game:
                     ReceiveProtocolGame(e); break;
+                case ProtocolType.Types.BNFTP:
+                    ReceiveProtocolBNFTP(e); break;
                 case ProtocolType.Types.Chat:
                 case ProtocolType.Types.Chat_Alt1:
                 case ProtocolType.Types.Chat_Alt2:
                     ReceiveProtocolChat(e); break;
                 default:
                     throw new ProtocolNotSupportedException(ProtocolType.Type, this, $"Unsupported protocol type [0x{(byte)ProtocolType.Type:X2}]");
+            }
+        }
+
+        protected void ReceiveProtocolBNFTP(SocketAsyncEventArgs e)
+        {
+            if (e.SocketError != SocketError.Success) return;
+
+            using var m = new MemoryStream(e.Buffer);
+            using var r = new BinaryReader(m);
+
+            var headerLength = r.ReadUInt16();
+            var protocolVersion = r.ReadUInt16();
+
+            switch (protocolVersion)
+            {
+                case 0x0100:
+                    {
+                        /**
+                         * ## VERSION 1    <-- ##
+                         * ## Client -> Server ##
+                         *
+                         * (TYPE)     (FIELD)                    (DESCRIPTION)
+                         * UINT16     Request Length
+                         * UINT16     Protocol Version           0x100 (256)
+                         * UINT32     Platform ID                See Product Identification
+                         * UINT32     Product ID                 See Product Identification
+                         * UINT32     Ad Banner ID               0 unless downloading an ad banner
+                         * UINT32     Ad Banner File Extension   0 unless downloading an ad banner
+                         * UINT32     File start position        For resuming an incomplete download
+                         * FILETIME   Filetime
+                         * STRING     Filename
+                         */
+
+                        /**
+                         * ## VERSION 1    --> ##
+                         * ## Server -> Client ##
+                         *
+                         * (TYPE)     (FIELD)                    (DESCRIPTION)
+                         * UINT16     Header Length              Does not include the file length
+                         * UINT16     Type
+                         * UINT32     File size
+                         * UINT32     Ad Banner ID               0 unless downloading an ad banner
+                         * UINT32     Ad Banner File Extension   0 unless downloading an ad banner
+                         * FILETIME   Filetime
+                         * STRING     Filename
+                         * VOID       File data
+                        */
+
+                        break;
+                    }
+                case 0x0200:
+                    {
+                        /**
+                         * ## VERSION 2    <-- ##
+                         * ## Client -> Server ##
+                         *
+                         * (TYPE)     (FIELD)                    (DESCRIPTION)
+                         * UINT16     Request Length
+                         * UINT16     Protocol Version           0x100 (256)
+                         * UINT32     Platform ID                See Product Identification
+                         * UINT32     Product ID                 See Product Identification
+                         * UINT32     Ad Banner ID               0 unless downloading an ad banner
+                         * UINT32     Ad Banner File Extension   0 unless downloading an ad banner
+                         * UINT32     File start position        For resuming an incomplete download
+                         * FILETIME   Filetime
+                         * STRING     Filename
+                         */
+
+                        /**
+                         * ## VERSION 2    --> ##
+                         * ## Server -> Client ##
+                         *
+                         * (TYPE)     (FIELD)                    (DESCRIPTION)
+                         * UINT32     Server Token
+                         */
+
+                        /**
+                         * ## VERSION 2    <-- ##
+                         * ## Client -> Server ##
+                         *
+                         * (TYPE)     (FIELD)                    (DESCRIPTION)
+                         * UINT32     Starting position          Facilitates resuming
+                         * FILETIME   Local filetime
+                         * UINT32     Client Token
+                         * UINT32     Key Length
+                         * UINT32     Key's product value
+                         * UINT32     Key's public value
+                         * UINT32     Unknown (Always 0)
+                         * UINT32 [5] CD key hash
+                         * STRING     Filename
+                         */
+
+                        /**
+                         * ## VERSION 2    --> ##
+                         * ## Server -> Client ##
+                         *
+                         * (TYPE)     (FIELD)                    (DESCRIPTION)
+                         * UINT16     Header Length              Does not include the file length
+                         * UINT32     File size
+                         * UINT32     Ad Banner ID               0 unless downloading an ad banner
+                         * UINT32     Ad Banner File Extension   0 unless downloading an ad banner
+                         * FILETIME   Filetime
+                         * STRING     Filename
+                         * VOID       File data
+                        */
+
+                        break;
+                    }
             }
         }
 
