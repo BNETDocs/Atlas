@@ -51,6 +51,7 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public StateFlags ActiveStateFlags { get; private set; }
         public UInt32 ElapsedTime { get; private set; }
+        public GameState Client { get; private set; }
         public UInt32 GamePort { get; private set; }
         public GameTypes GameType { get; private set; }
         public UInt32 GameVersion { get; private set; }
@@ -58,9 +59,10 @@ namespace Atlasd.Battlenet.Protocols.Game
         public string Password { get; private set; }
         public string Statstring { get; private set; }
 
-        public GameAd(string name, string password, string statstring, UInt32 gamePort, GameTypes gameType, UInt32 gameVersion)
+        public GameAd(GameState client, string name, string password, string statstring, UInt32 gamePort, GameTypes gameType, UInt32 gameVersion)
         {
             ActiveStateFlags = StateFlags.None;
+            Client = client;
             ElapsedTime = 0;
             GamePort = gamePort;
             GameType = gameType;
