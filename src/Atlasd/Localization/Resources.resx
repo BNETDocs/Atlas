@@ -165,6 +165,12 @@ Example: 0x10 = 16 decimal</value>
   <data name="Backstage" xml:space="preserve">
     <value>Backstage</value>
   </data>
+  <data name="BattlenetAdministrator" xml:space="preserve">
+    <value>Battle.net administrator</value>
+  </data>
+  <data name="BlizzardRepresentative" xml:space="preserve">
+    <value>Blizzard representative</value>
+  </data>
   <data name="ChannelFirstJoinGreeting" xml:space="preserve">
     <value>Welcome to {realm}!
 This server is hosted by {host}.

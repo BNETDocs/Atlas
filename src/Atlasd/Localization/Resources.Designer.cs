@@ -193,6 +193,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Battle.net administrator.
+        /// </summary>
+        public static string BattlenetAdministrator {
+            get {
+                return ResourceManager.GetString("BattlenetAdministrator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Blizzard representative.
+        /// </summary>
+        public static string BlizzardRepresentative {
+            get {
+                return ResourceManager.GetString("BlizzardRepresentative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Welcome to {realm}!
         ///This server is hosted by {host}.
         ///There are currently {gameUsers} users playing {gameAds} games of {game}, and {totalUsers} users playing {totalGameAds} games on {realm}..

@@ -346,10 +346,24 @@ namespace Atlasd.Battlenet
                 return;
             }
 
+            string sourceName;
+            if (source.ChannelFlags.HasFlag(Account.Flags.Employee))
+            {
+                sourceName = $"a {Resources.BlizzardRepresentative}";
+            }
+            else if (source.ChannelFlags.HasFlag(Account.Flags.Admin))
+            {
+                sourceName = $"a {Resources.BattlenetAdministrator}";
+            }
+            else
+            {
+                sourceName = source.OnlineName;
+            }
+
             var kickedStr = reason.Length > 0 ? Resources.UserKickedFromChannelWithReason : Resources.UserKickedFromChannel;
 
             kickedStr = kickedStr.Replace("{reason}", reason);
-            kickedStr = kickedStr.Replace("{source}", source.OnlineName);
+            kickedStr = kickedStr.Replace("{source}", sourceName);
             kickedStr = kickedStr.Replace("{target}", target);
 
             WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, source.ChannelFlags, source.Ping, source.OnlineName, kickedStr));
