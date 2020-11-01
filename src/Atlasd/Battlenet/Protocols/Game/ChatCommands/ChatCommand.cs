@@ -2,6 +2,7 @@
 using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game
 {
@@ -22,6 +23,11 @@ namespace Atlasd.Battlenet.Protocols.Game
         public virtual void Invoke(ChatCommandContext context)
         {
             throw new NotSupportedException("Base ChatCommand class does not Invoke()");
+        }
+
+        public static ChatCommand FromByteArray(byte[] text)
+        {
+            return FromString(Encoding.UTF8.GetString(text[..^1]));
         }
 
         public static ChatCommand FromString(string text)

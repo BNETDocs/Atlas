@@ -33,14 +33,29 @@ namespace Atlasd.Battlenet.Protocols.Game
         public UInt32 Flags { get; protected set; }
         public Int32 Ping { get; protected set; }
         public string Username { get; protected set; }
-        public string Text { get; protected set; }
+        public byte[] Text { get; protected set; }
+
+        public ChatEvent(EventIds eventId, UInt32 flags, Int32 ping, string username, byte[] text)
+        {
+            Initialize(eventId, flags, ping, username, text);
+        }
 
         public ChatEvent(EventIds eventId, UInt32 flags, Int32 ping, string username, string text)
         {
             Initialize(eventId, flags, ping, username, text);
         }
 
+        public ChatEvent(EventIds eventId, Account.Flags flags, Int32 ping, string username, byte[] text)
+        {
+            Initialize(eventId, (UInt32)flags, ping, username, text);
+        }
+
         public ChatEvent(EventIds eventId, Account.Flags flags, Int32 ping, string username, string text)
+        {
+            Initialize(eventId, (UInt32)flags, ping, username, text);
+        }
+
+        public ChatEvent(EventIds eventId, Channel.Flags flags, Int32 ping, string username, byte[] text)
         {
             Initialize(eventId, (UInt32)flags, ping, username, text);
         }
@@ -50,9 +65,24 @@ namespace Atlasd.Battlenet.Protocols.Game
             Initialize(eventId, (UInt32)flags, ping, username, text);
         }
 
-        public static string EventIdToString(EventIds eventId)
+        public static bool EventIdIsChatMessage(EventIds eventId)
         {
             return eventId switch {
+                EventIds.EID_WHISPERFROM => true,
+                EventIds.EID_TALK => true,
+                EventIds.EID_BROADCAST => true,
+                EventIds.EID_WHISPERTO => true,
+                EventIds.EID_INFO => true,
+                EventIds.EID_ERROR => true,
+                EventIds.EID_EMOTE => true,
+                _ => false,
+            };
+        }
+
+        public static string EventIdToString(EventIds eventId)
+        {
+            return eventId switch
+            {
                 EventIds.EID_USERSHOW => "EID_USERSHOW",
                 EventIds.EID_USERJOIN => "EID_USERJOIN",
                 EventIds.EID_USERLEAVE => "EID_USERLEAVE",
@@ -72,7 +102,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             };
         }
 
-        protected void Initialize(EventIds eventId, UInt32 flags, Int32 ping, string username, string text)
+        protected void Initialize(EventIds eventId, UInt32 flags, Int32 ping, string username, byte[] text)
         {
             EventId = eventId;
             Flags = flags;
@@ -81,14 +111,19 @@ namespace Atlasd.Battlenet.Protocols.Game
             Text = text;
         }
 
+        protected void Initialize(EventIds eventId, UInt32 flags, Int32 ping, string username, string text)
+        {
+            Initialize(eventId, flags, ping, username, Encoding.UTF8.GetBytes(text));
+        }
+
         public byte[] ToByteArray(ProtocolType.Types protocolType)
         {
             switch (protocolType) {
                 case ProtocolType.Types.Game:
                     {
-                        var buf = new byte[26 + Encoding.ASCII.GetByteCount(Username) + Encoding.UTF8.GetByteCount(Text)];
-                        var m = new MemoryStream(buf);
-                        var w = new BinaryWriter(m);
+                        var buf = new byte[26 + Encoding.ASCII.GetByteCount(Username) + Text.Length];
+                        using var m = new MemoryStream(buf);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)EventId);
                         w.Write((UInt32)Flags);
@@ -98,11 +133,16 @@ namespace Atlasd.Battlenet.Protocols.Game
                         w.Write((UInt32)0xDEADBEEF); // Registration authority (Defunct)
                         w.Write((string)Username);
 
-                        w.Write(Encoding.UTF8.GetBytes(Text)); // UTF-8 is needed for localization reasons
+                        if (EventIdIsChatMessage(EventId))
+                        {
+                            // UTF-8 conversion is needed for localization reasons
+                            w.Write(Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(Text)));
+                        }
+                        else
+                        {
+                            w.Write(Text);
+                        }
                         w.Write((byte)0);
-
-                        w.Close();
-                        m.Close();
 
                         return buf;
                     }
@@ -111,7 +151,9 @@ namespace Atlasd.Battlenet.Protocols.Game
                 case ProtocolType.Types.Chat_Alt2:
                     {
                         var buf = $"{1000 + EventId} ";
-                        var product = Text.Length < 4 ? "" : Text[0..4];
+                        var product = new byte[4];
+
+                        Buffer.BlockCopy(Text, 0, product, 0, Math.Min(4, Text.Length));
 
                         switch (EventId)
                         {
@@ -175,7 +217,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                         }
 
                         buf += "\r\n";
-                        return Encoding.ASCII.GetBytes(buf);
+                        return Encoding.UTF8.GetBytes(buf);
                     }
                 default:
                     throw new ProtocolNotSupportedException(protocolType, null, $"Unsupported protocol type [0x{(byte)protocolType:X2}]");

@@ -31,28 +31,27 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (context.Client.GameState == null)
                 throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND requires a GameState object");
 
-            if (Buffer.Length < 1)
-                throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND buffer must be at least 1 bytes");
+            if (Buffer.Length < 2)
+                throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND buffer must be at least 2 bytes");
 
-            var text = Encoding.ASCII.GetString(Buffer, 0, Buffer.Length - 1);
-
-            if (text.Length < 1)
-                throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND command must be at least 1 bytes");
-
-            if (text[0] != '/')
+            if (Buffer[0] != '/')
             {
                 if (context.Client.GameState.ActiveChannel == null)
                     throw new GameProtocolViolationException(context.Client, "Cannot send message, user is not in a channel");
 
                 if (context.Client.GameState.ActiveChannel.Count <= 1 || context.Client.GameState.ActiveChannel.ActiveFlags.HasFlag(Channel.Flags.Silent))
+                {
                     new ChatEvent(ChatEvent.EventIds.EID_INFO, context.Client.GameState.ActiveChannel.ActiveFlags, 0, context.Client.GameState.ActiveChannel.Name, Resources.NoOneHearsYou).WriteTo(context.Client);
+                }
                 else
-                    context.Client.GameState.ActiveChannel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_TALK, context.Client.GameState.ChannelFlags, context.Client.GameState.Ping, context.Client.GameState.OnlineName, text), context.Client.GameState);
+                {
+                    context.Client.GameState.ActiveChannel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_TALK, context.Client.GameState.ChannelFlags, context.Client.GameState.Ping, context.Client.GameState.OnlineName, Buffer), context.Client.GameState);
+                }
 
                 return true;
             }
 
-            var command = ChatCommand.FromString(text[1..]);
+            var command = ChatCommand.FromByteArray(Buffer[1..]);
             var commandEnvironment = new Dictionary<string, string>()
             {
                 { "accountName", context.Client.GameState.Username },
