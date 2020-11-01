@@ -57,10 +57,27 @@ namespace Atlasd.Battlenet
                 if (GameState != null)
                 {
                     GameState.Close();
-                    GameState = null;
                 }
             }
             catch (ObjectDisposedException) { }
+            finally
+            {
+                GameState = null;
+            }
+
+            // Close the BNFTPState
+            try
+            {
+                if (BNFTPState != null && BNFTPState.StreamReader != null)
+                {
+                    BNFTPState.CloseStream();
+                }
+            }
+            catch (ObjectDisposedException) { }
+            finally
+            {
+                BNFTPState = null;
+            }
 
             // Remove this from ActiveClientStates
             lock (Common.ActiveClientStates) Common.ActiveClientStates.Remove(this);
@@ -97,7 +114,7 @@ namespace Atlasd.Battlenet
         {
             lock (Common.ActiveClientStates) Common.ActiveClientStates.Add(this);
 
-            BNFTPState.Client = this;
+            BNFTPState = null;
             GameState = null;
             ProtocolType = null;
             RemoteEndPoint = client.RemoteEndPoint;
@@ -215,7 +232,6 @@ namespace Atlasd.Battlenet
 
         protected void ReceiveProtocolType(SocketAsyncEventArgs e)
         {
-            if (e.SocketError != SocketError.Success) return;
             if (ProtocolType != null) return;
 
             ProtocolType = new ProtocolType((ProtocolType.Types)ReceiveBuffer[0]);
@@ -225,12 +241,18 @@ namespace Atlasd.Battlenet
             {
                 GameState = new GameState(this);
             }
+            else if (ProtocolType.IsBNFTP())
+            {
+                BNFTPState = new BNFTPState(this);
+            }
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, $"Set protocol type [0x{(byte)ProtocolType.Type:X2}] ({ProtocolType})");
         }
 
         protected void ReceiveProtocol(SocketAsyncEventArgs e)
         {
+            if (e.SocketError != SocketError.Success) return;
+
             switch (ProtocolType.Type)
             {
                 case ProtocolType.Types.Game:
@@ -248,115 +270,12 @@ namespace Atlasd.Battlenet
 
         protected void ReceiveProtocolBNFTP(SocketAsyncEventArgs e)
         {
-            if (e.SocketError != SocketError.Success) return;
-
-            using var m = new MemoryStream(e.Buffer);
-            using var r = new BinaryReader(m);
-
-            var headerLength = r.ReadUInt16();
-            var protocolVersion = r.ReadUInt16();
-
-            switch (protocolVersion)
-            {
-                case 0x0100:
-                    {
-                        /**
-                         * ## VERSION 1    <-- ##
-                         * ## Client -> Server ##
-                         *
-                         * (TYPE)     (FIELD)                    (DESCRIPTION)
-                         * UINT16     Request Length
-                         * UINT16     Protocol Version           0x100 (256)
-                         * UINT32     Platform ID                See Product Identification
-                         * UINT32     Product ID                 See Product Identification
-                         * UINT32     Ad Banner ID               0 unless downloading an ad banner
-                         * UINT32     Ad Banner File Extension   0 unless downloading an ad banner
-                         * UINT32     File start position        For resuming an incomplete download
-                         * FILETIME   Filetime
-                         * STRING     Filename
-                         */
-
-                        /**
-                         * ## VERSION 1    --> ##
-                         * ## Server -> Client ##
-                         *
-                         * (TYPE)     (FIELD)                    (DESCRIPTION)
-                         * UINT16     Header Length              Does not include the file length
-                         * UINT16     Type
-                         * UINT32     File size
-                         * UINT32     Ad Banner ID               0 unless downloading an ad banner
-                         * UINT32     Ad Banner File Extension   0 unless downloading an ad banner
-                         * FILETIME   Filetime
-                         * STRING     Filename
-                         * VOID       File data
-                        */
-
-                        break;
-                    }
-                case 0x0200:
-                    {
-                        /**
-                         * ## VERSION 2    <-- ##
-                         * ## Client -> Server ##
-                         *
-                         * (TYPE)     (FIELD)                    (DESCRIPTION)
-                         * UINT16     Request Length
-                         * UINT16     Protocol Version           0x100 (256)
-                         * UINT32     Platform ID                See Product Identification
-                         * UINT32     Product ID                 See Product Identification
-                         * UINT32     Ad Banner ID               0 unless downloading an ad banner
-                         * UINT32     Ad Banner File Extension   0 unless downloading an ad banner
-                         * UINT32     File start position        For resuming an incomplete download
-                         * FILETIME   Filetime
-                         * STRING     Filename
-                         */
-
-                        /**
-                         * ## VERSION 2    --> ##
-                         * ## Server -> Client ##
-                         *
-                         * (TYPE)     (FIELD)                    (DESCRIPTION)
-                         * UINT32     Server Token
-                         */
-
-                        /**
-                         * ## VERSION 2    <-- ##
-                         * ## Client -> Server ##
-                         *
-                         * (TYPE)     (FIELD)                    (DESCRIPTION)
-                         * UINT32     Starting position          Facilitates resuming
-                         * FILETIME   Local filetime
-                         * UINT32     Client Token
-                         * UINT32     Key Length
-                         * UINT32     Key's product value
-                         * UINT32     Key's public value
-                         * UINT32     Unknown (Always 0)
-                         * UINT32 [5] CD key hash
-                         * STRING     Filename
-                         */
-
-                        /**
-                         * ## VERSION 2    --> ##
-                         * ## Server -> Client ##
-                         *
-                         * (TYPE)     (FIELD)                    (DESCRIPTION)
-                         * UINT16     Header Length              Does not include the file length
-                         * UINT32     File size
-                         * UINT32     Ad Banner ID               0 unless downloading an ad banner
-                         * UINT32     Ad Banner File Extension   0 unless downloading an ad banner
-                         * FILETIME   Filetime
-                         * STRING     Filename
-                         * VOID       File data
-                        */
-
-                        break;
-                    }
-            }
+            if (ReceiveBuffer.Length == 0) return;
+            BNFTPState.Receive(ReceiveBuffer);
         }
 
         protected void ReceiveProtocolChat(SocketAsyncEventArgs e)
         {
-            if (e.SocketError != SocketError.Success) return;
             Send(System.Text.Encoding.ASCII.GetBytes("The chat gateway is currently unsupported on Atlasd.\r\n"));
             throw new ProtocolNotSupportedException(ProtocolType.Type, this, $"Unsupported protocol type [0x{(byte)ProtocolType.Type:X2}]");
         }
