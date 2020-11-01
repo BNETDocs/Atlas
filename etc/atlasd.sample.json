@@ -1,6 +1,13 @@
 {
   "account": {
-    "auto_admin": true,
+    "auto_admin": [
+      "Admin",
+      "BNETDocs",
+      "BNRBot",
+      "Carl",
+      "islanti",
+      "Ribose"
+    ],
     "disallow_words": [
       "ass",
       "battle.net",

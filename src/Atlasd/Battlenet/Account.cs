@@ -160,10 +160,35 @@ namespace Atlasd.Battlenet
 
             if (!disallowWordsJson.ValueKind.HasFlag(JsonValueKind.Array))
             {
-                throw new NotSupportedException("Setting [account -> disallow_words] is not an array; check value");
+                throw new NotSupportedException("Setting [account] -> [disallow_words] is not an array; check value");
             }
 
-            var autoAdmin = autoAdminJson.GetBoolean();
+            bool autoAdmin = false;
+            if (autoAdminJson.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var nameJson in autoAdminJson.EnumerateArray())
+                {
+                    var name = nameJson.GetString();
+                    if (username.ToLower() == name.ToLower())
+                    {
+                        autoAdmin = true;
+                        break;
+                    }
+                }
+            }
+            else if (autoAdminJson.ValueKind == JsonValueKind.String)
+            {
+                autoAdmin = username.ToLower() == autoAdminJson.GetString().ToLower();
+            }
+            else if (autoAdminJson.ValueKind == JsonValueKind.True || autoAdminJson.ValueKind == JsonValueKind.False)
+            {
+                autoAdmin = autoAdminJson.GetBoolean() && Common.AccountsDb.Count == 0;
+            }
+            else
+            {
+                throw new NotSupportedException("Setting [account] -> [auto_admin] is not an array, string, or boolean; check value");
+            }
+
             var bannedWords = disallowWordsJson;
             var maximumAdjacentPunctuation = maxAdjacentPunctuationJson.GetUInt32();
             var maximumPunctuation = maxPunctuationJson.GetUInt32();
@@ -256,8 +281,7 @@ namespace Atlasd.Battlenet
                 account.Set(Account.UsernameKey, username);
                 account.Set(Account.PasswordKey, passwordHash);
 
-                var makeAdmin = autoAdmin && Common.AccountsDb.Count == 0;
-                account.Set(Account.FlagsKey, makeAdmin ? (Account.Flags.Employee | Account.Flags.Admin) : Account.Flags.None);
+                account.Set(Account.FlagsKey, autoAdmin ? (Account.Flags.Employee | Account.Flags.Admin) : Account.Flags.None);
 
                 Common.AccountsDb.Add(username, account);
             }
