@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -36,23 +37,23 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             var numAccounts = r.ReadUInt32();
             var numKeys = r.ReadUInt32();
-            var accounts = new List<string>();
-            var keys = new List<string>();
-            var values = new List<string>();
+            var accounts = new List<byte[]>();
+            var keys = new List<byte[]>();
+            var values = new List<byte[]>();
 
             while (accounts.Count < numAccounts)
             {
-                accounts.Add(r.ReadString());
+                accounts.Add(r.ReadByteString());
             }
 
             while (keys.Count < numKeys)
             {
-                keys.Add(r.ReadString());
+                keys.Add(r.ReadByteString());
             }
 
             while (values.Count < numKeys)
             {
-                values.Add(r.ReadString());
+                values.Add(r.ReadByteString());
             }
 
             r.Close();
@@ -61,9 +62,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             var hasSudoPrivs = context.Client.GameState.ChannelFlags.HasFlag(Account.Flags.Admin) ||
                 context.Client.GameState.ChannelFlags.HasFlag(Account.Flags.Employee);
 
-            foreach (var accountName in accounts)
+            foreach (var accountNameBytes in accounts)
             {
-                Battlenet.Common.AccountsDb.TryGetValue(accountName, out var account);
+                var accountNameStr = Encoding.UTF8.GetString(accountNameBytes);
+                Battlenet.Common.AccountsDb.TryGetValue(accountNameStr, out var account);
 
                 if (account == null)
                 {
@@ -73,7 +75,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                 for (var i = 0; i < numKeys; i++)
                 {
-                    var key = keys[i];
+                    var key = Encoding.UTF8.GetString(keys[i]);
                     var value = values[i];
 
                     if (!account.Get(key, out var dynvalue))
@@ -86,11 +88,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     if (!(kv.Writable == AccountKeyValue.WriteLevel.Any ||
                         (kv.Writable == AccountKeyValue.WriteLevel.Owner && (hasSudoPrivs || context.Client.GameState.ActiveAccount == account))))
                     {
-                        Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Client attempted to write userdata to account [{accountName}] key [{key}] but they have no privilege to do so [hasSudoPrivs: {hasSudoPrivs}]");
+                        Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Client attempted to write userdata to account [{accountNameStr}] key [{key}] but they have no privilege to do so [hasSudoPrivs: {hasSudoPrivs}]");
                         return false;
                     }
 
-                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Client wrote userdata to account [{accountName}] key [{key}] with [hasSudoPrivs: {hasSudoPrivs}]");
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Client wrote userdata to account [{accountNameStr}] key [{key}] with [hasSudoPrivs: {hasSudoPrivs}]");
                     kv.Value = value;
                 }
             }
