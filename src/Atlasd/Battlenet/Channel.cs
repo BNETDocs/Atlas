@@ -407,7 +407,7 @@ namespace Atlasd.Battlenet
                     foreach (var subuser in users)
                     {
                         // Tell everyone else about this user leaving the channel:
-                        new ChatEvent(ChatEvent.EventIds.EID_USERLEAVE, user.ChannelFlags, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring)).WriteTo(subuser.Client);
+                        new ChatEvent(ChatEvent.EventIds.EID_USERLEAVE, user.ChannelFlags, user.Ping, user.OnlineName, new byte[0]).WriteTo(subuser.Client);
                     }
                 }
             }
