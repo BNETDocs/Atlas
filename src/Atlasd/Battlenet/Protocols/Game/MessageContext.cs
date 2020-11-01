@@ -8,7 +8,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public ClientState Client { get; protected set; }
         public MessageDirection Direction { get; protected set; }
 
-        public MessageContext(ClientState client, MessageDirection direction, Dictionary<string, object> arguments = null)
+        public MessageContext(ClientState client, MessageDirection direction, Dictionary<string, dynamic> arguments = null)
         {
             Arguments = arguments;
             Client = client;
