@@ -15,6 +15,196 @@ namespace Atlasd.Daemon
         public static JsonDocument State { get; private set; }
         public static string Path { get; private set; } = null;
 
+        public static bool GetBoolean(string[] keyPath, bool defaultValue)
+        {
+            try
+            {
+                var json = State.RootElement;
+                for (var i = 0; i < keyPath.Length; i++)
+                {
+                    json.TryGetProperty(keyPath[i], out json);
+                }
+                return json.GetBoolean();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a boolean; check value");
+                return defaultValue;
+            }
+        }
+
+        public static byte GetByte(string[] keyPath, byte defaultValue)
+        {
+            try
+            {
+                var json = State.RootElement;
+                for (var i = 0; i < keyPath.Length; i++)
+                {
+                    json.TryGetProperty(keyPath[i], out json);
+                }
+                return json.GetByte();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a boolean; check value");
+                return defaultValue;
+            }
+        }
+
+        public static Int16 GetInt16(string[] keyPath, Int16 defaultValue)
+        {
+            try
+            {
+                var json = State.RootElement;
+                for (var i = 0; i < keyPath.Length; i++)
+                {
+                    json.TryGetProperty(keyPath[i], out json);
+                }
+                return json.GetInt16();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a boolean; check value");
+                return defaultValue;
+            }
+        }
+
+        public static Int32 GetInt32(string[] keyPath, Int32 defaultValue)
+        {
+            try
+            {
+                var json = State.RootElement;
+                for (var i = 0; i < keyPath.Length; i++)
+                {
+                    json.TryGetProperty(keyPath[i], out json);
+                }
+                return json.GetInt32();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a boolean; check value");
+                return defaultValue;
+            }
+        }
+
+        public static Int64 GetInt64(string[] keyPath, Int64 defaultValue)
+        {
+            try
+            {
+                var json = State.RootElement;
+                for (var i = 0; i < keyPath.Length; i++)
+                {
+                    json.TryGetProperty(keyPath[i], out json);
+                }
+                return json.GetInt64();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a boolean; check value");
+                return defaultValue;
+            }
+        }
+
+        public static sbyte GetSByte(string[] keyPath, sbyte defaultValue)
+        {
+            try
+            {
+                var json = State.RootElement;
+                for (var i = 0; i < keyPath.Length; i++)
+                {
+                    json.TryGetProperty(keyPath[i], out json);
+                }
+                return json.GetSByte();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a boolean; check value");
+                return defaultValue;
+            }
+        }
+
+        public static string GetString(string[] keyPath, string defaultValue)
+        {
+            try
+            {
+                var json = State.RootElement;
+                for (var i = 0; i < keyPath.Length; i++)
+                {
+                    json.TryGetProperty(keyPath[i], out json);
+                }
+                return json.GetString();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a boolean; check value");
+                return defaultValue;
+            }
+        }
+
+        public static UInt16 GetUInt16(string[] keyPath, UInt16 defaultValue)
+        {
+            try
+            {
+                var json = State.RootElement;
+                for (var i = 0; i < keyPath.Length; i++)
+                {
+                    json.TryGetProperty(keyPath[i], out json);
+                }
+                return json.GetUInt16();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a boolean; check value");
+                return defaultValue;
+            }
+        }
+
+        public static UInt32 GetUInt32(string[] keyPath, UInt32 defaultValue)
+        {
+            try
+            {
+                var json = State.RootElement;
+                for (var i = 0; i < keyPath.Length; i++)
+                {
+                    json.TryGetProperty(keyPath[i], out json);
+                }
+                return json.GetUInt32();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a boolean; check value");
+                return defaultValue;
+            }
+        }
+
+        public static UInt64 GetUInt64(string[] keyPath, UInt64 defaultValue)
+        {
+            try
+            {
+                var json = State.RootElement;
+                for (var i = 0; i < keyPath.Length; i++)
+                {
+                    json.TryGetProperty(keyPath[i], out json);
+                }
+                return json.GetUInt64();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a boolean; check value");
+                return defaultValue;
+            }
+        }
+
         public static void Initialize()
         {
             if (string.IsNullOrEmpty(Path))

@@ -152,9 +152,7 @@ namespace Atlasd.Battlenet
                 new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, Account.Flags.Admin, -1, "Battle.net", m).WriteTo(user.Client);
             }
 
-            Settings.State.RootElement.TryGetProperty("channel", out var channelJson);
-            channelJson.TryGetProperty("auto_op", out var autoOpJson);
-            var autoOp = autoOpJson.GetBoolean();
+            var autoOp = Settings.GetBoolean(new string[] { "channel", "auto_op" }, false);
 
             if ((autoOp == true && Count == 1 && IsPrivate()) || Name.ToLower() == "op " + user.OnlineName.ToLower())
                 UpdateUser(user, user.ChannelFlags | Account.Flags.ChannelOp);
