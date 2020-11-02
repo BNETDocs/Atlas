@@ -30,7 +30,14 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_ENTERCHAT ({4 + Buffer.Length} bytes)");
 
                         if (Buffer.Length < 2)
+                        {
                             throw new GameProtocolViolationException(context.Client, "SID_ENTERCHAT buffer must be at least 2 bytes");
+                        }
+
+                        if (context.Client.GameState.ActiveAccount == null || string.IsNullOrEmpty(context.Client.GameState.OnlineName))
+                        {
+                            throw new GameProtocolViolationException(context.Client, "SID_ENTERCHAT received before logon");
+                        }
 
                         /**
                          * (STRING) Username
