@@ -3,6 +3,7 @@ using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
@@ -33,6 +34,18 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             if (Buffer.Length < 2)
                 throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND buffer must be at least 2 bytes");
+
+            if (Buffer.Length > 224)
+                throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND buffer must be at most 224 bytes");
+
+            foreach (var c in Buffer)
+            {
+                if (c == 0x0D || c == 0x0A)
+                {
+                    // this message contains a newline and should be dropped per protocol
+                    return true;
+                }
+            }
 
             if (Buffer[0] != '/')
             {
