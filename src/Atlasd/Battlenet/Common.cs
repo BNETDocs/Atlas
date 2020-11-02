@@ -227,18 +227,15 @@ namespace Atlasd.Battlenet
                     continue;
                 }
 
-                lock (client)
-                {
-                    if (client.LastPing == null || client.LastPing + interval > now) continue;
+                if (client.LastPing == null || client.LastPing + interval > now) continue;
 
-                    now = DateTime.Now;
-                    client.LastPing = now;
-                    client.PingDelta = now;
-                    client.PingToken = (uint)r.Next(0, 0x7FFFFFFF);
+                now = DateTime.Now;
+                client.LastPing = now;
+                client.PingDelta = now;
+                client.PingToken = (uint)r.Next(0, 0x7FFFFFFF);
 
-                    msg.Invoke(new MessageContext(client.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){{ "token", client.PingToken }}));
-                    client.Client.Send(msg.ToByteArray(client.Client.ProtocolType));
-                }
+                msg.Invoke(new MessageContext(client.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){{ "token", client.PingToken }}));
+                client.Client.Send(msg.ToByteArray(client.Client.ProtocolType));
             }
         }
 
