@@ -56,9 +56,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var requestId = r.ReadUInt32();
                         var unknown = r.ReadUInt32();
                         var filename = r.ReadString();
+                        var filetime = (UInt64)0;
+
+
 
                         return new SID_GETFILETIME().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {
-                            { "requestId", requestId }, { "unknown", unknown }, { "filename", filename }
+                            { "requestId", requestId }, { "unknown", unknown }, { "filetime", filetime }, { "filename", filename }
                         }));
                     }
                 case MessageDirection.ServerToClient:
@@ -72,7 +75,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         var requestId = (UInt32)context.Arguments["requestId"];
                         var unknown = (UInt32)context.Arguments["unknown"];
-                        var filetime = (UInt64)0;
+                        var filetime = (UInt64)context.Arguments["filetime"];
                         var filename = (string)context.Arguments["filename"];
 
                         Buffer = new byte[17 + Encoding.UTF8.GetByteCount(filename)];
