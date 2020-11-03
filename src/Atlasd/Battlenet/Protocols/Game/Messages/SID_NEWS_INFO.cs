@@ -67,7 +67,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var newsTimestamp = DateTime.Now;
 
                         foreach (var chatEvent in newsGreeting)
-                            newsStr += chatEvent.Text + "\r\n";
+                            newsStr += chatEvent.Text + Environment.NewLine;
 
                         Buffer = new byte[18 + Encoding.UTF8.GetByteCount(newsStr)];
 

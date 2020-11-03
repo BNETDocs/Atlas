@@ -311,7 +311,7 @@ namespace Atlasd.Battlenet
                         r = r.Replace("{" + kv.Key + "}", kv.Value);
                     }
 
-                    foreach (var line in r.Split("\r\n"))
+                    foreach (var line in r.Split(Environment.NewLine))
                         new ChatEvent(ChatEvent.EventIds.EID_INFO, command.GameState.ChannelFlags, command.GameState.Ping, command.GameState.OnlineName, line).WriteTo(command.GameState.Client);
                 }
             });

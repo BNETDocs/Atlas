@@ -29,7 +29,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             if (!Battlenet.Common.GetClientByOnlineName(t, out var target) || target == null)
             {
                 r = Resources.UserNotLoggedOn;
-                foreach (var line in r.Split("\r\n"))
+                foreach (var line in r.Split(Environment.NewLine))
                     new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
                 return;
             }
@@ -39,7 +39,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             if (target.Away != null)
             {
-                str += "\r\n" + Resources.AwayCommandStatus.Replace("{awayMessage}", target.Away);
+                str += Environment.NewLine + Resources.AwayCommandStatus.Replace("{awayMessage}", target.Away);
             }
 
             var targetEnv = new Dictionary<string, string>()

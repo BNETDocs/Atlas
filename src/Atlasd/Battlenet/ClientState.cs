@@ -283,19 +283,19 @@ namespace Atlasd.Battlenet
                 return;
             }
 
-            if (!text.Contains("\r\n"))
+            if (!text.Contains(Environment.NewLine))
             {
                 // need more data
                 return;
             }
 
-            var pos = text.IndexOf("\r\n");
+            var pos = text.IndexOf(Environment.NewLine);
             ReceiveBuffer = ReceiveBuffer[(pos + 2)..];
             var line = text.Substring(0, pos);
 
             if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username) && string.IsNullOrEmpty(line))
             {
-                Send(Encoding.UTF8.GetBytes("Enter your login name and password.\r\n"));
+                Send(Encoding.UTF8.GetBytes($"Enter your login name and password.{Environment.NewLine}"));
                 GameState.Username = line;
                 Send(Encoding.UTF8.GetBytes($"Username: "));
                 return;
@@ -317,7 +317,7 @@ namespace Atlasd.Battlenet
                 if (account == null)
                 {
                     GameState.Username = null;
-                    Send(Encoding.UTF8.GetBytes("Incorrect username/password.\r\n"));
+                    Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Environment.NewLine}"));
                     return;
                 }
 
@@ -325,7 +325,7 @@ namespace Atlasd.Battlenet
                 if (!inPasswordHash.SequenceEqual(dbPasswordHash))
                 {
                     GameState.Username = null;
-                    Send(Encoding.UTF8.GetBytes("Incorrect username/password.\r\n"));
+                    Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Environment.NewLine}"));
                     return;
                 }
 
@@ -333,7 +333,7 @@ namespace Atlasd.Battlenet
                 if ((flags & Account.Flags.Closed) != 0)
                 {
                     GameState.Username = null;
-                    Send(Encoding.UTF8.GetBytes("Account closed.\r\n"));
+                    Send(Encoding.UTF8.GetBytes($"Account closed.{Environment.NewLine}"));
                     return;
                 }
 
@@ -365,7 +365,7 @@ namespace Atlasd.Battlenet
                     Common.ActiveGameStates.Add(GameState.OnlineName, GameState);
                 }
 
-                Send(Encoding.UTF8.GetBytes($"Connection from [{RemoteEndPoint}]\r\n"));
+                Send(Encoding.UTF8.GetBytes($"Connection from [{RemoteEndPoint}]{Environment.NewLine}"));
 
                 using var m1 = new MemoryStream(128);
                 using var w1 = new BinaryWriter(m1);
@@ -386,7 +386,7 @@ namespace Atlasd.Battlenet
                 }
             }
 
-            if (!text.Contains("\r\n"))
+            if (!text.Contains(Environment.NewLine))
             {
                 // The caret-return/line-feed character(s) have not yet been received, wait for more data
                 return;

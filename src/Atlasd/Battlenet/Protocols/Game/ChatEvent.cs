@@ -216,7 +216,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                                 }
                         }
 
-                        buf += "\r\n";
+                        buf += Environment.NewLine;
                         return Encoding.UTF8.GetBytes(buf);
                     }
                 default:

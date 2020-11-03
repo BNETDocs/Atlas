@@ -53,7 +53,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                     new AdminDisconnectCommand(Arguments).Invoke(context); return;
                 case "help":
                 case "?":
-                    r = string.Join("\r\n", new List<string>() {
+                    r = string.Join(Environment.NewLine, new List<string>() {
                         { "/admin ? (alias: /admin help)" },
                         { "/admin announce (alias: /admin broadcast)" },
                         { "/admin broadcast <message>" },
@@ -65,7 +65,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                         { "/admin shutdown [seconds] [message]" },
                         { "/admin spoofuserflag (alias: /admin spoofuserflags)" },
                         { "/admin spoofuserflags <user> <flags>" },
-                        { "/admin spoofusergame <user> <game>\r\n(This will preserve their statstring!)" },
+                        { "/admin spoofusergame <user> <game>" },
                         { "/admin spoofusername <oldname> <newname>" },
                         { "/admin spoofuserping <user> <ping>" },
                         { "" },
@@ -91,7 +91,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 r = r.Replace("{" + kv.Key + "}", kv.Value);
             }
 
-            foreach (var line in r.Split("\r\n"))
+            foreach (var line in r.Split(Environment.NewLine))
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
         }
     }

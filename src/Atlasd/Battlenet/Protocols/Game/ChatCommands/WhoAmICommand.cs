@@ -1,4 +1,5 @@
 ﻿using Atlasd.Localization;
+using System;
 using System.Collections.Generic;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
@@ -19,7 +20,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             if (context.GameState.Away != null)
             {
-                str += "\r\n" + Resources.AwayCommandStatusSelf.Replace("{awayMessage}", context.GameState.Away);
+                str += Environment.NewLine + Resources.AwayCommandStatusSelf.Replace("{awayMessage}", context.GameState.Away);
             }
 
             str = str.Replace("{channel}", ch == null ? "(null)" : ch.Name);

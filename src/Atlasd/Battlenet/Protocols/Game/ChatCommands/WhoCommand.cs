@@ -1,4 +1,5 @@
 ﻿using Atlasd.Localization;
+using System;
 using System.Collections.Generic;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
@@ -21,7 +22,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             if (ch == null)
             {
                 r = Resources.ChannelNotFound;
-                foreach (var line in r.Split("\r\n"))
+                foreach (var line in r.Split(Environment.NewLine))
                     new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
                 return;
             }
@@ -29,7 +30,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             if (ch.ActiveFlags.HasFlag(Channel.Flags.Restricted))
             {
                 r = Resources.ChannelIsRestricted;
-                foreach (var line in r.Split("\r\n"))
+                foreach (var line in r.Split(Environment.NewLine))
                     new ChatEvent(ChatEvent.EventIds.EID_ERROR, ch.ActiveFlags, 0, ch.Name, line).WriteTo(context.GameState.Client);
                 return;
             }
@@ -44,7 +45,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 r = r.Replace("{" + kv.Key + "}", kv.Value);
             }
 
-            foreach (var line in r.Split("\r\n"))
+            foreach (var line in r.Split(Environment.NewLine))
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
         }
     }

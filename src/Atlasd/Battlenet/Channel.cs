@@ -292,7 +292,7 @@ namespace Atlasd.Battlenet
                     s += $"{n}, ";
                 } else
                 {
-                    s += $"{n}\r\n";
+                    s += $"{n}{Environment.NewLine}";
                 }
                 i++;
             }
@@ -631,7 +631,7 @@ namespace Atlasd.Battlenet
             str = str.Replace("{totalUsers}", numTotalOnline.ToString("#,0"));
             str = str.Replace("{totalGameAds}", numTotalAdvertisements.ToString("#,0"));
 
-            foreach (var line in str.Split("\r\n"))
+            foreach (var line in str.Split(Environment.NewLine))
                 chatEvents.Add(new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, line));
 
             return chatEvents;
