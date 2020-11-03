@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text;
 using System.Text.Json;
 
 namespace Atlasd.Battlenet
@@ -91,6 +92,11 @@ namespace Atlasd.Battlenet
             }
 
             return false;
+        }
+
+        public bool Get(byte[] key, out dynamic value)
+        {
+            return Get(Encoding.UTF8.GetString(key), out value);
         }
 
         public bool Get(string key, out dynamic value)
