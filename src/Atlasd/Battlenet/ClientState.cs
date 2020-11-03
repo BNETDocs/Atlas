@@ -70,20 +70,6 @@ namespace Atlasd.Battlenet
                 GameState = null;
             }
 
-            // Close the BNFTPState
-            try
-            {
-                if (BNFTPState != null && BNFTPState.StreamReader != null)
-                {
-                    BNFTPState.CloseStream();
-                }
-            }
-            catch (ObjectDisposedException) { }
-            finally
-            {
-                BNFTPState = null;
-            }
-
             // Remove this from ActiveClientStates
             lock (Common.ActiveClientStates) Common.ActiveClientStates.Remove(this);
 

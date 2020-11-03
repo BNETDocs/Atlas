@@ -10,7 +10,6 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
     class BNFTPState
     {
         public ClientState Client;
-        public StreamReader StreamReader;
 
         // Version 1
         public UInt16 HeaderLength = 0;
@@ -32,31 +31,6 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
         {
             Client = client;
             ServerToken = (uint)new Random().Next(0, 0x7FFFFFFF);
-        }
-
-        public void CloseStream()
-        {
-            if (StreamReader != null)
-            {
-                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_BNFTP, $"Closing read stream for [{FileName}]...");
-                StreamReader.Close();
-                StreamReader = null;
-            }
-        }
-
-        public string GetPath()
-        {
-            Settings.State.RootElement.TryGetProperty("bnftp", out var bnftpJson);
-            bnftpJson.TryGetProperty("root", out var rootJson);
-            var root = rootJson.GetString();
-            return Path.Combine(root, FileName);
-        }
-
-        public void OpenStream()
-        {
-            var path = GetPath();
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_BNFTP, $"Opening read stream for [{path}]...");
-            StreamReader = new StreamReader(path);
         }
 
         public void Receive(byte[] buffer)
@@ -117,11 +91,27 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
                          * VOID       File data
                         */
 
+                        var file = new BNFTP.File(FileName);
+                        if (file == null)
+                        {
+                            Client.Disconnect();
+                        }
+
+                        BinaryReader stream = null;
+
                         bool uploaded = false;
                         try
                         {
-                            OpenStream();
+                            if (!file.OpenStream())
+                            {
+                                Client.Disconnect();
+                                break;
+                            }
 
+                            stream = new BinaryReader(file.StreamReader.BaseStream);
+                            stream.BaseStream.Position = Math.Min(stream.BaseStream.Length, FileStartPosition);
+
+                            var fileLength = (int)(stream.BaseStream.Length - stream.BaseStream.Position);
                             HeaderLength = (UInt16)(25 + Encoding.UTF8.GetByteCount(FileName));
                             var outBuf = new byte[HeaderLength];
                             using var wm = new MemoryStream(outBuf);
@@ -129,15 +119,15 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
 
                             w.Write(HeaderLength);
                             w.Write((UInt16)0); // "Type" ???
-                            w.Write((UInt32)StreamReader.BaseStream.Length);
+                            w.Write((UInt32)fileLength);
                             w.Write((UInt32)AdId);
                             w.Write((UInt32)AdFileExtension);
-                            w.Write((UInt64)new FileInfo(GetPath()).LastWriteTimeUtc.ToFileTimeUtc());
+                            w.Write((UInt64)new FileInfo(file.Path).LastWriteTimeUtc.ToFileTimeUtc());
                             w.Write(Encoding.UTF8.GetBytes(FileName));
                             w.Write((byte)0);
 
                             Write(outBuf);
-                            WriteStream();
+                            Write(stream.ReadBytes(fileLength));
 
                             uploaded = true;
                         }
@@ -154,7 +144,11 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
                                 Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_BNFTP, Client.RemoteEndPoint, $"Uploaded file [{FileName}]");
                             }
 
-                            CloseStream();
+                            if (stream != null)
+                            {
+                                stream.Close();
+                            }
+
                             Client.Disconnect();
                         }
 
@@ -236,12 +230,6 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
         public void Write(byte[] buffer)
         {
             Client.Send(buffer);
-        }
-
-        public void WriteStream()
-        {
-            using var r = new BinaryReader(StreamReader.BaseStream);
-            Write(r.ReadBytes((int)(r.BaseStream.Length - r.BaseStream.Position)));
         }
     }
 }

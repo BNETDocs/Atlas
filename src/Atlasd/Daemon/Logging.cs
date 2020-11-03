@@ -18,6 +18,7 @@ namespace Atlasd.Daemon
         public enum LogType : uint
         {
             Account,
+            BNFTP,
             Channel,
             Config,
             Client,
@@ -47,6 +48,7 @@ namespace Atlasd.Daemon
             return type switch
             {
                 LogType.Account => "Account",
+                LogType.BNFTP => "BNFTP",
                 LogType.Channel => "Channel",
                 LogType.Config => "Config",
                 LogType.Client => "Client",
