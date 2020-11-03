@@ -141,8 +141,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (context.Client.GameState == null || context.Client.GameState.Version == null || context.Client.GameState.Version.VersionByte == 0)
                             throw new GameProtocolViolationException(context.Client, "SID_READUSERDATA cannot be processed without an active version");
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         var numAccounts = r.ReadUInt32();
                         var numKeys = r.ReadUInt32();
@@ -157,9 +157,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         for (var i = 0; i < numKeys; i++)
                             keys.Add(r.ReadString());
 
-                        r.Close();
-                        m.Close();
-
                         if (numAccounts > 1)
                         {
                             accounts = new List<string>();
@@ -167,7 +164,9 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         }
 
                         if (numKeys > 31)
+                        {
                             throw new GameProtocolViolationException(context.Client, "SID_READUSERDATA must request no more than 31 keys");
+                        }
 
                         return new SID_READUSERDATA().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {
                             { "requestId", requestId },
@@ -191,13 +190,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var size = 12;
                         foreach (var value in values)
                         {
-                            size += 1 + Encoding.ASCII.GetByteCount(value);
+                            size += 1 + Encoding.UTF8.GetByteCount(value);
                         }
 
                         Buffer = new byte[size];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)accounts.Count);
                         w.Write((UInt32)keys.Count);
@@ -205,11 +204,9 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         foreach (var value in values)
                         {
-                            w.Write((string)value);
+                            w.Write(Encoding.UTF8.GetBytes(value));
+                            w.Write((byte)0);
                         }
-
-                        w.Close();
-                        m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_READUSERDATA ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
