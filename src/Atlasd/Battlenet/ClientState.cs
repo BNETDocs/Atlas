@@ -5,8 +5,6 @@ using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
-using System.Collections;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
