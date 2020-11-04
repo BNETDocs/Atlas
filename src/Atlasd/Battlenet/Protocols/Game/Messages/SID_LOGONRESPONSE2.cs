@@ -3,6 +3,7 @@ using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -66,7 +67,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         {
                             var passwordHashDb = (byte[])account.Get(Account.PasswordKey, new byte[20]);
                             var compareHash = OldAuth.CheckDoubleHashData(passwordHashDb, clientToken, serverToken);
-                            if (compareHash.Equals(passwordHash)) status = Statuses.BadPassword;
+                            if (!compareHash.SequenceEqual(passwordHash)) status = Statuses.BadPassword;
                         }
 
                         if (status == Statuses.None)
