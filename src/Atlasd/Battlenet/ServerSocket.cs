@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Atlasd.Daemon;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -80,7 +81,7 @@ namespace Atlasd.Battlenet
             Socket = new Socket(localEndPoint.AddressFamily, SocketType.Stream, System.Net.Sockets.ProtocolType.Tcp)
             {
                 ExclusiveAddressUse = true,
-                NoDelay = true,
+                NoDelay = Daemon.Common.TcpNoDelay,
                 UseOnlyOverlappedIO = true,
             };
         }

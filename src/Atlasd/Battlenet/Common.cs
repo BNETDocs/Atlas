@@ -111,6 +111,8 @@ namespace Atlasd.Battlenet
             PingTimer = new Timer(ProcessPingTimer, PingTimerState, 100, 100);
 
             ScheduledShutdown = new ShutdownEvent(null, DateTime.MinValue, null);
+
+            Daemon.Common.TcpNoDelay = Settings.GetBoolean(new string[] { "battlenet", "listener", "tcp_nodelay" }, true);
         }
 
         public static void InitializeAds()

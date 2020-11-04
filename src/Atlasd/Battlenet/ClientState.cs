@@ -111,7 +111,7 @@ namespace Atlasd.Battlenet
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, "TCP connection established");
 
-            client.NoDelay = true;
+            client.NoDelay = Daemon.Common.TcpNoDelay;
             client.ReceiveTimeout = 500;
             client.SendTimeout = 500;
 

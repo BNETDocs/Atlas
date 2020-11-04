@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
 
 namespace Atlasd.Daemon
 {
     class Common
     {
+        public static bool TcpNoDelay = true;
+
         public static bool TryToUInt32FromString(string value, out uint number, uint defaultNumber = 0)
         {
             string v = value;
