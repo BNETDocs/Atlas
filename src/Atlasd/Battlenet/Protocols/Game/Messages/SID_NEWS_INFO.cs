@@ -62,14 +62,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var account = context.Client.GameState.ActiveAccount;
                         var lastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
 
-                        var newsStr = "";
                         var newsGreeting = Channel.GetServerStats(context.Client);
                         var newsTimestamp = DateTime.Now;
 
-                        foreach (var chatEvent in newsGreeting)
-                            newsStr += chatEvent.Text + Environment.NewLine;
-
-                        Buffer = new byte[18 + Encoding.UTF8.GetByteCount(newsStr)];
+                        Buffer = new byte[18 + Encoding.UTF8.GetByteCount(newsGreeting)];
 
                         var m = new MemoryStream(Buffer);
                         var w = new BinaryWriter(m);
@@ -79,7 +75,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write((UInt32)(newsTimestamp.ToFileTimeUtc() >> 32));
                         w.Write((UInt32)(newsTimestamp.ToFileTimeUtc() >> 32));
                         w.Write((UInt32)(newsTimestamp.ToFileTimeUtc() >> 32));
-                        w.Write((string)newsStr);
+                        w.Write(Encoding.UTF8.GetBytes(newsGreeting));
+                        w.Write((byte)0);
 
                         w.Close();
                         m.Close();

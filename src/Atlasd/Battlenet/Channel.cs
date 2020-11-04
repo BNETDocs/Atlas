@@ -600,29 +600,26 @@ namespace Atlasd.Battlenet
 
         public static void WriteServerStats(ClientState receiver)
         {
-            var chatEvents = GetServerStats(receiver);
+            var serverStats = GetServerStats(receiver);
 
-            foreach (var chatEvent in chatEvents)
-                chatEvent.WriteTo(receiver);
+            foreach (var line in serverStats.Split(Environment.NewLine))
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, receiver.GameState.ActiveChannel.ActiveFlags, 0, receiver.GameState.ActiveChannel.Name, line).WriteTo(receiver);
         }
 
-        public static List<ChatEvent> GetServerStats(ClientState receiver)
+        public static string GetServerStats(ClientState receiver)
         {
-            var chatEvents = new List<ChatEvent>();
-
-            if (receiver == null || receiver.GameState == null || receiver.GameState.ActiveChannel == null)
-                return chatEvents;
+            if (receiver == null || receiver.GameState == null || receiver.GameState.ActiveChannel == null) return "";
 
             var channel = receiver.GameState.ActiveChannel;
-
-            var strGame = Product.ProductName(receiver.GameState.Product, true);
             var numGameOnline = Common.GetActiveClientCountByProduct(receiver.GameState.Product);
             var numGameAdvertisements = 0;
             var numTotalOnline = Common.ActiveClientStates.Count;
             var numTotalAdvertisements = 0;
+            var strGame = Product.ProductName(receiver.GameState.Product, true);
 
             var str = Resources.ChannelFirstJoinGreeting;
 
+            str = str.Replace("{channel}", channel.Name);
             str = str.Replace("{host}", "BNETDocs");
             str = str.Replace("{game}", strGame);
             str = str.Replace("{gameUsers}", numGameOnline.ToString("#,0"));
@@ -631,10 +628,7 @@ namespace Atlasd.Battlenet
             str = str.Replace("{totalUsers}", numTotalOnline.ToString("#,0"));
             str = str.Replace("{totalGameAds}", numTotalAdvertisements.ToString("#,0"));
 
-            foreach (var line in str.Split(Environment.NewLine))
-                chatEvents.Add(new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, line));
-
-            return chatEvents;
+            return str;
         }
     }
 }
