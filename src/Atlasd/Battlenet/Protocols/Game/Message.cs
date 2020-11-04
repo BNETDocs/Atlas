@@ -29,6 +29,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             return ((MessageIds)id) switch
             {
                 MessageIds.SID_NULL => new Messages.SID_NULL(buffer),
+                MessageIds.SID_STOPADV => new Messages.SID_STOPADV(buffer),
                 MessageIds.SID_CLIENTID => new Messages.SID_CLIENTID(buffer),
                 MessageIds.SID_STARTVERSIONING => new Messages.SID_STARTVERSIONING(buffer),
                 MessageIds.SID_REPORTVERSION => new Messages.SID_REPORTVERSION(buffer),

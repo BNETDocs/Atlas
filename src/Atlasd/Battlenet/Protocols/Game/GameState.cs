@@ -148,17 +148,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             }
 
             // Remove this GameAd
-            if (GameAd != null)
-            {
-                if (Battlenet.Common.ActiveGameAds.TryRemove(GameAd.Name, out var removedGameAd))
-                {
-                    if (removedGameAd != GameAd)
-                    {
-                        // Hrm...
-                        Battlenet.Common.ActiveGameAds.TryAdd(GameAd.Name, GameAd);
-                    }
-                }
-            }
+            StopGameAd();
 
             // Remove this GameState from the NullTimer and PingTimer
             lock (Battlenet.Common.NullTimerState) Battlenet.Common.NullTimerState.Remove(this);
@@ -317,6 +307,20 @@ namespace Atlasd.Battlenet.Protocols.Game
                 if (!(ex is ArgumentOutOfRangeException || ex is CultureNotFoundException)) throw;
 
                 Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, Client.RemoteEndPoint, $"Error setting client locale to [{localeId}], using default");
+            }
+        }
+
+        public void StopGameAd()
+        {
+            if (GameAd == null) return;
+
+            if (Battlenet.Common.ActiveGameAds.TryRemove(GameAd.Name, out var removedGameAd))
+            {
+                if (removedGameAd != GameAd)
+                {
+                    // Hrm...
+                    Battlenet.Common.ActiveGameAds.TryAdd(GameAd.Name, GameAd);
+                }
             }
         }
     }

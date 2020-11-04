@@ -42,6 +42,9 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (Buffer.Length < 23)
                             throw new GameProtocolViolationException(context.Client, "SID_STARTADVEX2 buffer must be at least 23 bytes");
 
+                        if (context.Client.GameState.ActiveAccount == null)
+                            throw new GameProtocolViolationException(context.Client, "SID_STARTADVEX2 was received before logon");
+
                         using var m = new MemoryStream(Buffer);
                         using var r = new BinaryReader(m);
 
