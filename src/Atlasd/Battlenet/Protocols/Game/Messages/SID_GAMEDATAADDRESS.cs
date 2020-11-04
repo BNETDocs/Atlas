@@ -2,6 +2,7 @@
 using Atlasd.Daemon;
 using System;
 using System.IO;
+using System.Net;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -30,17 +31,17 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length != 16)
                 throw new GameProtocolViolationException(context.Client, "SID_GAMEDATAADDRESS buffer must be 16 bytes");
 
-            var m = new MemoryStream(Buffer);
-            var r = new BinaryReader(m);
+            using var m = new MemoryStream(Buffer);
+            using var r = new BinaryReader(m);
 
             var unknown0 = r.ReadUInt16();
             var port     = r.ReadUInt16();
-            var address  = r.ReadUInt32();
+            var address  = r.ReadBytes(4);
             var unknown1 = r.ReadUInt32();
             var unknown2 = r.ReadUInt32();
 
-            r.Close();
-            m.Close();
+            context.Client.GameState.GameDataAddress = new IPAddress(address);
+            context.Client.GameState.GameDataPort = port;
 
             context.Client.Send(ToByteArray(context.Client.ProtocolType));
             return true;

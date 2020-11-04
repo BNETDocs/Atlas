@@ -29,6 +29,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public Account.Flags ChannelFlags;
         public DateTime ConnectedTimestamp;
         public GameAd GameAd;
+        public IPAddress GameDataAddress;
         public List<GameKey> GameKeys;
         public DateTime LastLogon;
         public DateTime LastNull;
@@ -46,6 +47,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public string Away;
         public string DoNotDisturb;
         public UInt32 ClientToken;
+        public ushort GameDataPort;
         public string KeyOwner;
         public string OnlineName;
         public Int32 Ping;
@@ -70,6 +72,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             ChannelFlags = Account.Flags.None;
             ConnectedTimestamp = DateTime.Now;
             GameAd = null;
+            GameDataAddress = null;
             GameKeys = new List<GameKey>();
             LastLogon = DateTime.Now;
             LastNull = DateTime.Now;
@@ -86,6 +89,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             Away = null;
             DoNotDisturb = null;
             ClientToken = 0;
+            GameDataPort = 0;
             KeyOwner = null;
             OnlineName = null;
             Ping = -1;
