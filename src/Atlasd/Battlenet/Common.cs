@@ -35,7 +35,7 @@ namespace Atlasd.Battlenet
         public static List<Advertisement> ActiveAds;
         public static Dictionary<string, Channel> ActiveChannels;
         public static List<ClientState> ActiveClientStates;
-        public static ConcurrentBag<GameAd> ActiveGameAds;
+        public static ConcurrentDictionary<byte[], GameAd> ActiveGameAds;
         public static Dictionary<string, GameState> ActiveGameStates;
         public static IPAddress DefaultAddress { get; private set; }
         public static int DefaultPort { get; private set; }
@@ -94,7 +94,7 @@ namespace Atlasd.Battlenet
             ActiveAccounts = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClientStates = new List<ClientState>();
-            ActiveGameAds = new ConcurrentBag<GameAd>();
+            ActiveGameAds = new ConcurrentDictionary<byte[], GameAd>();
             ActiveGameStates = new Dictionary<string, GameState>(StringComparer.OrdinalIgnoreCase);
 
             InitializeAds();

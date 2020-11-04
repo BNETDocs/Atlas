@@ -28,6 +28,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public Channel ActiveChannel;
         public Account.Flags ChannelFlags;
         public DateTime ConnectedTimestamp;
+        public GameAd GameAd;
         public List<GameKey> GameKeys;
         public DateTime LastLogon;
         public DateTime LastNull;
@@ -68,6 +69,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             ActiveChannel = null;
             ChannelFlags = Account.Flags.None;
             ConnectedTimestamp = DateTime.Now;
+            GameAd = null;
             GameKeys = new List<GameKey>();
             LastLogon = DateTime.Now;
             LastNull = DateTime.Now;
@@ -142,6 +144,19 @@ namespace Atlasd.Battlenet.Protocols.Game
                     var username = (string)ActiveAccount.Get(Account.UsernameKey);
                     if (Battlenet.Common.ActiveAccounts.ContainsKey(username))
                         Battlenet.Common.ActiveAccounts.Remove(username);
+                }
+            }
+
+            // Remove this GameAd
+            if (GameAd != null)
+            {
+                if (Battlenet.Common.ActiveGameAds.TryRemove(GameAd.Name, out var removedGameAd))
+                {
+                    if (removedGameAd != GameAd)
+                    {
+                        // Hrm...
+                        Battlenet.Common.ActiveGameAds.TryAdd(GameAd.Name, GameAd);
+                    }
                 }
             }
 
@@ -269,16 +284,21 @@ namespace Atlasd.Battlenet.Protocols.Game
                         w.Write(clanTag);
                     }
                 }
-
-                Statstring = new byte[(int)w.BaseStream.Position];
-                Buffer.BlockCopy(buf, 0, Statstring, 0, (int)w.BaseStream.Position);
             }
             finally
             {
-                if (w != null) w.Close();
-                if (m != null) m.Close();
+                if (w == null)
+                {
+                    Statstring = buf;
+                }
+                else
+                {
+                    Statstring = new byte[(int)w.BaseStream.Position];
+                    Buffer.BlockCopy(buf, 0, Statstring, 0, (int)w.BaseStream.Position);
+                    w.Close();
+                }
 
-                Statstring = buf;
+                if (m != null) m.Close();
             }
         }
 

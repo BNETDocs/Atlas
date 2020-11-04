@@ -51,18 +51,18 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var subGameType = r.ReadUInt16();
                         var viewingFilter = r.ReadUInt32();
                         var reserved = r.ReadUInt32();
-                        var gameName = r.ReadString();
-                        var gamePassword = r.ReadString();
-                        var gameStatstring = r.ReadString();
+                        var gameName = r.ReadByteString();
+                        var gamePassword = r.ReadByteString();
+                        var gameStatstring = r.ReadByteString();
 
                         var gameAds = Battlenet.Common.ActiveGameAds.ToArray();
                         GameAd gameAd = null;
 
-                        foreach (var _g in gameAds)
+                        foreach (var _pair in gameAds)
                         {
-                            if (_g.Client == context.Client.GameState)
+                            if (_pair.Value.Client == context.Client.GameState)
                             {
-                                gameAd = _g;
+                                gameAd = _pair.Value;
                                 break;
                             }
                         }
@@ -70,7 +70,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (gameAd == null)
                         {
                             gameAd = new GameAd(context.Client.GameState, gameName, gamePassword, gameStatstring, 6112, (GameAd.GameTypes)gameType, context.Client.GameState.Version.VersionByte);
-                            Battlenet.Common.ActiveGameAds.Add(gameAd);
+                            context.Client.GameState.GameAd = gameAd;
+                            Battlenet.Common.ActiveGameAds.TryAdd(gameName, gameAd);
                         }
 
                         gameAd.SetActiveStateFlags((GameAd.StateFlags)gameState);

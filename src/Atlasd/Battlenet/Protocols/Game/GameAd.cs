@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game
 {
@@ -55,11 +53,11 @@ namespace Atlasd.Battlenet.Protocols.Game
         public UInt32 GamePort { get; private set; }
         public GameTypes GameType { get; private set; }
         public UInt32 GameVersion { get; private set; }
-        public string Name { get; private set; }
-        public string Password { get; private set; }
-        public string Statstring { get; private set; }
+        public byte[] Name { get; private set; }
+        public byte[] Password { get; private set; }
+        public byte[] Statstring { get; private set; }
 
-        public GameAd(GameState client, string name, string password, string statstring, UInt32 gamePort, GameTypes gameType, UInt32 gameVersion)
+        public GameAd(GameState client, byte[] name, byte[] password, byte[] statstring, UInt32 gamePort, GameTypes gameType, UInt32 gameVersion)
         {
             ActiveStateFlags = StateFlags.None;
             Client = client;
@@ -92,12 +90,12 @@ namespace Atlasd.Battlenet.Protocols.Game
             GameVersion = newGameVersion;
         }
 
-        public void SetName(string newName)
+        public void SetName(byte[] newName)
         {
             Name = newName;
         }
 
-        public void SetPassword(string newPassword)
+        public void SetPassword(byte[] newPassword)
         {
             Password = newPassword;
         }
@@ -107,7 +105,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             GamePort = newPort;
         }
 
-        public void SetStatstring(string newStatstring)
+        public void SetStatstring(byte[] newStatstring)
         {
             Statstring = newStatstring;
         }
