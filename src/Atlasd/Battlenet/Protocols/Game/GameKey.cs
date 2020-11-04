@@ -107,6 +107,22 @@ namespace Atlasd.Battlenet.Protocols.Game
             };
         }
 
+        public static uint RequiredKeyCount(Product.ProductCode code)
+        {
+            return code switch
+            {
+                Product.ProductCode.DiabloII => 1,
+                Product.ProductCode.DiabloIILordOfDestruction => 2,
+                Product.ProductCode.StarcraftBroodwar => 1,
+                Product.ProductCode.StarcraftJapanese => 1,
+                Product.ProductCode.StarcraftOriginal => 1,
+                Product.ProductCode.WarcraftIIBNE => 1,
+                Product.ProductCode.WarcraftIIIFrozenThrone => 2,
+                Product.ProductCode.WarcraftIIIReignOfChaos => 1,
+                _ => 0,
+            };
+        }
+
         public void SetPrivateValue(byte[] privateValue)
         {
             if (!(privateValue.Length == 4 || privateValue.Length == 20))
