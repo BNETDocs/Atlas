@@ -15,6 +15,46 @@ namespace Atlasd.Daemon
         public static JsonDocument State { get; private set; }
         public static string Path { get; private set; } = null;
 
+        public static bool CanRead()
+        {
+            FileInfo fileinfo;
+            try
+            {
+                fileinfo = new FileInfo(Path);
+
+                if (fileinfo == null)
+                {
+                    Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Configuration file [{Path}] returned null FileInfo object; check filesystem");
+                    return false;
+                }
+
+                if (!fileinfo.Exists)
+                {
+                    Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Configuration file [{Path}] does not exist; check file");
+                    return false;
+                }
+
+                if (fileinfo.Attributes.HasFlag(FileAttributes.Directory))
+                {
+                    Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Configuration file [{Path}] points to a directory; check path string");
+                    return false;
+                }
+
+                if (fileinfo.Length == 0)
+                {
+                    Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Configuration file [{Path}] is empty; check file");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is UnauthorizedAccessException || ex is PathTooLongException)) throw;
+                return false;
+            }
+        }
+
         public static bool GetBoolean(string[] keyPath, bool defaultValue)
         {
             try
@@ -219,6 +259,11 @@ namespace Atlasd.Daemon
         public static void Load()
         {
             Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, $"Loading configuration from [{Path}]");
+
+            if (!CanRead())
+            {
+                throw new InvalidOperationException();
+            }
 
             try
             {
