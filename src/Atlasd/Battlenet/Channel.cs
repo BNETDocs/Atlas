@@ -131,7 +131,7 @@ namespace Atlasd.Battlenet
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, Resources.ChannelIsChatRestricted).WriteTo(user.Client);
             }
 
-            var topic = RenderTopic(user).Split("\n");
+            var topic = RenderTopic(user).Split(Environment.NewLine);
             foreach (var line in topic)
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line).WriteTo(user.Client);
 
@@ -596,39 +596,6 @@ namespace Atlasd.Battlenet
                     user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
                 }
             }
-        }
-
-        public static void WriteServerStats(ClientState receiver)
-        {
-            var serverStats = GetServerStats(receiver);
-
-            foreach (var line in serverStats.Split(Environment.NewLine))
-                new ChatEvent(ChatEvent.EventIds.EID_INFO, receiver.GameState.ActiveChannel.ActiveFlags, 0, receiver.GameState.ActiveChannel.Name, line).WriteTo(receiver);
-        }
-
-        public static string GetServerStats(ClientState receiver)
-        {
-            if (receiver == null || receiver.GameState == null || receiver.GameState.ActiveChannel == null) return "";
-
-            var channel = receiver.GameState.ActiveChannel;
-            var numGameOnline = Common.GetActiveClientCountByProduct(receiver.GameState.Product);
-            var numGameAdvertisements = 0;
-            var numTotalOnline = Common.ActiveClientStates.Count;
-            var numTotalAdvertisements = 0;
-            var strGame = Product.ProductName(receiver.GameState.Product, true);
-
-            var str = Resources.ChannelFirstJoinGreeting;
-
-            str = str.Replace("{channel}", channel.Name);
-            str = str.Replace("{host}", "BNETDocs");
-            str = str.Replace("{game}", strGame);
-            str = str.Replace("{gameUsers}", numGameOnline.ToString("#,0"));
-            str = str.Replace("{gameAds}", numGameAdvertisements.ToString("#,0"));
-            str = str.Replace("{realm}", "Battle.net");
-            str = str.Replace("{totalUsers}", numTotalOnline.ToString("#,0"));
-            str = str.Replace("{totalGameAds}", numTotalAdvertisements.ToString("#,0"));
-
-            return str;
         }
     }
 }

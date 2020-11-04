@@ -222,7 +222,7 @@ namespace Atlasd.Localization {
         /// <summary>
         ///   Looks up a localized string similar to Welcome to {realm}!
         ///This server is hosted by {host}.
-        ///There are currently {gameUsers} users playing {gameAds} games of {game}, and {totalUsers} users playing {totalGameAds} games on {realm}..
+        ///{serverStats}.
         /// </summary>
         public static string ChannelFirstJoinGreeting {
             get {
@@ -505,6 +505,15 @@ namespace Atlasd.Localization {
         public static string ServerShutdownScheduledWithMessage {
             get {
                 return ResourceManager.GetString("ServerShutdownScheduledWithMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are currently {gameUsers} users playing {gameAds} games of {game}, and {totalUsers} users playing {totalGameAds} games on {realm}..
+        /// </summary>
+        public static string ServerStatistics {
+            get {
+                return ResourceManager.GetString("ServerStatistics", resourceCulture);
             }
         }
         

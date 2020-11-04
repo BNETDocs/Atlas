@@ -49,6 +49,42 @@ namespace Atlasd.Battlenet
         public static List<GameState> PingTimerState { get; private set; }
         public static ShutdownEvent ScheduledShutdown { get; private set; }
 
+        public static string GetServerGreeting(ClientState receiver)
+        {
+            var r = Resources.ChannelFirstJoinGreeting;
+
+            r = r.Replace("{host}", "BNETDocs");
+            r = r.Replace("{serverStats}", GetServerStats(receiver));
+            r = r.Replace("{realm}", "Battle.net");
+
+            return r;
+        }
+
+        public static string GetServerStats(ClientState receiver)
+        {
+            if (receiver == null || receiver.GameState == null || receiver.GameState.ActiveChannel == null) return "";
+
+            var channel = receiver.GameState.ActiveChannel;
+            var numGameOnline = Common.GetActiveClientCountByProduct(receiver.GameState.Product);
+            var numGameAdvertisements = 0;
+            var numTotalOnline = Common.ActiveClientStates.Count;
+            var numTotalAdvertisements = 0;
+            var strGame = Product.ProductName(receiver.GameState.Product, true);
+
+            var r = Resources.ServerStatistics;
+
+            r = r.Replace("{channel}", channel.Name);
+            r = r.Replace("{host}", "BNETDocs");
+            r = r.Replace("{game}", strGame);
+            r = r.Replace("{gameUsers}", numGameOnline.ToString("#,0"));
+            r = r.Replace("{gameAds}", numGameAdvertisements.ToString("#,0"));
+            r = r.Replace("{realm}", "Battle.net");
+            r = r.Replace("{totalUsers}", numTotalOnline.ToString("#,0"));
+            r = r.Replace("{totalGameAds}", numTotalAdvertisements.ToString("#,0"));
+
+            return r;
+        }
+
         public static void Initialize()
         {
             Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, "Initializing Battle.net common state");

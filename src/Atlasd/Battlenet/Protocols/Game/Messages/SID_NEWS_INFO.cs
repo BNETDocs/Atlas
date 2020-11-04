@@ -1,5 +1,6 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
+using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -62,7 +63,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var account = context.Client.GameState.ActiveAccount;
                         var lastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
 
-                        var newsGreeting = Channel.GetServerStats(context.Client);
+                        var newsGreeting = Battlenet.Common.GetServerGreeting(context.Client);
                         var newsTimestamp = DateTime.Now;
 
                         Buffer = new byte[18 + Encoding.UTF8.GetByteCount(newsGreeting)];

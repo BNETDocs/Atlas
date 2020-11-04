@@ -177,7 +177,7 @@ Example: 0x10 = 16 decimal</value>
   <data name="ChannelFirstJoinGreeting" xml:space="preserve">
     <value>Welcome to {realm}!
 This server is hosted by {host}.
-There are currently {gameUsers} users playing {gameAds} games of {game}, and {totalUsers} users playing {totalGameAds} games on {realm}.</value>
+{serverStats}</value>
   </data>
   <data name="ChannelIsChatRestricted" xml:space="preserve">
     <value>This channel does not have chat privileges.</value>
@@ -288,6 +288,9 @@ Displays the current {realm} Time ({realmTimezone}).</value>
   </data>
   <data name="ServerShutdownScheduledWithMessage" xml:space="preserve">
     <value>A server shutdown has been scheduled in {period} ({message}).</value>
+  </data>
+  <data name="ServerStatistics" xml:space="preserve">
+    <value>There are currently {gameUsers} users playing {gameAds} games of {game}, and {totalUsers} users playing {totalGameAds} games on {realm}.</value>
   </data>
   <data name="TheVoid" xml:space="preserve">
     <value>The Void</value>

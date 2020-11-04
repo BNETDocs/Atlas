@@ -128,13 +128,19 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     return false;
                 }
 
-                Channel.WriteServerStats(context.Client);
+                var serverGreeting = Battlenet.Common.GetServerGreeting(context.Client).Split(Environment.NewLine);
+
+                // Welcome to Battle.net!
+                foreach (var line in serverGreeting)
+                    new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, line).WriteTo(context.Client);
 
                 if (Product.IsChatRestricted(userGame))
+                {
                     new ChatEvent(ChatEvent.EventIds.EID_ERROR, activeUserFlags, activeUserPing, onlineName, Resources.GameProductIsChatRestricted).WriteTo(context.Client);
+                }
 
-                var lastLogonTimestamp = lastLogon.ToString(Common.HumanDateTimeFormat);
-                new ChatEvent(ChatEvent.EventIds.EID_INFO, activeUserFlags, activeUserPing, onlineName, Resources.LastLogonInfo.Replace("{timestamp}", lastLogonTimestamp)).WriteTo(context.Client);
+                // Send EID_INFO "Last logon: ..."
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, activeUserFlags, activeUserPing, onlineName, Resources.LastLogonInfo.Replace("{timestamp}", lastLogon.ToString(Common.HumanDateTimeFormat))).WriteTo(context.Client);
 
                 var failedLogins = (UInt32)0;
                 if (account.ContainsKey(Account.FailedLogonsKey)) failedLogins = (UInt32)account.Get(Account.FailedLogonsKey);
