@@ -259,7 +259,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                      */
 
                     //var iconCode = ActiveAccount.Get("System\\Icon", product);
-                    var iconCode = Encoding.ASCII.GetBytes("1O3W");
+                    var iconCode = Encoding.ASCII.GetBytes("0R3W");
                     var ladderLevel = (uint)0;
                     var clanTag = (byte[])ActiveAccount.Get("System\\Clan", new byte[] { 0, 0, 0, 0 });
 
