@@ -56,8 +56,9 @@ namespace Atlasd.Battlenet.Protocols.Game
         public byte[] Name { get; private set; }
         public byte[] Password { get; private set; }
         public byte[] Statstring { get; private set; }
+        public ushort SubGameType { get; private set; }
 
-        public GameAd(GameState client, byte[] name, byte[] password, byte[] statstring, UInt32 gamePort, GameTypes gameType, UInt32 gameVersion)
+        public GameAd(GameState client, byte[] name, byte[] password, byte[] statstring, UInt32 gamePort, GameTypes gameType, ushort subGameType, UInt32 gameVersion)
         {
             ActiveStateFlags = StateFlags.None;
             Client = client;
@@ -68,6 +69,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             Name = name;
             Password = password;
             Statstring = statstring;
+            SubGameType = subGameType;
         }
 
         public void SetActiveStateFlags(StateFlags newFlags)
@@ -108,6 +110,11 @@ namespace Atlasd.Battlenet.Protocols.Game
         public void SetStatstring(byte[] newStatstring)
         {
             Statstring = newStatstring;
+        }
+
+        public void SetSubGameType(byte newSubGameType)
+        {
+            SubGameType = newSubGameType;
         }
     };
 }

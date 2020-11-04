@@ -1,6 +1,7 @@
 using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -50,11 +51,36 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var viewingFilter = r.ReadUInt32();
                         var reserved = r.ReadUInt32();
                         var numberOfGames = r.ReadUInt32();
-                        var gameName = r.ReadString();
-                        var gamePassword = r.ReadString();
-                        var gameStatstring = r.ReadString();
+                        var gameName = r.ReadByteString();
+                        var gamePassword = r.ReadByteString();
+                        var gameStatstring = r.ReadByteString();
 
-                        return true;
+                        var gameAds = new List<GameAd>();
+
+                        foreach (var _pair in Battlenet.Common.ActiveGameAds)
+                        {
+                            var _ad = _pair.Value;
+
+                            if (_ad.Client == null) continue;
+                            if (_ad.Client.Product != context.Client.GameState.Product) continue;
+
+                            if (viewingFilter == 0xFFFF || viewingFilter == 0x30)
+                            {
+                                if (gameType != 0 && gameType != (ushort)_ad.GameType) continue;
+                                if (subGameType != 0 && subGameType != _ad.SubGameType) continue;
+                            }
+                            else if (viewingFilter == 0xFF80) { }
+                            else
+                            {
+                                continue;
+                            }
+
+                            gameAds.Add(_ad);
+                        }
+
+                        return new SID_GETADVLISTEX().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){
+                            { "gameAds", gameAds }
+                        }));
                     }
                 case MessageDirection.ServerToClient:
                     {
@@ -79,6 +105,16 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          *       (STRING) Game password
                          *       (STRING) Game statstring
                          */
+
+                        var gameAds = (List<GameAd>)context.Arguments["gameAds"];
+                        var size = (ulong)0;
+
+                        foreach (var gameAd in gameAds)
+                        {
+                            size += 35 + (ulong)gameAd.Name.Length + (ulong)gameAd.Password.Length + (ulong)gameAd.Statstring.Length;
+                        }
+
+                        // TODO
 
                         Buffer = new byte[8];
 
