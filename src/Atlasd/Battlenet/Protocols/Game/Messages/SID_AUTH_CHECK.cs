@@ -91,15 +91,19 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             if (unknownValue != 0)
                                 throw new GameProtocolViolationException(context.Client, "Invalid game key unknown value");
 
+                            GameKey gameKey = null;
                             try
                             {
-                                var gameKey = new GameKey(keyLength, productValue, publicValue, hashedKeyData);
-                                context.Client.GameState.GameKeys.Add(gameKey);
+                                gameKey = new GameKey(keyLength, productValue, publicValue, hashedKeyData);
                             }
                             catch (GameProtocolViolationException)
                             {
                                 Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "Received invalid game key");
-                                return false;
+                                gameKey = null;
+                            }
+                            finally
+                            {
+                                context.Client.GameState.GameKeys.Add(gameKey);
                             }
                         }
 
@@ -113,7 +117,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (context.Client.GameState.GameKeys.Count < requiredKeyCount)
                         {
                             // Incorrect number of keys
-                            status = Statuses.GameKeyInvalid;
+                            status = Statuses.GameKeyProductMismatch;
                             if (context.Client.GameState.GameKeys.Count >= 1)
                                 status |= Statuses.GameKeyExpansion;
                         }

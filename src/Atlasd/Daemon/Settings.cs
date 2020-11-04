@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,6 +53,25 @@ namespace Atlasd.Daemon
             {
                 if (!(ex is ArgumentNullException || ex is UnauthorizedAccessException || ex is PathTooLongException)) throw;
                 return false;
+            }
+        }
+
+        public static JsonElement.ArrayEnumerator GetArray(string[] keyPath)
+        {
+            try
+            {
+                var json = State.RootElement;
+                for (var i = 0; i < keyPath.Length; i++)
+                {
+                    json.TryGetProperty(keyPath[i], out json);
+                }
+                return json.EnumerateArray();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not an array; check value");
+                return new JsonElement.ArrayEnumerator();
             }
         }
 

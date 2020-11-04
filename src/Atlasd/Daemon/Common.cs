@@ -6,6 +6,16 @@ namespace Atlasd.Daemon
     {
         public static bool TcpNoDelay = true;
 
+        /**
+         * <seealso cref="https://stackoverflow.com/a/228060/2367146"/>
+         */
+        public static string ReverseString(string s)
+        {
+            char[] charArray = s.ToCharArray();
+            Array.Reverse(charArray);
+            return new string(charArray);
+        }
+
         public static bool TryToUInt32FromString(string value, out uint number, uint defaultNumber = 0)
         {
             string v = value;

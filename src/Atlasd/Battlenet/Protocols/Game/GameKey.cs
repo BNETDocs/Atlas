@@ -1,5 +1,9 @@
 ﻿using Atlasd.Battlenet.Exceptions;
+using Atlasd.Daemon;
 using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game
 {
@@ -109,18 +113,25 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public static uint RequiredKeyCount(Product.ProductCode code)
         {
-            return code switch
+            var buf = new byte[4];
+            using var m = new MemoryStream(buf);
+            using var w = new BinaryWriter(m);
+            w.Write((uint)code);
+            var productStr = Daemon.Common.ReverseString(Encoding.UTF8.GetString(buf));
+
+            try
             {
-                Product.ProductCode.DiabloII => 1,
-                Product.ProductCode.DiabloIILordOfDestruction => 2,
-                Product.ProductCode.StarcraftBroodwar => 1,
-                Product.ProductCode.StarcraftJapanese => 1,
-                Product.ProductCode.StarcraftOriginal => 1,
-                Product.ProductCode.WarcraftIIBNE => 1,
-                Product.ProductCode.WarcraftIIIFrozenThrone => 2,
-                Product.ProductCode.WarcraftIIIReignOfChaos => 1,
-                _ => 0,
-            };
+                Settings.State.RootElement.TryGetProperty("battlenet", out var battlenetJson);
+                battlenetJson.TryGetProperty("emulation", out var emulationJson);
+                emulationJson.TryGetProperty("required_game_key_count", out var requiredGameKeyCountJson);
+                requiredGameKeyCountJson.TryGetProperty(productStr, out var productJson);
+                return productJson.GetUInt32();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                return 0;
+            }
         }
 
         public void SetPrivateValue(byte[] privateValue)
