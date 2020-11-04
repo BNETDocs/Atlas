@@ -21,7 +21,7 @@ namespace Atlasd.Battlenet
             StarcraftOriginal = 0x53544152, // STAR
             StarcraftShareware = 0x53534852, // SSHR
 
-            WarcraftII = 0x5732424E, // W2BN
+            WarcraftIIBNE = 0x5732424E, // W2BN
             WarcraftIIIDemo = 0x5733444D, // W3DM
             WarcraftIIIFrozenThrone = 0x57335850, // W3XP
             WarcraftIIIReignOfChaos = 0x57415233, // WAR3
@@ -38,6 +38,11 @@ namespace Atlasd.Battlenet
                 ProductCode.WarcraftIIIDemo => true,
                 _ => false,
             };
+        }
+
+        public static bool IsChat(ProductCode code)
+        {
+            return code == ProductCode.Chat;
         }
 
         public static bool IsDiablo(ProductCode code)
@@ -60,6 +65,18 @@ namespace Atlasd.Battlenet
             };
         }
 
+        public static bool IsStarcraft(ProductCode code)
+        {
+            return code switch
+            {
+                ProductCode.StarcraftBroodwar => true,
+                ProductCode.StarcraftJapanese => true,
+                ProductCode.StarcraftOriginal => true,
+                ProductCode.StarcraftShareware => true,
+                _ => false,
+            };
+        }
+
         public static bool IsUDPSupported(ProductCode code)
         {
             return code switch
@@ -70,9 +87,14 @@ namespace Atlasd.Battlenet
                 ProductCode.StarcraftJapanese => true,
                 ProductCode.StarcraftOriginal => true,
                 ProductCode.StarcraftShareware => true,
-                ProductCode.WarcraftII => true,
+                ProductCode.WarcraftIIBNE => true,
                 _ => false,
             };
+        }
+
+        public static bool IsWarcraftII(ProductCode code)
+        {
+            return code == ProductCode.WarcraftIIBNE;
         }
 
         public static bool IsWarcraftIII(ProductCode code)
@@ -100,7 +122,7 @@ namespace Atlasd.Battlenet
                 ProductCode.StarcraftJapanese         => "Starcraft Japanese",
                 ProductCode.StarcraftOriginal         => "Starcraft Original",
                 ProductCode.StarcraftShareware        => "Starcraft Shareware",
-                ProductCode.WarcraftII                => "Warcraft II" + (extended ? " Battle.net Edition" : " BNE"),
+                ProductCode.WarcraftIIBNE                => "Warcraft II" + (extended ? " Battle.net Edition" : " BNE"),
                 ProductCode.WarcraftIIIDemo           => "Warcraft III Demo",
                 ProductCode.WarcraftIIIFrozenThrone   => "Warcraft III" + (extended ? " The Frozen Throne" : " TFT"),
                 ProductCode.WarcraftIIIReignOfChaos   => "Warcraft III" + (extended ? " Reign of Chaos" : " RoC"),
@@ -121,7 +143,7 @@ namespace Atlasd.Battlenet
                 ProductCode.StarcraftJapanese => "StarCraft",
                 ProductCode.StarcraftOriginal => "StarCraft",
                 ProductCode.StarcraftShareware => "StarCraft Shareware",
-                ProductCode.WarcraftII => "WarCraft II",
+                ProductCode.WarcraftIIBNE => "WarCraft II",
                 ProductCode.WarcraftIIIDemo => "WarCraft III",
                 ProductCode.WarcraftIIIFrozenThrone => "Frozen Throne",
                 ProductCode.WarcraftIIIReignOfChaos => "WarCraft III",
@@ -162,7 +184,7 @@ namespace Atlasd.Battlenet
                     return ProductCode.StarcraftShareware;
                 case "W2BN":
                 case "NB2W":
-                    return ProductCode.WarcraftII;
+                    return ProductCode.WarcraftIIBNE;
                 case "W3DM":
                 case "MD3W":
                     return ProductCode.WarcraftIIIDemo;

@@ -48,36 +48,48 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         using var r = new BinaryReader(m);
 
                         var username = r.ReadString();
+                        var statstring = r.ReadBytes((int)(r.BaseStream.Length - r.BaseStream.Position - 1));
+
                         if (username.Length > 0 && username.ToLower() != context.Client.GameState.Username.ToLower())
                         {
                             throw new GameProtocolViolationException(context.Client, $"Client tried entering chat with differnet username [{username}] than their account name [{context.Client.GameState.Username}]");
                         }
 
-                        context.Client.GameState.Statstring = Encoding.ASCII.GetBytes(r.ReadString());
-
                         var productId = (UInt32)context.Client.GameState.Product;
 
-                        if (context.Client.GameState.Statstring.Length == 0)
-                        {
-                            context.Client.GameState.Statstring = new byte[4];
+                        // Statstring length is either 0 bytes or 4-128 bytes, not including the null-terminator.
+                        if (statstring.Length != 0 && (statstring.Length < 4 || statstring.Length > 128))
+                            throw new GameProtocolViolationException(context.Client, "Client sent invalid statstring size in SID_ENTERCHAT");
 
-                            using var _m = new MemoryStream(context.Client.GameState.Statstring);
+                        // Add the product id if size = 0
+                        if (statstring.Length == 0)
+                        {
+                            statstring = new byte[4];
+
+                            using var _m = new MemoryStream(statstring);
                             using var _w = new BinaryWriter(_m);
 
                             _w.Write(productId);
                         }
 
-                        // Statstring length is between 4-128 bytes, not including the null-terminator.
-                        if (context.Client.GameState.Statstring.Length < 4 || context.Client.GameState.Statstring.Length > 128)
-                            throw new GameProtocolViolationException(context.Client, "Client sent invalid statstring size in SID_ENTERCHAT");
-
-                        if (context.Client.GameState.Statstring.Length >= 4)
+                        // Verify the product matches
+                        if (statstring.Length >= 4)
                         {
-                            using var _m = new MemoryStream(context.Client.GameState.Statstring);
+                            using var _m = new MemoryStream(statstring);
                             using var _r = new BinaryReader(_m);
 
                             if (_r.ReadUInt32() != productId)
                                 throw new GameProtocolViolationException(context.Client, "Client attempted to set different product id in statstring");
+                        }
+
+                        // Use their statstring if Diablo
+                        if (Product.IsDiablo(context.Client.GameState.Product))
+                        {
+                            context.Client.GameState.Statstring = statstring;
+                        }
+                        else
+                        {
+                            context.Client.GameState.GenerateStatstring();
                         }
 
                         return new SID_ENTERCHAT().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));

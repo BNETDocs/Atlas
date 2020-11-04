@@ -2,7 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -87,8 +90,8 @@ namespace Atlasd.Battlenet.Protocols.Game
             PingToken = (uint)r.Next(0, 0x7FFFFFFF);
             ProtocolId = 0;
             ServerToken = (uint)r.Next(0, 0x7FFFFFFF);
-            SpawnKey = false;
             Statstring = null;
+            SpawnKey = false;
             TimezoneBias = 0;
             UDPSupported = false;
             UDPToken = (uint)r.Next(0, 0x7FFFFFFF);
@@ -155,6 +158,128 @@ namespace Atlasd.Battlenet.Protocols.Game
             Close(); // call our public cleanup method
 
             IsDisposing = false;
+        }
+
+        public void GenerateStatstring()
+        {
+            byte[] buf = null;
+            MemoryStream m = null;
+            BinaryWriter w = null;
+
+            try
+            {
+                buf = new byte[128];
+                m = new MemoryStream(buf);
+                w = new BinaryWriter(m);
+
+                w.Write((UInt32)Product);
+                var product = new byte[4];
+                Buffer.BlockCopy(buf, 0, product, 0, product.Length);
+                var game = Encoding.UTF8.GetString(product);
+
+                if (Battlenet.Product.IsStarcraft(Product)
+                    || Battlenet.Product.IsWarcraftII(Product))
+                {
+                    /**
+                     * Contain 9 fields that are delimited with spaces.
+                     * Ladder Rating
+                     * Ladder Rank
+                     * Wins
+                     *     The amount of wins in normal games
+                     * Spawned
+                     *     '0': Not spawned
+                     *     '1': Spawned
+                     * League ID
+                     * High Ladder Rating
+                     *     The highest rating that the player has ever achieved
+                     * IronMan Ladder Rating
+                     *     Only applicable to: WarCraft II
+                     * IronMan Ladder Rank
+                     *     Only applicable to: WarCraft II
+                     * Icon Code
+                     *     Only applicable to: StarCraft, StarCraft Japanese, StarCraft: Brood War
+                     *     This value should be searched for in the Icon Code array of each icon in each Battle.net Icon file that is loaded. If a match is found, the client should use this icon when displaying the user. See Icons.bni.
+                     */
+
+                    var ladderRating = (uint)0;
+                    var ladderRank = (uint)0;
+                    var wins = (uint)ActiveAccount.Get($"record\\{game}\\0\\wins", 0);
+                    var leagueId = (uint)ActiveAccount.Get("System\\League", 0);
+                    var highLadderRating = (uint)ActiveAccount.Get($"record\\{game}\\1\\rating", 0);
+                    var ironManLadderRating = (uint)ActiveAccount.Get($"record\\{game}\\3\\rating", 0);
+                    var ironManLadderRank = (uint)ActiveAccount.Get($"record\\{game}\\3\\rank", 0);
+                    var iconCode = (byte[])ActiveAccount.Get("System\\Icon", product);
+
+                    w.Write(' ');
+                    w.Write(Encoding.ASCII.GetBytes(ladderRating.ToString()));
+                    w.Write(' ');
+                    w.Write(Encoding.ASCII.GetBytes(ladderRank.ToString()));
+                    w.Write(' ');
+                    w.Write(Encoding.ASCII.GetBytes(wins.ToString()));
+                    w.Write(' ');
+                    w.Write(SpawnKey ? '1' : '0');
+                    w.Write(' ');
+                    w.Write(Encoding.ASCII.GetBytes(leagueId.ToString()));
+                    w.Write(' ');
+                    w.Write(Encoding.ASCII.GetBytes(highLadderRating.ToString()));
+                    w.Write(' ');
+                    w.Write(Encoding.ASCII.GetBytes(ironManLadderRating.ToString()));
+                    w.Write(' ');
+                    w.Write(Encoding.ASCII.GetBytes(ironManLadderRank.ToString()));
+                    w.Write(' ');
+                    w.Write(iconCode);
+                }
+
+                if (Battlenet.Product.IsWarcraftIII(Product))
+                {
+                    /**
+                     * Contain 2 fields and 1 optional field, all fields are delimited with spaces.
+                     * There is a possibility that there can be 0 fields, meaning that the user was not assigned their stats before joining the channel (often appears with bots who join a channel automatically and not waiting until the user clicks 'Enter Chat').
+                     *
+                     *     Icon Code
+                     *         Format: Level + Tier + "3W" (Special icons may not follow this format)
+                     *             Level: The "win level" of the icon 1 through 5 (6 on TFT). 1 is always peon.
+                     *             Tier: The race tier of the icon
+                     *                 R: Random
+                     *                 H: Human
+                     *                 U: Undead
+                     *                 N: Night Elf
+                     *                 O: Orc
+                     *                 D: Tournament (TFT)
+                     *         This value should be searched for in the Icon Code array of each icon in each Battle.net Icon file that is loaded. If a match is found, the client should use this icon when displaying the user. See Icons.bni.
+                     *     Level
+                     *         Level of the player. (Highest out of all possible game types that the user has played.) '0' means no ladder games on record.
+                     *     Clan tag (OPTIONAL)
+                     *         Reversed clan tag, appears only if the player is in a clan.
+                     */
+
+                    //var iconCode = ActiveAccount.Get("System\\Icon", product);
+                    var iconCode = Encoding.ASCII.GetBytes("1O3W");
+                    var ladderLevel = (uint)0;
+                    var clanTag = (byte[])ActiveAccount.Get("System\\Clan", new byte[] { 0, 0, 0, 0 });
+
+                    w.Write(' ');
+                    w.Write(Encoding.ASCII.GetBytes(iconCode.ToString()));
+                    w.Write(' ');
+                    w.Write(Encoding.ASCII.GetBytes(ladderLevel.ToString()));
+
+                    if (!clanTag.SequenceEqual(new byte[] { 0, 0, 0, 0 }))
+                    {
+                        w.Write(' ');
+                        w.Write(clanTag);
+                    }
+                }
+
+                Statstring = new byte[(int)w.BaseStream.Position];
+                Buffer.BlockCopy(buf, 0, Statstring, 0, (int)w.BaseStream.Position);
+            }
+            finally
+            {
+                if (w != null) w.Close();
+                if (m != null) m.Close();
+
+                Statstring = buf;
+            }
         }
 
         public void SetLocale()
