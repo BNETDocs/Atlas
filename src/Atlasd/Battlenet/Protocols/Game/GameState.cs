@@ -264,7 +264,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                     var clanTag = (byte[])ActiveAccount.Get("System\\Clan", new byte[] { 0, 0, 0, 0 });
 
                     w.Write(' ');
-                    w.Write(Encoding.ASCII.GetBytes(iconCode.ToString()));
+                    w.Write(iconCode);
                     w.Write(' ');
                     w.Write(Encoding.ASCII.GetBytes(ladderLevel.ToString()));
 
