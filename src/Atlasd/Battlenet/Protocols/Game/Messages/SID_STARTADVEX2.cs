@@ -69,7 +69,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         if (gameAd == null)
                         {
-                            gameAd = new GameAd(context.Client.GameState, gameName, gamePassword, gameStatstring, 6112, (GameAd.GameTypes)gameType, context.Client.GameState.Version.VersionByte);
+                            gameAd = new GameAd(context.Client.GameState, gameName, gamePassword, gameStatstring, 6112, (GameAd.GameTypes)gameType, subGameType, context.Client.GameState.Version.VersionByte);
                             context.Client.GameState.GameAd = gameAd;
                             Battlenet.Common.ActiveGameAds.TryAdd(gameName, gameAd);
                         }
