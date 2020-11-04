@@ -115,6 +115,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to parse your grace period request, please see https://bit.ly/34Sgl2w.
+        /// </summary>
+        public static string AdminShutdownCommandParseError {
+            get {
+                return ResourceManager.GetString("AdminShutdownCommandParseError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The server shutdown was scheduled..
         /// </summary>
         public static string AdminShutdownCommandScheduled {

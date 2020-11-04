@@ -135,6 +135,9 @@
   <data name="AdminShutdownCommandCancelled" xml:space="preserve">
     <value>The server shutdown was cancelled.</value>
   </data>
+  <data name="AdminShutdownCommandParseError" xml:space="preserve">
+    <value>Unable to parse your grace period request, please see https://bit.ly/34Sgl2w</value>
+  </data>
   <data name="AdminShutdownCommandScheduled" xml:space="preserve">
     <value>The server shutdown was scheduled.</value>
   </data>

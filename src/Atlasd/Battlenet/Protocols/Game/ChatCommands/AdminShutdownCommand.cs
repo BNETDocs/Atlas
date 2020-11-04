@@ -20,11 +20,14 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 periodStr = Arguments[0];
                 Arguments.RemoveAt(0);
             }
-            double.TryParse(periodStr, out var periodDbl);
-            var period = TimeSpan.FromSeconds(periodDbl);
-            var message = string.Join(' ', Arguments);
 
-            Battlenet.Common.ScheduleShutdown(period, message, context);
+            if (!double.TryParse(periodStr, out var periodDbl))
+            {
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, (uint)0, context.GameState.Ping, context.GameState.OnlineName, Resources.AdminShutdownCommandParseError).WriteTo(context.GameState.Client);
+                return;
+            }
+
+            Battlenet.Common.ScheduleShutdown(TimeSpan.FromSeconds(periodDbl), string.Join(' ', Arguments), context);
         }
     }
 }
