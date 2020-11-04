@@ -40,6 +40,16 @@ namespace Atlasd.Battlenet
             };
         }
 
+        public static bool IsDiablo(ProductCode code)
+        {
+            return code switch
+            {
+                ProductCode.DiabloRetail => true,
+                ProductCode.DiabloShareware => true,
+                _ => false,
+            };
+        }
+
         public static bool IsDiabloII(ProductCode code)
         {
             return code switch
