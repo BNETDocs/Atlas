@@ -54,7 +54,7 @@ namespace Atlasd
 
             while (!Exit)
             {
-                await Task.Delay(10);
+                await Task.Delay(1);
                 await Task.Yield();
             }
 
