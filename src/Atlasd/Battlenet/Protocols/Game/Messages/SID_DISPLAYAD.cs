@@ -28,17 +28,14 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length < 14)
                 throw new GameProtocolViolationException(context.Client, "SID_DISPLAYAD buffer must be at least 14 bytes");
 
-            var m = new MemoryStream(Buffer);
-            var r = new BinaryReader(m);
+            using var m = new MemoryStream(Buffer);
+            using var r = new BinaryReader(m);
 
             var platformId = r.ReadUInt32();
             var productId = r.ReadUInt32();
             var adId = r.ReadUInt32();
             var adFilename = r.ReadString();
             var adUrl = r.ReadString();
-
-            r.Close();
-            m.Close();
 
             return true;
         }
