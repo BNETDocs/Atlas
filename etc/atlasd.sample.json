@@ -148,13 +148,39 @@
       },
       {
         "name": "Public Chat",
-        "flags": 33
-      },
-      {
-        "name": "Starcraft",
         "flags": 33,
         "products": [
-          "STAR"
+          "CHAT"
+        ]
+      },
+      {
+        "name": "Diablo II",
+        "flags": 33,
+        "products": [
+          "D2DV"
+        ],
+        "product_restricted": true
+      },
+      {
+        "name": "Lord of Destruction",
+        "flags": 33,
+        "products": [
+          "D2XP"
+        ],
+        "product_restricted": true
+      },
+      {
+        "name": "Diablo",
+        "flags": 33,
+        "products": [
+          "DRTL"
+        ]
+      },
+      {
+        "name": "Diablo Shareware",
+        "flags": 33,
+        "products": [
+          "DSHR"
         ]
       },
       {
@@ -165,18 +191,48 @@
         ]
       },
       {
-        "name": "Diablo II",
+        "name": "StarCraft",
         "flags": 33,
         "products": [
-          "D2DV"
+          "STAR"
         ]
       },
       {
-        "name": "Lord of Destruction",
+        "name": "StarCraft Japan",
         "flags": 33,
         "products": [
-          "D2XP"
+          "JSTR"
         ]
+      },
+      {
+        "name": "StarCraft Shareware",
+        "flags": 33,
+        "products": [
+          "SSHR"
+        ]
+      },
+      {
+        "name": "WarCraft II",
+        "flags": 33,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "WarCraft III",
+        "flags": 33,
+        "products": [
+          "WAR3"
+        ],
+        "product_restricted": true
+      },
+      {
+        "name": "Frozen Throne",
+        "flags": 33,
+        "products": [
+          "W3XP"
+        ],
+        "product_restricted": true
       },
       {
         "name": "24423lkn",
@@ -597,7 +653,7 @@
     "charset": "utf8mb4",
     "connect_timeout": 3,
     "database": "atlasd",
-    "hostname": "localhost",
+    "hostname": "mariadb.localdomain",
     "password": "atlasdev",
     "username": "atlasd"
   }
