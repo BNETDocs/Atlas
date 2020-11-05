@@ -88,7 +88,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             var firstJoin = flags == Flags.First || flags == Flags.First_D2;
             if (firstJoin) channelName = $"{Product.ProductChannelName(userGame)} {userCountryAbbr}-1";
 
-            var ignoreLimits = userFlags.HasFlag(Account.Flags.Employee);
+            var ignoreLimits = userFlags.HasFlag(Account.Flags.Employee) || userFlags.HasFlag(Account.Flags.Admin);
             var channel = Channel.GetChannelByName(channelName, false);
 
             if (channel == null && flags == Flags.NoCreate)
