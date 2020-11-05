@@ -2,7 +2,7 @@
 
 namespace Atlasd.Battlenet.Protocols.Game
 {
-    class LocaleInfo
+    struct LocaleInfo
     {
         public UInt32 SystemLocaleId;
         public UInt32 UserLocaleId;
