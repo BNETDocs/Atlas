@@ -85,8 +85,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (status == Statuses.None)
                         {
                             context.Client.GameState.ActiveAccount = account;
+                            context.Client.GameState.FailedLogons = (UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0);
                             context.Client.GameState.LastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
 
+                            account.Set(Account.FailedLogonsKey, (UInt32)0);
                             account.Set(Account.IPAddressKey, context.Client.RemoteEndPoint.ToString().Split(":")[0]);
                             account.Set(Account.LastLogonKey, DateTime.Now);
                             account.Set(Account.PortKey, context.Client.RemoteEndPoint.ToString().Split(":")[1]);

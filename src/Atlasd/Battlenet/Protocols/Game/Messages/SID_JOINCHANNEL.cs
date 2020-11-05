@@ -142,12 +142,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 // Send EID_INFO "Last logon: ..."
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, activeUserFlags, activeUserPing, onlineName, Resources.LastLogonInfo.Replace("{timestamp}", lastLogon.ToString(Common.HumanDateTimeFormat))).WriteTo(context.Client);
 
-                var failedLogins = (UInt32)0;
-                if (account.ContainsKey(Account.FailedLogonsKey)) failedLogins = (UInt32)account.Get(Account.FailedLogonsKey);
-                account.Set(Account.FailedLogonsKey, (UInt32)0);
+                var failedLogins = context.Client.GameState.FailedLogons;
+                context.Client.GameState.FailedLogons = 0;
 
                 if (failedLogins > 0)
+                {
                     new ChatEvent(ChatEvent.EventIds.EID_ERROR, activeUserFlags, activeUserPing, onlineName, Resources.FailedLogonAttempts.Replace("{count}", failedLogins.ToString("##,0"))).WriteTo(context.Client);
+                }
             }
 
             return true;

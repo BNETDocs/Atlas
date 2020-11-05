@@ -47,6 +47,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public string Away;
         public string DoNotDisturb;
         public UInt32 ClientToken;
+        public UInt32 FailedLogons;
         public ushort GameDataPort;
         public string KeyOwner;
         public string OnlineName;
@@ -89,6 +90,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             Away = null;
             DoNotDisturb = null;
             ClientToken = 0;
+            FailedLogons = 0;
             GameDataPort = 0;
             KeyOwner = null;
             OnlineName = null;
