@@ -187,19 +187,19 @@ namespace Atlasd.Battlenet
 
             if (channel != null || !autoCreate) return channel;
 
+            var isStatic = GetStaticChannel(name, out var staticName, out var staticFlags, out var staticMaxUsers, out var staticTopic, out var staticProducts);
+
+            if (!isStatic)
+            {
+                channel = new Channel(name, Flags.None);
+            }
+            else
+            {
+                channel = new Channel(staticName, staticFlags, staticMaxUsers, staticTopic);
+            }
+
             lock (Common.ActiveChannels)
             {
-                var isStatic = GetStaticChannel(name, out var staticName, out var staticFlags, out var staticMaxUsers, out var staticTopic, out var staticProducts);
-
-                if (!isStatic)
-                {
-                    channel = new Channel(name, Flags.None);
-                }
-                else
-                {
-                    channel = new Channel(staticName, staticFlags, staticMaxUsers, staticTopic);
-                }
-
                 Common.ActiveChannels.Add(channel.Name, channel);
             }
 
