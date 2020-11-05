@@ -47,6 +47,13 @@ For Fedora or other Red Hat based systems:
 5. Run debugger: `dotnet run`
 6. See `dotnet --help` for other compile options
 
+### Adjust settings
+
+1. Copy the `etc/atlasd.sample.json` to either the same directory or where you will store configs for this software. Name it whatever you wish, `atlad.json` is a good example. Point the Atlasd daemon at the file using the `-c` or `--config` command-line argument; e.g. `atlasd -c ../etc/atlasd.json`
+2. Change the settings as desired.
+3. Launch atlasd.
+4. If you find yourself wishing to change additional settings after atlasd has started, you may either restart atlasd, or send `/admin reload` as a command through a bot.
+
 ## License
 
 Atlas is free software distributed under the [MIT License](./LICENSE.txt). It is not officially affiliated with or endorsed by Blizzard Entertainment, its subsidiaries, or business partners. Battle.net, Diablo, StarCraft, and WarCraft are registered trademarks of Blizzard Entertainment in the United States. This software is provided as-is in the hopes that it is useful without warranty of any kind.
