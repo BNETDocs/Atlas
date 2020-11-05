@@ -63,6 +63,18 @@ namespace Atlasd.Daemon
             };
         }
 
+        public static LogLevel StringToLogLevel(string value)
+        {
+            return value.ToLower() switch
+            {
+                "error" => LogLevel.Error,
+                "warning" => LogLevel.Warning,
+                "info" => LogLevel.Info,
+                "debug" => LogLevel.Debug,
+                _ => throw new IndexOutOfRangeException("Unknown value"),
+            };
+        }
+
         public static void WriteLine(LogLevel level, LogType type, string buffer)
         {
             if (level > CurrentLogLevel) return;

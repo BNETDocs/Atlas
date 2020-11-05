@@ -44,6 +44,11 @@ namespace Atlasd
 
             ParseCommandLineArgs(args);
             Settings.Initialize();
+
+            var logLevel = Settings.GetString(new string[] { "logging", "level" }, "Debug");
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, $"Setting log level to {logLevel}");
+            Logging.CurrentLogLevel = Logging.StringToLogLevel(logLevel);
+
             Battlenet.Common.Initialize();
             Battlenet.Common.Listener.Start();
 

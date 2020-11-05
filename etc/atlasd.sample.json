@@ -648,6 +648,9 @@
       }
     ]
   },
+  "logging": {
+    "level": "Debug"
+  },
   "document_version": 0,
   "mysql": {
     "charset": "utf8mb4",
