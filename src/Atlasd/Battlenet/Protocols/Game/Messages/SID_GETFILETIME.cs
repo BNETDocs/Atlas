@@ -58,7 +58,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var filename = r.ReadString();
                         var filetime = (UInt64)0;
 
-                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_BNFTP, context.Client.RemoteEndPoint, $"Requesting filetime info for [{filename}]...");
+                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_BNFTP, context.Client.RemoteEndPoint, $"Requesting filetime for [{filename}]...");
 
                         var fileinfo = new BNFTP.File(filename).GetFileInfo();
                         if (fileinfo != null)
