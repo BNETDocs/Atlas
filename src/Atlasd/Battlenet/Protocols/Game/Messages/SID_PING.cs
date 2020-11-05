@@ -37,57 +37,27 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length != 4)
                 throw new GameProtocolViolationException(context.Client, "SID_PING buffer must be 4 bytes");
 
-            bool autoRefreshPings = false;
-            try
-            {
-                Settings.State.RootElement.TryGetProperty("battlenet", out var battlenetJson);
-                battlenetJson.TryGetProperty("emulation", out var emulationJson);
-                emulationJson.TryGetProperty("auto_refresh_pings", out var autoRefreshPingsJson);
-                autoRefreshPings = autoRefreshPingsJson.GetBoolean();
-            }
-            catch (Exception ex)
-            {
-                if (!(ex is InvalidOperationException || ex is ArgumentNullException))
-                {
-                    throw ex;
-                }
+            if (context.Client == null || !context.Client.Connected) return false;
 
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, "Setting [battlenet] -> [emulation] -> [auto_refresh_pings] is invalid; check value");
-            }
+            var delta = DateTime.Now - context.Client.GameState.PingDelta;
 
-            int ping = -1;
-            try
-            {
-                lock (context.Client.GameState) ping = context.Client.GameState.Ping;
-            }
-            catch (ArgumentNullException) { }
-            catch (NullReferenceException) { }
+            var autoRefreshPings = Settings.GetBoolean(new string[] { "battlenet", "emulation", "auto_refresh_pings" }, false);
 
-            if (!autoRefreshPings && ping != -1) return true;
+            if (!autoRefreshPings && context.Client.GameState.Ping != -1) return true;
 
             using var m = new MemoryStream(Buffer);
             using var r = new BinaryReader(m);
             var token = r.ReadUInt32();
 
-            lock (context.Client.GameState)
+            if (!(context.Direction == MessageDirection.ClientToServer && token == context.Client.GameState.PingToken)) return true;
+
+            context.Client.GameState.Ping = (int)Math.Round(delta.TotalMilliseconds);
+
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Ping: {context.Client.GameState.Ping}ms");
+
+            if (context.Client.GameState.ActiveChannel != null)
             {
-                var serverToken = context.Client.GameState.PingToken;
-
-                if (context.Direction == MessageDirection.ClientToServer && token == serverToken)
-                {
-                    lock (context.Client.GameState)
-                    {
-                        var delta = DateTime.Now - context.Client.GameState.PingDelta;
-                        context.Client.GameState.Ping = (int)Math.Round(delta.TotalMilliseconds);
-
-                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Ping: {context.Client.GameState.Ping}ms");
-
-                        if (context.Client.GameState.ActiveChannel != null)
-                        {
-                            context.Client.GameState.ActiveChannel.UpdateUser(context.Client.GameState, context.Client.GameState.Ping);
-                        }
-                    }
-                }
+                context.Client.GameState.ActiveChannel.UpdateUser(context.Client.GameState, context.Client.GameState.Ping);
             }
 
             return true;
