@@ -67,13 +67,21 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         {
                             var passwordHashDb = (byte[])account.Get(Account.PasswordKey, new byte[20]);
                             var compareHash = OldAuth.CheckDoubleHashData(passwordHashDb, clientToken, serverToken);
-                            if (!compareHash.SequenceEqual(passwordHash)) status = Statuses.BadPassword;
+                            if (!compareHash.SequenceEqual(passwordHash))
+                            {
+                                account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
+                                status = Statuses.BadPassword;
+                            }
                         }
 
                         if (status == Statuses.None)
                         {
                             var flags = (Account.Flags)account.Get(Account.FlagsKey, Account.Flags.None);
-                            if ((flags & Account.Flags.Closed) != 0) status = Statuses.AccountClosed;
+                            if ((flags & Account.Flags.Closed) != 0)
+                            {
+                                account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
+                                status = Statuses.AccountClosed;
+                            }
                         }
                         
                         if (status == Statuses.None)
