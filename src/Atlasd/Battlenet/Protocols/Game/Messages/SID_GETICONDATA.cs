@@ -40,16 +40,19 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          *   (STRING) Filename
                          */
 
-                        var Filetime = (UInt64)0;
-                        var Filename = "icons.bni";
+                        var fileInfo = new FileInfo("icons.bni");
 
-                        Buffer = new byte[9 + Encoding.ASCII.GetByteCount(Filename)];
+                        var fileTime = (UInt64)fileInfo.LastWriteTimeUtc.ToFileTimeUtc();
+                        var fileName = fileInfo.Name;
+
+                        Buffer = new byte[9 + Encoding.UTF8.GetByteCount(fileName)];
 
                         var m = new MemoryStream(Buffer);
                         var w = new BinaryWriter(m);
 
-                        w.Write((UInt64)Filetime);
-                        w.Write((string)Filename);
+                        w.Write((UInt64)fileTime);
+                        w.Write(Encoding.UTF8.GetBytes(fileName));
+                        w.Write((byte)0);
 
                         w.Close();
                         m.Close();
