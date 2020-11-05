@@ -298,6 +298,10 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public void SetLocale()
         {
+            // TODO : Fix this so it works with the asynchronous stuff.
+            return;
+
+            /*
             // UserLocaleId is converted to (int) because CultureInfo uses a signed int for "culture"
             var localeId = (int)Locale.UserLocaleId;
 
@@ -312,6 +316,7 @@ namespace Atlasd.Battlenet.Protocols.Game
 
                 Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, Client.RemoteEndPoint, $"Error setting client locale to [{localeId}], using default");
             }
+            */
         }
 
         public void StopGameAd()
