@@ -1,0 +1,14 @@
+###############################################################################
+# Set default behavior to automatically normalize line endings.
+###############################################################################
+* text=auto eol=crlf
+
+###############################################################################
+# Behavior related to Battle.net BNFTP files.
+###############################################################################
+*.bni binary
+*.ini text eol=crlf
+*.mng binary
+*.mpq binary
+*.smk binary
+*.txt text eol=crlf
