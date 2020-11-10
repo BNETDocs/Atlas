@@ -43,6 +43,9 @@
 #*.jpg   binary
 #*.png   binary
 #*.gif   binary
+*.bni binary
+*.mng binary
+*.smk binary
 
 ###############################################################################
 # diff behavior for common document formats
