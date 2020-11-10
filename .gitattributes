@@ -4,6 +4,16 @@
 * text=auto eol=crlf
 
 ###############################################################################
+# Behavior related to Battle.net BNFTP files.
+###############################################################################
+*.bni binary
+*.ini text eol=crlf
+*.mng binary
+*.mpq binary
+*.smk binary
+
+
+###############################################################################
 # Set default behavior for command prompt diff.
 #
 # This is need for earlier builds of msysgit that does not have it on by
@@ -43,10 +53,6 @@
 #*.jpg   binary
 #*.png   binary
 #*.gif   binary
-*.bni binary
-*.mng binary
-*.mpq binary
-*.smk binary
 
 ###############################################################################
 # diff behavior for common document formats
