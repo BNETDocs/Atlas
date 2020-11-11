@@ -188,8 +188,9 @@ namespace Atlasd.Battlenet.Protocols.Game
                 Buffer.BlockCopy(buf, 0, product, 0, product.Length);
                 var game = Encoding.UTF8.GetString(product);
 
-                if (Battlenet.Product.IsStarcraft(Product)
-                    || Battlenet.Product.IsWarcraftII(Product))
+                // Product is not SSHR, but is STAR/SEXP/JSTR or W2BN:
+                if (Product != Battlenet.Product.ProductCode.StarcraftShareware && (
+                    Battlenet.Product.IsStarcraft(Product) || Battlenet.Product.IsWarcraftII(Product)))
                 {
                     /**
                      * Contain 9 fields that are delimited with spaces.
