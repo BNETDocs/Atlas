@@ -1,5 +1,6 @@
 ﻿using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Battlenet.Protocols.Game.Messages;
+using Atlasd.Battlenet.Protocols.Udp;
 using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
@@ -50,6 +51,7 @@ namespace Atlasd.Battlenet
         private static bool PingTimerLock;
         public static List<GameState> PingTimerState { get; private set; }
         public static ShutdownEvent ScheduledShutdown { get; private set; }
+        public static UdpListener UdpListener { get; private set; }
 
         public static string GetServerGreeting(ClientState receiver)
         {
@@ -192,6 +194,7 @@ namespace Atlasd.Battlenet
             }
             ListenerEndPoint = listenerEndPoint;
 
+            UdpListener = new UdpListener(ListenerEndPoint);
             Listener = new ServerSocket(ListenerEndPoint);
         }
         

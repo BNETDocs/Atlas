@@ -98,6 +98,8 @@ namespace Atlasd.Battlenet
                 throw new NullReferenceException("LocalEndPoint must be set to an instance of IPEndPoint");
             }
 
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, $"Starting TCP listener on [{LocalEndPoint}]");
+
             Socket.Bind(LocalEndPoint);
             Socket.Listen(backlog);
             IsListening = true;
@@ -134,7 +136,10 @@ namespace Atlasd.Battlenet
         {
             if (!IsListening) return;
 
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, $"Stopping TCP listener on [{Socket.LocalEndPoint}]");
+
             Socket.Close();
+            Socket = null;
 
             IsListening = false;
         }

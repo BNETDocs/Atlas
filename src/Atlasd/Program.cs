@@ -50,6 +50,7 @@ namespace Atlasd
             Logging.CurrentLogLevel = Logging.StringToLogLevel(logLevel);
 
             Battlenet.Common.Initialize();
+            Battlenet.Common.UdpListener.Start();
             Battlenet.Common.Listener.Start();
 
             while (!Exit)

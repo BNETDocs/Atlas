@@ -1,4 +1,4 @@
-﻿namespace Atlasd.Battlenet.Protocols.UDP
+﻿namespace Atlasd.Battlenet.Protocols.Udp
 {
     enum Messages : byte
     {
