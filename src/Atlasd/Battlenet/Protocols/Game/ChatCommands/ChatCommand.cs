@@ -69,6 +69,11 @@ namespace Atlasd.Battlenet.Protocols.Game
                 case "where":
                 case "whois":
                     return new WhereIsCommand(args);
+                case "whisper":
+                case "msg":
+                case "m":
+                case "w":
+                    return new WhisperCommand(args);
                 case "who":
                     return new WhoCommand(args);
                 case "whoami":

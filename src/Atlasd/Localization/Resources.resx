@@ -335,6 +335,15 @@ Your local time: {localTime}</value>
   <data name="UserUnBannedFromChannel" xml:space="preserve">
     <value>{target} was unbanned by {source}</value>
   </data>
+  <data name="WhisperCommandEmptyMessage" xml:space="preserve">
+    <value>What do you want to say?</value>
+  </data>
+  <data name="WhisperCommandUserIsAway" xml:space="preserve">
+    <value>{user} is away ({message})</value>
+  </data>
+  <data name="WhisperCommandUserIsDoNotDisturb" xml:space="preserve">
+    <value>{user} is unavailable ({message})</value>
+  </data>
   <data name="WhoCommand" xml:space="preserve">
     <value>Users in channel {channel}:
 {users}</value>

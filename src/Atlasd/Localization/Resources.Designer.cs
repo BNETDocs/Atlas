@@ -645,6 +645,33 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to What do you want to say?.
+        /// </summary>
+        public static string WhisperCommandEmptyMessage {
+            get {
+                return ResourceManager.GetString("WhisperCommandEmptyMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {user} is away ({message}).
+        /// </summary>
+        public static string WhisperCommandUserIsAway {
+            get {
+                return ResourceManager.GetString("WhisperCommandUserIsAway", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {user} is unavailable ({message}).
+        /// </summary>
+        public static string WhisperCommandUserIsDoNotDisturb {
+            get {
+                return ResourceManager.GetString("WhisperCommandUserIsDoNotDisturb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Users in channel {channel}:
         ///{users}.
         /// </summary>
