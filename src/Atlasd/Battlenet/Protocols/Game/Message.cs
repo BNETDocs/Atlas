@@ -1,6 +1,5 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using System;
-using System.Reflection;
 using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game
@@ -77,6 +76,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_AUTH_INFO => new Messages.SID_AUTH_INFO(buffer),
                 MessageIds.SID_AUTH_CHECK => new Messages.SID_AUTH_CHECK(buffer),
                 MessageIds.SID_FRIENDSLIST => new Messages.SID_FRIENDSLIST(buffer),
+                MessageIds.SID_CLANMEMBERLIST => new Messages.SID_CLANMEMBERLIST(buffer),
                 /*
                 MessageIds.SID_ => new Messages.SID_(buffer),
                 */
