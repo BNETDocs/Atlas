@@ -89,6 +89,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             return (MessageIds)messageId switch
             {
                 MessageIds.SID_NULL => "SID_NULL",
+                MessageIds.SID_STOPADV => "SID_STOPADV",
                 MessageIds.SID_CLIENTID => "SID_CLIENTID",
                 MessageIds.SID_STARTVERSIONING => "SID_STARTVERSIONING",
                 MessageIds.SID_REPORTVERSION => "SID_REPORTVERSION",
@@ -122,17 +123,21 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_LOGONRESPONSE => "SID_LOGONRESPONSE",
                 MessageIds.SID_CREATEACCOUNT => "SID_CREATEACCOUNT",
                 MessageIds.SID_SYSTEMINFO => "SID_SYSTEMINFO",
+                MessageIds.SID_GAMERESULT => "SID_GAMERESULT",
                 MessageIds.SID_GETICONDATA => "SID_GETICONDATA",
                 MessageIds.SID_CDKEY => "SID_CDKEY",
+                MessageIds.SID_CHECKDATAFILE => "SID_CHECKDATAFILE",
                 MessageIds.SID_GETFILETIME => "SID_GETFILETIME",
                 MessageIds.SID_CDKEY2 => "SID_CDKEY2",
                 MessageIds.SID_LOGONRESPONSE2 => "SID_LOGONRESPONSE2",
+                MessageIds.SID_CHECKDATAFILE2 => "SID_CHECKDATAFILE2",
                 MessageIds.SID_CREATEACCOUNT2 => "SID_CREATEACCOUNT2",
                 MessageIds.SID_QUERYADURL => "SID_QUERYADURL",
                 MessageIds.SID_NEWS_INFO => "SID_NEWS_INFO",
                 MessageIds.SID_AUTH_INFO => "SID_AUTH_INFO",
                 MessageIds.SID_AUTH_CHECK => "SID_AUTH_CHECK",
                 MessageIds.SID_FRIENDSLIST => "SID_FRIENDSLIST",
+                MessageIds.SID_CLANMEMBERLIST => "SID_CLANMEMBERLIST",
                 _ => null,
             };
         }
