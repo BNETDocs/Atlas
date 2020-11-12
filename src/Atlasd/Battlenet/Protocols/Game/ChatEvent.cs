@@ -130,7 +130,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                         w.Write((Int32)Ping);
                         w.Write((UInt32)0); // IP address (Defunct)
                         w.Write((UInt32)0xBAADF00D); // Account number (Defunct)
-                        w.Write((UInt32)0xDEADBEEF); // Registration authority (Defunct)
+                        w.Write((UInt32)0xBAADF00D); // Registration authority (Defunct)
                         w.Write((string)Username);
 
                         if (EventIdIsChatMessage(EventId))
