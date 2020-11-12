@@ -171,6 +171,12 @@ Example: 0x10 = 16 decimal</value>
   <data name="BattlenetAdministrator" xml:space="preserve">
     <value>Battle.net administrator</value>
   </data>
+  <data name="BattlenetRepresentative" xml:space="preserve">
+    <value>Battle.net representative</value>
+  </data>
+  <data name="BlizzardAdministrator" xml:space="preserve">
+    <value>Blizzard administrator</value>
+  </data>
   <data name="BlizzardRepresentative" xml:space="preserve">
     <value>Blizzard representative</value>
   </data>

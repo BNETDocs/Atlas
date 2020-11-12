@@ -211,6 +211,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Battle.net representative.
+        /// </summary>
+        public static string BattlenetRepresentative {
+            get {
+                return ResourceManager.GetString("BattlenetRepresentative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Blizzard administrator.
+        /// </summary>
+        public static string BlizzardAdministrator {
+            get {
+                return ResourceManager.GetString("BlizzardAdministrator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Blizzard representative.
         /// </summary>
         public static string BlizzardRepresentative {

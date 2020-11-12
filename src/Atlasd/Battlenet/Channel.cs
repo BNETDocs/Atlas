@@ -344,26 +344,14 @@ namespace Atlasd.Battlenet
                 return;
             }
 
-            bool maskAdminsInKickMessage = true;
-            try
-            {
-                Settings.State.RootElement.TryGetProperty("battlenet", out var battlenetJson);
-                battlenetJson.TryGetProperty("emulation", out var emulationJson);
-                emulationJson.TryGetProperty("mask_admins_in_kick_message", out var maskAdminsInKickMessageJson);
-                maskAdminsInKickMessage = maskAdminsInKickMessageJson.GetBoolean();
-            }
-            catch (Exception ex)
-            {
-                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, "Setting [battlenet] -> [emulation] -> [mask_admins_in_kick_message] is not a boolean; check value");
-            }
+            bool maskAdminsInKickMessage = Settings.GetBoolean(new string[] { "battlenet", "emulation", "mask_admins_in_kick_message" }, false);
 
             var sourceName = source.OnlineName;
             if (maskAdminsInKickMessage)
             {
                 if (source.ChannelFlags.HasFlag(Account.Flags.Employee))
                 {
-                    sourceName = $"a {Resources.BlizzardRepresentative}";
+                    sourceName = $"a {Resources.BattlenetRepresentative}";
                 }
                 else if (source.ChannelFlags.HasFlag(Account.Flags.Admin))
                 {
