@@ -482,8 +482,7 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 
-        ///.
+        ///   Looks up a localized string similar to \r\n.
         /// </summary>
         public static string NewLine {
             get {
