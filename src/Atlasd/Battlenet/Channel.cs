@@ -344,19 +344,13 @@ namespace Atlasd.Battlenet
                 return;
             }
 
-            bool maskAdminsInKickMessage = Settings.GetBoolean(new string[] { "battlenet", "emulation", "mask_admins_in_kick_message" }, false);
-
             var sourceName = source.OnlineName;
-            if (maskAdminsInKickMessage)
+            var maskAdminsInKickMessage = Settings.GetBoolean(new string[] { "battlenet", "emulation", "mask_admins_in_kick_message" }, false);
+            if (maskAdminsInKickMessage
+                && (source.ChannelFlags.HasFlag(Account.Flags.Employee)
+                || source.ChannelFlags.HasFlag(Account.Flags.Admin)))
             {
-                if (source.ChannelFlags.HasFlag(Account.Flags.Employee))
-                {
-                    sourceName = $"a {Resources.BattlenetRepresentative}";
-                }
-                else if (source.ChannelFlags.HasFlag(Account.Flags.Admin))
-                {
-                    sourceName = $"a {Resources.BattlenetAdministrator}";
-                }
+                sourceName = $"a {Resources.BattlenetRepresentative}";
             }
 
             var kickedStr = reason.Length > 0 ? Resources.UserKickedFromChannelWithReason : Resources.UserKickedFromChannel;
@@ -372,7 +366,7 @@ namespace Atlasd.Battlenet
             kickedStr = Resources.YouWereKickedFromChannel;
 
             kickedStr = kickedStr.Replace("{reason}", reason);
-            kickedStr = kickedStr.Replace("{source}", source.OnlineName);
+            kickedStr = kickedStr.Replace("{source}", sourceName);
             kickedStr = kickedStr.Replace("{target}", target);
 
             new ChatEvent(ChatEvent.EventIds.EID_INFO, source.ChannelFlags, source.Ping, source.OnlineName, kickedStr).WriteTo(targetClient.Client);
