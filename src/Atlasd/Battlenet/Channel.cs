@@ -292,7 +292,7 @@ namespace Atlasd.Battlenet
                     s += $"{n}, ";
                 } else
                 {
-                    s += $"{n}{Resources.NewLine}";
+                    s += $"{n}{Battlenet.Common.NewLine}";
                 }
                 i++;
             }

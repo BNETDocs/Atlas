@@ -42,7 +42,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 remarks = remarks.Replace("{" + kv.Key + "}", kv.Value);
             }
 
-            foreach (var line in remarks.Split(Resources.NewLine))
+            foreach (var line in remarks.Split(Battlenet.Common.NewLine))
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
         }
     }

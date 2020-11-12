@@ -16,6 +16,8 @@ namespace Atlasd.Battlenet
 {
     class Common
     {
+        public const string NewLine = "\r\n"; // This should be the same line ending format of the Atlasd/Localization/Resources.resx XML document.
+
         public struct ShutdownEvent
         {
             public string AdminMessage { get; private set; }

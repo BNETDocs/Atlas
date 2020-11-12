@@ -24,7 +24,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             str = str.Replace(" 0", "  ");
 
-            foreach (var line in str.Split(Resources.NewLine))
+            foreach (var line in str.Split(Battlenet.Common.NewLine))
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
         }
     }
