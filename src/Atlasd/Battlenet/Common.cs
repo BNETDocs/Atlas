@@ -69,9 +69,9 @@ namespace Atlasd.Battlenet
             if (receiver == null || receiver.GameState == null || receiver.GameState.ActiveChannel == null) return "";
 
             var channel = receiver.GameState.ActiveChannel;
-            var numGameOnline = Common.GetActiveClientCountByProduct(receiver.GameState.Product);
+            var numGameOnline = GetActiveClientCountByProduct(receiver.GameState.Product);
             var numGameAdvertisements = 0;
-            var numTotalOnline = Common.ActiveClientStates.Count;
+            var numTotalOnline = ActiveClientStates.Count;
             var numTotalAdvertisements = 0;
             var strGame = Product.ProductName(receiver.GameState.Product, true);
 

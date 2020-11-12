@@ -131,7 +131,7 @@ namespace Atlasd.Battlenet
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, Resources.ChannelIsChatRestricted).WriteTo(user.Client);
             }
 
-            var topic = RenderTopic(user).Split(Environment.NewLine);
+            var topic = RenderTopic(user).Replace("\r\n", "\n").Replace("\r", "\n").Split("\n");
             foreach (var line in topic)
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line).WriteTo(user.Client);
 
@@ -292,7 +292,7 @@ namespace Atlasd.Battlenet
                     s += $"{n}, ";
                 } else
                 {
-                    s += $"{n}{Environment.NewLine}";
+                    s += $"{n}{Resources.NewLine}";
                 }
                 i++;
             }

@@ -20,7 +20,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             if (context.GameState.Away != null)
             {
-                str += Environment.NewLine + Resources.AwayCommandStatusSelf.Replace("{awayMessage}", context.GameState.Away);
+                str += Resources.NewLine + Resources.AwayCommandStatusSelf.Replace("{awayMessage}", context.GameState.Away);
             }
 
             str = str.Replace("{channel}", ch == null ? "(null)" : ch.Name);

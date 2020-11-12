@@ -1,5 +1,6 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Battlenet.Protocols.Game.Messages;
+using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -216,7 +217,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                                 }
                         }
 
-                        buf += Environment.NewLine;
+                        buf += Resources.NewLine;
                         return Encoding.UTF8.GetBytes(buf);
                     }
                 default:

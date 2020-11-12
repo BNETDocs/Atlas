@@ -482,6 +482,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to \r\n.
+        /// </summary>
+        public static string NewLine {
+            get {
+                return ResourceManager.GetString("NewLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No one hears you..
         /// </summary>
         public static string NoOneHearsYou {
