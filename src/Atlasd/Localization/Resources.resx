@@ -281,7 +281,8 @@ Displays the current {realm} Time ({realmTimezone}).</value>
     <value>Last logon: {timestamp}</value>
   </data>
   <data name="NewLine" xml:space="preserve">
-    <value>\r\n</value>
+    <value>
+</value>
     <comment>This should be the same line ending format of this Resources.resx XML document.</comment>
   </data>
   <data name="NoOneHearsYou" xml:space="preserve">
