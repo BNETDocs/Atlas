@@ -160,7 +160,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             }
             else if (protocolType.IsChat())
             {
-                return Encoding.UTF8.GetBytes($"{2000 + Id} {MessageName(Id).Replace("SID_", "")}");
+                return Encoding.UTF8.GetBytes($"{2000 + Id} {MessageName(Id).Replace("SID_", "")}{Battlenet.Common.NewLine}");
             }
             else
             {
