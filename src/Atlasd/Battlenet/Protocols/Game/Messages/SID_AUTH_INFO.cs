@@ -61,11 +61,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         context.Client.GameState.Locale.CountryNameAbbreviated = r.ReadString();
                         context.Client.GameState.Locale.CountryName = r.ReadString();
 
-                        // SID_PING is not sent here in this handshake. Instead, that process relies on
-                        // the low resolution period of Battlenet.Common.PingTimer, the minimum value of
-                        // a DateTime, and having the flexibility of executing asynchronously.
-
-                        return new SID_AUTH_INFO().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
+                        return new SID_PING().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){{ "token", context.Client.GameState.PingToken }}))
+                            && new SID_AUTH_INFO().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
                     }
                 case MessageDirection.ServerToClient:
                     {
