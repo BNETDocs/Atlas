@@ -20,7 +20,7 @@ namespace Atlasd
         public static bool Exit = false;
         public static int ExitCode = 0;
 
-        public static async Task<int> Main(string[] args)
+        public static int Main(string[] args)
         {
             Thread.CurrentThread.Name = "Main";
 
@@ -35,8 +35,7 @@ namespace Atlasd
                 Console.WriteLine($"[{DateTime.Now}] Waiting for debugger to attach...");
                 while (!Debugger.IsAttached)
                 {
-                    await Task.Delay(10);
-                    await Task.Yield();
+                    Task.Yield();
                 }
                 Console.WriteLine($"[{DateTime.Now}] Debugger attached: {Debugger.IsAttached}");
             }
@@ -55,12 +54,13 @@ namespace Atlasd
 
             while (!Exit)
             {
-                await Task.Delay(1);
-                await Task.Yield();
+                Task.Delay(10);
+                Task.Yield();
             }
 
             return ExitCode;
         }
+
         private static void ParseCommandLineArgs(string[] args)
         {
             string arg;
