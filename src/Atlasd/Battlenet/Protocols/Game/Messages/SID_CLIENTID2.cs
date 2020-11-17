@@ -78,8 +78,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             r.Close();
             m.Close();
 
-            return new SID_CLIENTID().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient)) &&
-                new SID_LOGONCHALLENGEEX().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient)) &&
+            return new SID_LOGONCHALLENGEEX().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient)) &&
                 new SID_PING().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new System.Collections.Generic.Dictionary<string, object>() {{ "token", context.Client.GameState.PingToken }}));
         }
     }
