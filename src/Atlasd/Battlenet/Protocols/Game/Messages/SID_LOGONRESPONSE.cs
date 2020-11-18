@@ -120,7 +120,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         r.Close();
                         m.Close();
 
-                        return new SID_LOGONRESPONSE2().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {
+                        return new SID_LOGONRESPONSE().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {
                             { "status", status },
                         }));
                     }
