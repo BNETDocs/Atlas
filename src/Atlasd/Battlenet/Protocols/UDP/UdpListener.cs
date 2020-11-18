@@ -63,7 +63,22 @@ namespace Atlasd.Battlenet.Protocols.Udp
         {
             if (e.LastOperation != SocketAsyncOperation.ReceiveFrom) return;
 
-            Task.Run(() => { ReceiveFromAsyncCompleted(sender, e); });
+            var buf = string.Empty; // buffer
+            var pre = string.Empty; // preview
+
+            for (var i = 0; i < e.Buffer.Length; i++)
+            {
+                if (i % 16 == 0)
+                {
+                    buf += pre + Environment.NewLine;
+                    pre = string.Empty;
+                }
+
+                buf += $"{e.Buffer[i]:X2} ";
+                pre += i > 32 && i < 127 ? (char)e.Buffer[i] : '.';
+            }
+
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_UDP, $"Received UDP datagram:{Environment.NewLine}{buf}");
         }
 
         public void Stop()
