@@ -11,7 +11,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
     {
         protected enum Statuses : UInt32
         {
-            None = 0xFFFFFFFF,
             Success = 0,
             AccountNotFound = 1,
             BadPassword = 2,
@@ -48,83 +47,67 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (STRING)     Username
                          */
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         var clientToken = r.ReadUInt32();
                         var serverToken = r.ReadUInt32();
                         var passwordHash = r.ReadBytes(20);
                         context.Client.GameState.Username = r.ReadString();
 
-                        Statuses status = Statuses.None;
-
                         Battlenet.Common.AccountsDb.TryGetValue(context.Client.GameState.Username, out Account account);
 
-                        if (status == Statuses.None && account == null)
-                            status = Statuses.AccountNotFound;
-
-                        if (status == Statuses.None)
+                        if (account == null)
                         {
-                            var passwordHashDb = (byte[])account.Get(Account.PasswordKey, new byte[20]);
-                            var compareHash = OldAuth.CheckDoubleHashData(passwordHashDb, clientToken, serverToken);
-                            if (!compareHash.SequenceEqual(passwordHash))
-                            {
-                                account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
-                                status = Statuses.BadPassword;
-                            }
+                            return new SID_LOGONRESPONSE2().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.AccountNotFound }}));
                         }
 
-                        if (status == Statuses.None)
+                        var passwordHashDb = (byte[])account.Get(Account.PasswordKey, new byte[20]);
+                        var compareHash = OldAuth.CheckDoubleHashData(passwordHashDb, clientToken, serverToken);
+                        if (!compareHash.SequenceEqual(passwordHash))
                         {
-                            var flags = (Account.Flags)account.Get(Account.FlagsKey, Account.Flags.None);
-                            if ((flags & Account.Flags.Closed) != 0)
-                            {
-                                account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
-                                status = Statuses.AccountClosed;
-                            }
+                            account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
+                            return new SID_LOGONRESPONSE2().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.BadPassword }}));
+                        }
+
+                        var flags = (Account.Flags)account.Get(Account.FlagsKey, Account.Flags.None);
+                        if ((flags & Account.Flags.Closed) != 0)
+                        {
+                            account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
+                            return new SID_LOGONRESPONSE2().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.AccountClosed }}));
                         }
                         
-                        if (status == Statuses.None)
+                        context.Client.GameState.ActiveAccount = account;
+                        context.Client.GameState.FailedLogons = (UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0);
+                        context.Client.GameState.LastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
+
+                        account.Set(Account.FailedLogonsKey, (UInt32)0);
+                        account.Set(Account.IPAddressKey, context.Client.RemoteEndPoint.ToString().Split(":")[0]);
+                        account.Set(Account.LastLogonKey, DateTime.Now);
+                        account.Set(Account.PortKey, context.Client.RemoteEndPoint.ToString().Split(":")[1]);
+
+                        lock (Battlenet.Common.ActiveAccounts)
                         {
-                            context.Client.GameState.ActiveAccount = account;
-                            context.Client.GameState.FailedLogons = (UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0);
-                            context.Client.GameState.LastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
+                            var serial = 1;
+                            var onlineName = context.Client.GameState.Username;
 
-                            account.Set(Account.FailedLogonsKey, (UInt32)0);
-                            account.Set(Account.IPAddressKey, context.Client.RemoteEndPoint.ToString().Split(":")[0]);
-                            account.Set(Account.LastLogonKey, DateTime.Now);
-                            account.Set(Account.PortKey, context.Client.RemoteEndPoint.ToString().Split(":")[1]);
-
-                            lock (Battlenet.Common.ActiveAccounts)
+                            while (Battlenet.Common.ActiveAccounts.ContainsKey(onlineName))
                             {
-                                var serial = 1;
-                                var onlineName = context.Client.GameState.Username;
-
-                                while (Battlenet.Common.ActiveAccounts.ContainsKey(onlineName))
-                                {
-                                    onlineName = $"{context.Client.GameState.Username}#{++serial}";
-                                }
-
-                                context.Client.GameState.OnlineName = onlineName;
-                                Battlenet.Common.ActiveAccounts.Add(onlineName, account);
+                                onlineName = $"{context.Client.GameState.Username}#{++serial}";
                             }
 
-                            context.Client.GameState.Username = (string)account.Get(Account.UsernameKey, context.Client.GameState.Username);
-
-                            lock (Battlenet.Common.ActiveGameStates)
-                            {
-                                Battlenet.Common.ActiveGameStates.Add(context.Client.GameState.OnlineName, context.Client.GameState);
-                            }
-
-                            status = Statuses.Success;
+                            context.Client.GameState.OnlineName = onlineName;
+                            Battlenet.Common.ActiveAccounts.Add(onlineName, account);
                         }
 
-                        r.Close();
-                        m.Close();
+                        context.Client.GameState.Username = (string)account.Get(Account.UsernameKey, context.Client.GameState.Username);
 
-                        return new SID_LOGONRESPONSE2().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {
-                            { "status", status },
-                        }));
+                        lock (Battlenet.Common.ActiveGameStates)
+                        {
+                            Battlenet.Common.ActiveGameStates.Add(context.Client.GameState.OnlineName, context.Client.GameState);
+                        }
+
+                        return new SID_LOGONRESPONSE2().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.Success }}));
                     }
                 case MessageDirection.ServerToClient:
                     {
@@ -133,18 +116,15 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (STRING) Additional information (optional)
                          */
 
-                        Buffer = new byte[4 + (context.Arguments.ContainsKey("info") ? 1 + ((string)context.Arguments["info"]).Length : 0)];
+                        var info = (byte[])(context.Arguments.ContainsKey("info") ? context.Arguments["info"] : new byte[0]);
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        Buffer = new byte[4 + info.Length];
+
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)(Statuses)context.Arguments["status"]);
-
-                        if (context.Arguments.ContainsKey("info"))
-                            w.Write((string)context.Arguments["info"]);
-
-                        w.Close();
-                        m.Close();
+                        w.Write(info);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_LOGONRESPONSE2 ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

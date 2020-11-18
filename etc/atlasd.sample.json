@@ -127,7 +127,8 @@
       {
         "name": "Town Square",
         "flags": 1,
-        "topic": "Welcome {user}, your ping is {ping}, have fun!"
+        "max_users": 40,
+        "topic": "General discussion. Join our Discord at: https://bnetdocs.org/discord"
       },
       {
         "name": "ktbpa",
