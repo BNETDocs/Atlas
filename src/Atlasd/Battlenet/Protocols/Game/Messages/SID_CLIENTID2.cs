@@ -10,7 +10,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
         public SID_CLIENTID2()
         {
             Id = (byte)MessageIds.SID_CLIENTID2;
-            Buffer = new byte[16];
+            Buffer = new byte[0];
         }
 
         public SID_CLIENTID2(byte[] buffer)
@@ -46,8 +46,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length < 22)
                 throw new GameProtocolViolationException(context.Client, "SID_CLIENTID2 buffer must be at least 22 bytes");
 
-            var m = new MemoryStream(Buffer);
-            var r = new BinaryReader(m);
+            using var m = new MemoryStream(Buffer);
+            using var r = new BinaryReader(m);
                         
             var serverVersion = r.ReadUInt32();
 
@@ -74,9 +74,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             var registrationToken = r.ReadUInt32();
             var pcComputerName = r.ReadString();
             var pcUserName = r.ReadString();
-
-            r.Close();
-            m.Close();
 
             return new SID_CLIENTID().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient)) &&
                 new SID_LOGONCHALLENGEEX().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient)) &&

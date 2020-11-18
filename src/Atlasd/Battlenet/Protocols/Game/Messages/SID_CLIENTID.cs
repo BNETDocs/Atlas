@@ -10,7 +10,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
         public SID_CLIENTID()
         {
             Id = (byte)MessageIds.SID_CLIENTID;
-            Buffer = new byte[16];
+            Buffer = new byte[0];
         }
 
         public SID_CLIENTID(byte[] buffer)
@@ -39,18 +39,15 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (Buffer.Length < 18)
                             throw new GameProtocolViolationException(context.Client, "SID_CLIENTID buffer must be at least 18 bytes");
 
-                        /*var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        /*using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         var registrationVersion = r.ReadUInt32();
                         var registrationAuthority = r.ReadUInt32();
                         var accountNumber = r.ReadUInt32();
                         var registrationToken = r.ReadUInt32();
                         var pcComputerName = r.ReadString();
-                        var pcUserName = r.ReadString();
-
-                        r.Close();
-                        m.Close();*/
+                        var pcUserName = r.ReadString();*/
 
                         return new SID_CLIENTID().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient)) &&
                             new SID_LOGONCHALLENGEEX().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient)) &&
@@ -67,16 +64,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[16];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)0); // Registration version (Defunct)
                         w.Write((UInt32)0); // Registration authority (Defunct)
                         w.Write((UInt32)0); // Account number (Defunct)
                         w.Write((UInt32)0); // Registration token (Defunct)
-
-                        w.Close();
-                        m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CLIENTID ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

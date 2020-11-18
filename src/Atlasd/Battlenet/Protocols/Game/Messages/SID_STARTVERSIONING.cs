@@ -11,7 +11,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
         public SID_STARTVERSIONING()
         {
             Id = (byte)MessageIds.SID_STARTVERSIONING;
-            Buffer = new byte[16];
+            Buffer = new byte[0];
         }
 
         public SID_STARTVERSIONING(byte[] buffer)
@@ -38,8 +38,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (Buffer.Length != 16)
                             throw new GameProtocolViolationException(context.Client, "SID_STARTVERSIONING buffer must be 16 bytes");
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         context.Client.GameState.Platform = (Platform.PlatformCode)r.ReadUInt32();
                         context.Client.GameState.Product = (Product.ProductCode)r.ReadUInt32();
@@ -49,9 +49,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         if (unknown0 != 0)
                             Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, string.Format("[" + Common.DirectionToString(context.Direction) + "] SID_STARTVERSIONING unknown field is non-zero (0x{0:X8})", unknown0));
-
-                        r.Close();
-                        m.Close();
 
                         return new SID_STARTVERSIONING().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
                     }
@@ -69,15 +66,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[10 + Encoding.ASCII.GetByteCount(MPQFilename) + Encoding.ASCII.GetByteCount(Formula)];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((UInt64)MPQFiletime);
                         w.Write((string)MPQFilename);
                         w.Write((string)Formula);
-
-                        w.Close();
-                        m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_STARTVERSIONING ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
