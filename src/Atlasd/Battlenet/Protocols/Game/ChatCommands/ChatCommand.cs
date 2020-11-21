@@ -47,7 +47,9 @@ namespace Atlasd.Battlenet.Protocols.Game
             var cmd = args[0];
             args.RemoveAt(0);
 
-            var newRaw = raw[(cmd.Length + 1)..]; // Removes (cmd+' ') from raw
+            // Calculates and removes (cmd+' ') from (raw) which prints into (newRaw):
+            var stripSize = cmd.Length + (text.Length - cmd.Length > 0 ? 1 : 0);
+            var newRaw = raw[stripSize..];
 
             switch (cmd)
             {
