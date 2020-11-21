@@ -8,7 +8,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
     class WhereIsCommand : ChatCommand
     {
-        public WhereIsCommand(List<string> arguments) : base(arguments) { }
+        public WhereIsCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
 
         public override bool CanInvoke(ChatCommandContext context)
         {
@@ -22,7 +22,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             if (t.ToLower() == context.GameState.OnlineName.ToLower())
             {
-                new WhoAmICommand(Arguments).Invoke(context);
+                new WhoAmICommand(RawBuffer, Arguments).Invoke(context);
                 return;
             }
 

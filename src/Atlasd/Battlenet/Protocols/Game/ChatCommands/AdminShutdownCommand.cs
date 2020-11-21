@@ -6,7 +6,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
     class AdminShutdownCommand : ChatCommand
     {
-        public AdminShutdownCommand(List<string> arguments) : base(arguments) { }
+        public AdminShutdownCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
 
         public override bool CanInvoke(ChatCommandContext context)
         {

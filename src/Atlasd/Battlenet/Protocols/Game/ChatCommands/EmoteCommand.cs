@@ -5,7 +5,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
     class EmoteCommand : ChatCommand
     {
-        public EmoteCommand(List<string> arguments) : base(arguments) { }
+        public EmoteCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
 
         public override bool CanInvoke(ChatCommandContext context)
         {
@@ -20,7 +20,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 return;
             }
 
-            context.GameState.ActiveChannel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_EMOTE, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, string.Join(' ', context.Command.Arguments)), context.GameState);
+            context.GameState.ActiveChannel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_EMOTE, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, RawBuffer), context.GameState);
 
             if (context.GameState.ActiveChannel.Count <= 1 || context.GameState.ActiveChannel.ActiveFlags.HasFlag(Channel.Flags.Silent))
             {

@@ -7,7 +7,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
     class AdminCommand : ChatCommand
     {
-        public AdminCommand(List<string> arguments) : base(arguments) { }
+        public AdminCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
 
         public override bool CanInvoke(ChatCommandContext context)
         {
@@ -26,7 +26,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             if (!hasSudo)
             {
-                new InvalidCommand(Arguments).Invoke(context);
+                new InvalidCommand(RawBuffer, Arguments).Invoke(context);
                 return;
             }
 
@@ -47,10 +47,10 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             {
                 case "announce":
                 case "broadcast":
-                    new AdminBroadcastCommand(Arguments).Invoke(context); return;
+                    new AdminBroadcastCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "disconnect":
                 case "dc":
-                    new AdminDisconnectCommand(Arguments).Invoke(context); return;
+                    new AdminDisconnectCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "help":
                 case "?":
                     r = string.Join(Environment.NewLine, new List<string>() {
@@ -73,14 +73,14 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                     break;
                 case "moveuser":
                 case "move":
-                    new AdminMoveUserCommand(Arguments).Invoke(context); return;
+                    new AdminMoveUserCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "reload":
-                    new AdminReloadCommand(Arguments).Invoke(context); return;
+                    new AdminReloadCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "shutdown":
-                    new AdminShutdownCommand(Arguments).Invoke(context); return;
+                    new AdminShutdownCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "spoofuserflag":
                 case "spoofuserflags":
-                    new AdminSpoofUserFlagsCommand(Arguments).Invoke(context); return;
+                    new AdminSpoofUserFlagsCommand(RawBuffer, Arguments).Invoke(context); return;
                 default:
                     r = "That is not a valid admin command. Type /admin help or /admin ? for more info.";
                     break;

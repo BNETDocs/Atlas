@@ -7,7 +7,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
     class AdminBroadcastCommand : ChatCommand
     {
-        public AdminBroadcastCommand(List<string> arguments) : base(arguments) { }
+        public AdminBroadcastCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
 
         public override bool CanInvoke(ChatCommandContext context)
         {

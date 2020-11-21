@@ -5,7 +5,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
     class WhisperCommand : ChatCommand
     {
-        public WhisperCommand(List<string> arguments) : base(arguments) { }
+        public WhisperCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
 
         public override bool CanInvoke(ChatCommandContext context)
         {

@@ -7,7 +7,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
     class AdminMoveUserCommand : ChatCommand
     {
-        public AdminMoveUserCommand(List<string> arguments) : base(arguments) { }
+        public AdminMoveUserCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
 
         public override bool CanInvoke(ChatCommandContext context)
         {

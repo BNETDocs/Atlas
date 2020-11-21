@@ -7,7 +7,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
     class SquelchCommand : ChatCommand
     {
-        public SquelchCommand(List<string> arguments) : base(arguments) { }
+        public SquelchCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
 
         public override bool CanInvoke(ChatCommandContext context)
         {

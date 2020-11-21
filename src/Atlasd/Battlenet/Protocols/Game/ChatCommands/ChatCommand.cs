@@ -9,10 +9,15 @@ namespace Atlasd.Battlenet.Protocols.Game
     class ChatCommand
     {
         public List<string> Arguments { get; protected set; }
+        public byte[] RawBuffer { get; protected set; }
 
-        public ChatCommand(List<string> arguments)
+        /**
+         * <param name="rawBuffer">The byte array from the client, stripped of the slash and null-terminator. Value may be used during invocation of a ChatCommand.</param>
+         */
+        public ChatCommand(byte[] rawBuffer, List<string> arguments)
         {
             Arguments = arguments;
+            RawBuffer = rawBuffer;
         }
 
         public virtual bool CanInvoke(ChatCommandContext context)
@@ -27,59 +32,66 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public static ChatCommand FromByteArray(byte[] text)
         {
-            return FromString(Encoding.UTF8.GetString(text[..^1]));
+            return Parse(Encoding.UTF8.GetString(text), text);
         }
 
         public static ChatCommand FromString(string text)
+        {
+            return Parse(text, Encoding.UTF8.GetBytes(text));
+        }
+
+        private static ChatCommand Parse(string text, byte[] raw)
         {
             var args = new List<string>(text.Split(' '));
 
             var cmd = args[0];
             args.RemoveAt(0);
 
+            var newRaw = raw[(cmd.Length + 1)..]; // Removes (cmd+' ') from raw
+
             switch (cmd)
             {
                 case "admin":
-                    return new AdminCommand(args);
+                    return new AdminCommand(newRaw, args);
                 case "away":
-                    return new AwayCommand(args);
+                    return new AwayCommand(newRaw, args);
                 case "channel":
                 case "join":
                 case "j":
-                    return new JoinCommand(args);
+                    return new JoinCommand(newRaw, args);
                 case "emote":
                 case "me":
-                    return new EmoteCommand(args);
+                    return new EmoteCommand(newRaw, args);
                 case "help":
                 case "?":
-                    return new HelpCommand(args);
+                    return new HelpCommand(newRaw, args);
                 case "ignore":
                 case "squelch":
-                    return new SquelchCommand(args);
+                    return new SquelchCommand(newRaw, args);
                 case "kick":
-                    return new KickCommand(args);
+                    return new KickCommand(newRaw, args);
                 case "time":
-                    return new TimeCommand(args);
+                    return new TimeCommand(newRaw, args);
                 case "unignore":
                 case "unsquelch":
-                    return new UnsquelchCommand(args);
+                    return new UnsquelchCommand(newRaw, args);
                 case "users":
-                    return new UsersCommand(args);
+                    return new UsersCommand(newRaw, args);
                 case "whereis":
                 case "where":
                 case "whois":
-                    return new WhereIsCommand(args);
+                    return new WhereIsCommand(newRaw, args);
                 case "whisper":
                 case "msg":
                 case "m":
                 case "w":
-                    return new WhisperCommand(args);
+                    return new WhisperCommand(newRaw, args);
                 case "who":
-                    return new WhoCommand(args);
+                    return new WhoCommand(newRaw, args);
                 case "whoami":
-                    return new WhoAmICommand(args);
+                    return new WhoAmICommand(newRaw, args);
                 default:
-                    return new InvalidCommand(args);
+                    return new InvalidCommand(newRaw, args);
             }
         }
     }

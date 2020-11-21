@@ -8,7 +8,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
     class AdminReloadCommand : ChatCommand
     {
-        public AdminReloadCommand(List<string> arguments) : base(arguments) { }
+        public AdminReloadCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
 
         public override bool CanInvoke(ChatCommandContext context)
         {

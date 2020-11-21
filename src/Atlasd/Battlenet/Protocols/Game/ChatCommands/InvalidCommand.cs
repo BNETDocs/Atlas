@@ -5,7 +5,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
     class InvalidCommand : ChatCommand
     {
-        public InvalidCommand(List<string> arguments) : base(arguments) { }
+        public InvalidCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
 
         public override bool CanInvoke(ChatCommandContext context)
         {

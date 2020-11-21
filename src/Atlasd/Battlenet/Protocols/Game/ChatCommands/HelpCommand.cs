@@ -6,7 +6,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
     class HelpCommand : ChatCommand
     {
-        public HelpCommand(List<string> arguments) : base(arguments) { }
+        public HelpCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
 
         public override bool CanInvoke(ChatCommandContext context)
         {

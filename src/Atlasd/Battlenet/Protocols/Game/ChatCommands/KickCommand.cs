@@ -5,7 +5,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
     class KickCommand : ChatCommand
     {
-        public KickCommand(List<string> arguments) : base(arguments) { }
+        public KickCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
 
         public override bool CanInvoke(ChatCommandContext context)
         {
