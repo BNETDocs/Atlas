@@ -72,6 +72,9 @@ namespace Atlasd.Battlenet.Protocols.Game
                     return new SquelchCommand(newRaw, args);
                 case "kick":
                     return new KickCommand(newRaw, args);
+                case "rejoin":
+                case "rj":
+                    return new ReJoinCommand(newRaw, args);
                 case "time":
                     return new TimeCommand(newRaw, args);
                 case "unignore":
