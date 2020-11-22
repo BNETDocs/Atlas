@@ -16,11 +16,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            var text = string.Join(' ', Arguments);
-
             Task.Run(() =>
             {
-                var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, text);
+                var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, RawBuffer);
 
                 lock (Battlenet.Common.ActiveGameStates)
                 {

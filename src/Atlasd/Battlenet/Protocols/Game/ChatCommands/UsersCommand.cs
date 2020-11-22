@@ -15,7 +15,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            string r = Battlenet.Common.GetServerStats(context.GameState.Client);
+            var r = Battlenet.Common.GetServerStats(context.GameState.Client);
 
             foreach (var kv in context.Environment)
             {
@@ -23,7 +23,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
 
             foreach (var line in r.Split(Battlenet.Common.NewLine))
+            {
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
+            }
         }
     }
 }

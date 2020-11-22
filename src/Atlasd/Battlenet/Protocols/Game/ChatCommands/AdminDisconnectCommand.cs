@@ -1,9 +1,9 @@
 ﻿using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Localization;
-using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
@@ -18,8 +18,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            var t = Arguments.Count == 0 ? "" : Arguments[0];
-            string r;
+            var t = Arguments.Count == 0 ? "" : Arguments[0]; // target
+            string r; // reply
 
             if (t.Length == 0 || !Battlenet.Common.GetClientByOnlineName(t, out var target) || target == null)
             {
@@ -29,7 +29,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 return;
             }
 
-            Arguments.RemoveAt(0); // remove t
+            Arguments.RemoveAt(0); // remove target
+            // Calculates and removes (target+' ') from (raw) which prints into (newRaw):
+            RawBuffer = RawBuffer[(Encoding.UTF8.GetByteCount(t) + (Arguments.Count > 0 ? 1 : 0))..];
             var reason = string.Join(' ', Arguments);
 
             var targetEnv = new Dictionary<string, string>()
@@ -58,7 +60,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
 
             new SID_MESSAGEBOX().Invoke(new MessageContext(target.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){
-                { "style", (uint)0 }, { "caption", Resources.DisconnectedByAdminCaption }, { "text", r }
+                { "style", (uint)0x10030 }, { "caption", Resources.DisconnectedByAdminCaption }, { "text", r }
             }));
 
             target.Client.Disconnect();

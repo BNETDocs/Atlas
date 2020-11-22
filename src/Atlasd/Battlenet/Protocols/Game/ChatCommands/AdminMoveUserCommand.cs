@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
@@ -16,8 +17,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            var t = Arguments.Count == 0 ? "" : Arguments[0];
-            string r;
+            var t = Arguments.Count == 0 ? "" : Arguments[0]; // target
+            string r; // reply
 
             if (t.Length == 0 || !Battlenet.Common.GetClientByOnlineName(t, out var target) || target == null)
             {
@@ -27,8 +28,10 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 return;
             }
 
-            Arguments.RemoveAt(0); // remove t
-            
+            Arguments.RemoveAt(0); // remove target
+            // Calculates and removes (target+' ') from (raw) which prints into (newRaw):
+            RawBuffer = RawBuffer[(Encoding.UTF8.GetByteCount(t) + (Arguments.Count > 0 ? 1 : 0))..];
+
             if (target.ActiveChannel == null)
             {
                 r = Resources.UserNotInChannel;

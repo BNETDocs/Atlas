@@ -17,12 +17,11 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
         public override void Invoke(ChatCommandContext context)
         {
             string message = Arguments.Count == 0 ? null : string.Join(" ", Arguments);
-            string r;
+            string r; // reply
 
-            if (context.GameState.Away == null || (message != null && message.Length > 0))
+            if (context.GameState.Away == null || !string.IsNullOrEmpty(message))
             {
-                if (message == null || message.Length == 0) message = "Not available";
-                context.GameState.Away = message;
+                context.GameState.Away = string.IsNullOrEmpty(message) ? "Not available" : message;
                 r = Resources.AwayCommandOn;
             } else
             {
@@ -36,7 +35,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
 
             foreach (var line in r.Split(Battlenet.Common.NewLine))
+            {
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
+            }
         }
     }
 }

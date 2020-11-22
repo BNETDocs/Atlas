@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
@@ -35,11 +36,15 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             if (Arguments.Count == 0)
             {
                 cmd = "";
-            } else
+            }
+            else
             {
                 cmd = Arguments[0];
                 Arguments.RemoveAt(0);
             }
+
+            // Calculates and removes (cmd+' ') from (raw) which prints into (newRaw):
+            RawBuffer = RawBuffer[(Encoding.UTF8.GetByteCount(cmd) + (Arguments.Count > 0 ? 1 : 0))..];
 
             string r;
 
@@ -53,7 +58,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                     new AdminDisconnectCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "help":
                 case "?":
-                    r = string.Join(Environment.NewLine, new List<string>() {
+                    r = string.Join(Battlenet.Common.NewLine, new List<string>() {
                         { "/admin ? (alias: /admin help)" },
                         { "/admin announce (alias: /admin broadcast)" },
                         { "/admin broadcast <message>" },

@@ -16,22 +16,22 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
         public override void Invoke(ChatCommandContext context)
         {
             var ch = context.GameState.ActiveChannel;
-            var str = ch == null ? Resources.YouAreUsingGameInRealm : Resources.YouAreUsingGameInTheChannel;
+            var r = ch == null ? Resources.YouAreUsingGameInRealm : Resources.YouAreUsingGameInTheChannel;
 
             if (context.GameState.Away != null)
             {
-                str += Battlenet.Common.NewLine + Resources.AwayCommandStatusSelf.Replace("{awayMessage}", context.GameState.Away);
+                r += Battlenet.Common.NewLine + Resources.AwayCommandStatusSelf.Replace("{awayMessage}", context.GameState.Away);
             }
 
-            str = str.Replace("{channel}", ch == null ? "(null)" : ch.Name);
-            str = str.Replace("{realm}", "BNETDocs");
+            r = r.Replace("{channel}", ch == null ? "(null)" : ch.Name);
+            r = r.Replace("{realm}", "BNETDocs");
 
             foreach (var kv in context.Environment)
             {
-                str = str.Replace("{" + kv.Key + "}", kv.Value);
+                r = r.Replace("{" + kv.Key + "}", kv.Value);
             }
 
-            new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, str).WriteTo(context.GameState.Client);
+            new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, r).WriteTo(context.GameState.Client);
         }
     }
 }

@@ -15,17 +15,19 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            var str = Resources.TimeCommand;
+            var r = Resources.TimeCommand;
 
             foreach (var kv in context.Environment)
             {
-                str = str.Replace("{" + kv.Key + "}", kv.Value);
+                r = r.Replace("{" + kv.Key + "}", kv.Value);
             }
 
-            str = str.Replace(" 0", "  ");
+            r = r.Replace(" 0", "  ");
 
-            foreach (var line in str.Split(Battlenet.Common.NewLine))
+            foreach (var line in r.Split(Battlenet.Common.NewLine))
+            {
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
+            }
         }
     }
 }

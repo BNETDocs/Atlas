@@ -1,5 +1,6 @@
 ﻿using Atlasd.Localization;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
@@ -22,11 +23,11 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             var target = Arguments[0];
             Arguments.RemoveAt(0);
-
-            var message = string.Join(" ", Arguments);
+            // Calculates and removes (target+' ') from (raw) which prints into (newRaw):
+            RawBuffer = RawBuffer[(Encoding.UTF8.GetByteCount(target) + (Arguments.Count > 0 ? 1 : 0))..];
 
             // Check for empty message
-            if (string.IsNullOrEmpty(message))
+            if (RawBuffer.Length == 0)
             {
                 new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, Resources.WhisperCommandEmptyMessage).WriteTo(context.GameState.Client);
                 return;
@@ -53,7 +54,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
 
             // Notify the source we whispered the target
-            new ChatEvent(ChatEvent.EventIds.EID_WHISPERTO, targetState.ChannelFlags, targetState.Ping, targetState.OnlineName, message).WriteTo(context.GameState.Client);
+            new ChatEvent(ChatEvent.EventIds.EID_WHISPERTO, targetState.ChannelFlags, targetState.Ping, targetState.OnlineName, RawBuffer).WriteTo(context.GameState.Client);
 
             // Check if target is marked away
             if (!string.IsNullOrEmpty(targetState.Away))
@@ -67,7 +68,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
 
             // Notify the target they were whispered by the source
-            new ChatEvent(ChatEvent.EventIds.EID_WHISPERFROM, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, message).WriteTo(targetState.Client);
+            new ChatEvent(ChatEvent.EventIds.EID_WHISPERFROM, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, RawBuffer).WriteTo(targetState.Client);
         }
     }
 }

@@ -17,8 +17,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            var t = Arguments.Count == 0 ? "" : Arguments[0];
-            string r;
+            var t = Arguments.Count == 0 ? "" : Arguments[0]; // target
+            string r; // reply
 
             if (t.ToLower() == context.GameState.OnlineName.ToLower())
             {
