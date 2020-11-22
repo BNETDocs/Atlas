@@ -16,23 +16,24 @@ namespace Atlasd.Battlenet
         [Flags]
         public enum Flags : UInt32
         {
-            None            = 0x00000, // aka "Private"
-            Public          = 0x00001,
-            Moderated       = 0x00002,
-            Restricted      = 0x00004,
-            Silent          = 0x00008,
-            System          = 0x00010,
+            None = 0x00000, // aka "Private"
+            Public = 0x00001,
+            Moderated = 0x00002,
+            Restricted = 0x00004,
+            Silent = 0x00008,
+            System = 0x00010,
             ProductSpecific = 0x00020,
-            Global          = 0x01000,
-            Redirected      = 0x04000,
-            Chat            = 0x08000,
-            TechSupport     = 0x10000,
+            Global = 0x01000,
+            Redirected = 0x04000,
+            Chat = 0x08000,
+            TechSupport = 0x10000,
         };
 
         public Flags ActiveFlags { get; protected set; }
         public bool AllowNewUsers { get; protected set; }
         protected List<GameState> BannedUsers { get; private set; }
         public int Count { get => Users.Count; }
+        public Dictionary<GameState, GameState> DesignatedHeirs { get; protected set; }
         public int MaxUsers { get; protected set; }
         public string Name { get; protected set; }
         public string Topic { get; protected set; }
@@ -43,6 +44,7 @@ namespace Atlasd.Battlenet
             ActiveFlags = flags;
             AllowNewUsers = true;
             BannedUsers = new List<GameState>();
+            DesignatedHeirs = new Dictionary<GameState, GameState>();
             MaxUsers = maxUsers;
             Name = name;
             Topic = topic;
@@ -158,8 +160,23 @@ namespace Atlasd.Battlenet
                 UpdateUser(user, user.ChannelFlags | Account.Flags.ChannelOp);
         }
 
+        public void Designate(GameState designator, GameState heir)
+        {
+            if (!DesignatedHeirs.ContainsKey(designator))
+            {
+                DesignatedHeirs.Add(designator, heir);
+            }
+            else
+            {
+                DesignatedHeirs[designator] = heir;
+            }
+        }
+
         public void Dispose()
         {
+            BannedUsers = null;
+            DesignatedHeirs = null;
+
             if (Users != null)
             {
                 var theVoid = GetChannelByName(Resources.TheVoid, true);
@@ -409,12 +426,37 @@ namespace Atlasd.Battlenet
                 lock (user)
                 {
                     user.ActiveChannel = null;
-                    user.ChannelFlags &= ~Account.Flags.ChannelOp;
+                    var wasChannelOp = user.ChannelFlags.HasFlag(Account.Flags.Employee)
+                        || user.ChannelFlags.HasFlag(Account.Flags.ChannelOp)
+                        || user.ChannelFlags.HasFlag(Account.Flags.Admin);
+                    user.ChannelFlags &= ~Account.Flags.ChannelOp; // remove channel op
 
                     foreach (var subuser in users)
                     {
                         // Tell everyone else about this user leaving the channel:
                         new ChatEvent(ChatEvent.EventIds.EID_USERLEAVE, user.ChannelFlags, user.Ping, user.OnlineName, new byte[0]).WriteTo(subuser.Client);
+                    }
+
+                    lock (DesignatedHeirs)
+                    {
+                        var designatedHeirExists = DesignatedHeirs.ContainsKey(user);
+
+                        if (wasChannelOp && designatedHeirExists && Users.Contains(DesignatedHeirs[user]))
+                        {
+                            var heir = DesignatedHeirs[user];
+
+                            if (heir != null && heir.ActiveChannel == this && !heir.ChannelFlags.HasFlag(Account.Flags.ChannelOp))
+                            {
+                                // Promote the designated heir.
+                                heir.ChannelFlags |= Account.Flags.ChannelOp;
+                                UpdateUser(heir, heir.ChannelFlags);
+                            }
+                        }
+
+                        if (designatedHeirExists)
+                        {
+                            DesignatedHeirs.Remove(user);
+                        }
                     }
                 }
             }

@@ -304,6 +304,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {user} is your new designated heir..
+        /// </summary>
+        public static string DesignateCommand {
+            get {
+                return ResourceManager.GetString("DesignateCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You have been disconnected by a system administrator..
         /// </summary>
         public static string DisconnectedByAdmin {

@@ -47,56 +47,58 @@ namespace Atlasd.Battlenet.Protocols.Game
             var cmd = args[0];
             args.RemoveAt(0);
 
-            // Calculates and removes (cmd+' ') from (raw) which prints into (newRaw):
+            // Calculates and removes (cmd+' ') from (raw) which prints into (_raw):
             var stripSize = cmd.Length + (text.Length - cmd.Length > 0 ? 1 : 0);
-            var newRaw = raw[stripSize..];
+            var _raw = raw[stripSize..];
 
             switch (cmd)
             {
                 case "admin":
-                    return new AdminCommand(newRaw, args);
+                    return new AdminCommand(_raw, args);
                 case "away":
-                    return new AwayCommand(newRaw, args);
+                    return new AwayCommand(_raw, args);
                 case "channel":
                 case "join":
                 case "j":
-                    return new JoinCommand(newRaw, args);
+                    return new JoinCommand(_raw, args);
+                case "designate":
+                    return new DesignateCommand(_raw, args);
                 case "emote":
                 case "me":
-                    return new EmoteCommand(newRaw, args);
+                    return new EmoteCommand(_raw, args);
                 case "help":
                 case "?":
-                    return new HelpCommand(newRaw, args);
+                    return new HelpCommand(_raw, args);
                 case "ignore":
                 case "squelch":
-                    return new SquelchCommand(newRaw, args);
+                    return new SquelchCommand(_raw, args);
                 case "kick":
-                    return new KickCommand(newRaw, args);
+                    return new KickCommand(_raw, args);
                 case "rejoin":
                 case "rj":
-                    return new ReJoinCommand(newRaw, args);
+                    return new ReJoinCommand(_raw, args);
                 case "time":
-                    return new TimeCommand(newRaw, args);
+                    return new TimeCommand(_raw, args);
                 case "unignore":
                 case "unsquelch":
-                    return new UnsquelchCommand(newRaw, args);
+                    return new UnsquelchCommand(_raw, args);
                 case "users":
-                    return new UsersCommand(newRaw, args);
+                    return new UsersCommand(_raw, args);
                 case "whereis":
                 case "where":
                 case "whois":
-                    return new WhereIsCommand(newRaw, args);
+                    return new WhereIsCommand(_raw, args);
                 case "whisper":
                 case "msg":
                 case "m":
                 case "w":
-                    return new WhisperCommand(newRaw, args);
+                    return new WhisperCommand(_raw, args);
                 case "who":
-                    return new WhoCommand(newRaw, args);
+                    return new WhoCommand(_raw, args);
                 case "whoami":
-                    return new WhoAmICommand(newRaw, args);
+                    return new WhoAmICommand(_raw, args);
                 default:
-                    return new InvalidCommand(newRaw, args);
+                    return new InvalidCommand(_raw, args);
             }
         }
     }

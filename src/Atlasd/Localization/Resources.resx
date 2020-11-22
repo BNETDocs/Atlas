@@ -204,6 +204,9 @@ This server is hosted by {host}.
   <data name="ChatCommandUnavailable" xml:space="preserve">
     <value>That command is not available at the moment.</value>
   </data>
+  <data name="DesignateCommand" xml:space="preserve">
+    <value>{user} is your new designated heir.</value>
+  </data>
   <data name="DisconnectedByAdmin" xml:space="preserve">
     <value>You have been disconnected by a system administrator.</value>
   </data>

@@ -1,7 +1,6 @@
 ﻿using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -45,8 +44,8 @@ namespace Atlasd.Battlenet.Protocols.Game
         public VersionInfo Version;
 
         public string Away;
-        public string DoNotDisturb;
         public UInt32 ClientToken;
+        public string DoNotDisturb;
         public UInt32 FailedLogons;
         public ushort GameDataPort;
         public string KeyOwner;
