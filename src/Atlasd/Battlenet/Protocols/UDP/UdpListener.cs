@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet.Protocols.Udp
 {
-    class UdpListener : IDisposable
+    class UdpListener : IDisposable, IListener
     {
+        public bool IsListening { get => Socket != null; }
         public IPEndPoint LocalEndPoint { get; protected set; }
         public Socket Socket { get; protected set; }
 
         public UdpListener(IPEndPoint endp)
         {
-            LocalEndPoint = endp;
+            SetLocalEndPoint(endp);
         }
 
         public void Close()
@@ -30,7 +31,7 @@ namespace Atlasd.Battlenet.Protocols.Udp
 
         public void SetLocalEndPoint(IPEndPoint endp)
         {
-            if (Socket != null)
+            if (IsListening)
             {
                 throw new InvalidOperationException();
             }
@@ -83,13 +84,12 @@ namespace Atlasd.Battlenet.Protocols.Udp
 
         public void Stop()
         {
-            if (Socket != null)
-            {
-                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, $"Stopping UDP listener on [{Socket.LocalEndPoint}]");
+            if (!IsListening) return;
 
-                Socket.Close();
-                Socket = null;
-            }
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, $"Stopping UDP listener on [{Socket.LocalEndPoint}]");
+
+            Socket.Close();
+            Socket = null;
         }
     }
 }

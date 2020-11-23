@@ -28,6 +28,7 @@ namespace Atlasd.Daemon
             Client_IPC,
             Client_MCP,
             Client_UDP,
+            Http,
             Server,
         };
 
@@ -58,6 +59,7 @@ namespace Atlasd.Daemon
                 LogType.Client_IPC => "Client_IPC",
                 LogType.Client_MCP => "Client_MCP",
                 LogType.Client_UDP => "Client_UDP",
+                LogType.Http => "Http",
                 LogType.Server => "Server",
                 _ => throw new IndexOutOfRangeException("Unknown log type"),
             };

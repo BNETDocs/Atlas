@@ -49,9 +49,11 @@ namespace Atlasd
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, $"Setting log level to {logLevel}");
             Logging.CurrentLogLevel = Logging.StringToLogLevel(logLevel);
 
+            Common.Initialize();
             Battlenet.Common.Initialize();
             Battlenet.Common.UdpListener.Start();
             Battlenet.Common.Listener.Start();
+            Common.HttpListener.Start();
 
             while (!Exit)
             {
