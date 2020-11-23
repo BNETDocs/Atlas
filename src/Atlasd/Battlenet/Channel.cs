@@ -585,17 +585,17 @@ namespace Atlasd.Battlenet
 
         public void UpdateUser(GameState client, Account.Flags flags)
         {
-            UpdateUser(client, flags, client.Ping, Encoding.UTF8.GetString(client.Statstring));
+            UpdateUser(client, flags, client.Ping, client.Statstring);
         }
 
         public void UpdateUser(GameState client, Int32 ping)
         {
-            UpdateUser(client, client.ChannelFlags, ping, Encoding.UTF8.GetString(client.Statstring));
+            UpdateUser(client, client.ChannelFlags, ping, client.Statstring);
         }
 
         public void UpdateUser(GameState client, byte[] statstring)
         {
-            UpdateUser(client, client.ChannelFlags, client.Ping, Encoding.UTF8.GetString(statstring));
+            UpdateUser(client, client.ChannelFlags, client.Ping, statstring);
         }
 
         public void UpdateUser(GameState client, string statstring)
@@ -614,11 +614,7 @@ namespace Atlasd.Battlenet
 
         public void UpdateUser(GameState client, Account.Flags flags, Int32 ping, string statstring)
         {
-            client.ChannelFlags = flags;
-            client.Ping = ping;
-            client.Statstring = Encoding.UTF8.GetBytes(statstring);
-
-            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, client.ChannelFlags, client.Ping, client.OnlineName, client.Statstring), client);
+            UpdateUser(client, flags, ping, Encoding.UTF8.GetBytes(statstring));
         }
 
         public void WriteChatEvent(ChatEvent chatEvent, GameState owner = null)
