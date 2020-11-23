@@ -4,6 +4,7 @@ using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using System.Threading;
 
@@ -118,12 +119,12 @@ namespace Atlasd.Battlenet
                     foreach (var subuser in users)
                     {
                         // Tell this user about everyone in the channel:
-                        new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, subuser.ChannelFlags, subuser.Ping, subuser.OnlineName, Encoding.ASCII.GetString(subuser.Statstring)).WriteTo(user.Client);
+                        new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, subuser.ChannelFlags, subuser.Ping, subuser.OnlineName, subuser.Statstring).WriteTo(user.Client);
 
                         // Tell everyone else about this user entering the channel:
                         if (subuser != user)
                         {
-                            new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, user.ChannelFlags, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring)).WriteTo(subuser.Client);
+                            new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, user.ChannelFlags, user.Ping, user.OnlineName, user.Statstring).WriteTo(subuser.Client);
                         }
                     }
                 }
@@ -495,8 +496,12 @@ namespace Atlasd.Battlenet
                     // Show users in channel or display info about no chat:
                     if (!ActiveFlags.HasFlag(Flags.Silent))
                     {
-                        var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, user.ChannelFlags, user.Ping, user.OnlineName, Encoding.ASCII.GetString(user.Statstring));
-                        foreach (var subuser in Users) WriteChatEvent(chatEvent, subuser.Client.GameState);
+                        var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, user.ChannelFlags, user.Ping, user.OnlineName, user.Statstring);
+
+                        foreach (var subuser in Users)
+                        {
+                            WriteChatEvent(chatEvent, subuser.Client.GameState);
+                        }
                     }
                     else
                     {
@@ -561,30 +566,39 @@ namespace Atlasd.Battlenet
 
         public void SquelchUpdate(GameState client)
         {
-            if (client == null) return;
+            if (client == null) throw new NullReferenceException("Client parameter must not be null");
 
-            // TODO
+            lock (Users)
+            {
+                foreach (var user in Users)
+                {
+                    var remoteAddress = IPAddress.Parse(user.Client.RemoteEndPoint.ToString().Split(':')[0]);
+                    var squelched = client.SquelchedIPs.Contains(remoteAddress);
+                    var flags = squelched ? user.ChannelFlags | Account.Flags.Squelched : user.ChannelFlags & ~Account.Flags.Squelched;
+                    new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, flags, user.Ping, user.OnlineName, user.Statstring).WriteTo(client.Client);
+                }
+            }
         }
 
         // This function should only be called if any of the attributes were modified outside of this class.
         public void UpdateUser(GameState client)
         {
-            UpdateUser(client, client.ChannelFlags, client.Ping, Encoding.ASCII.GetString(client.Statstring));
+            UpdateUser(client, client.ChannelFlags, client.Ping, client.Statstring);
         }
 
         public void UpdateUser(GameState client, Account.Flags flags)
         {
-            UpdateUser(client, flags, client.Ping, Encoding.ASCII.GetString(client.Statstring));
+            UpdateUser(client, flags, client.Ping, Encoding.UTF8.GetString(client.Statstring));
         }
 
         public void UpdateUser(GameState client, Int32 ping)
         {
-            UpdateUser(client, client.ChannelFlags, ping, Encoding.ASCII.GetString(client.Statstring));
+            UpdateUser(client, client.ChannelFlags, ping, Encoding.UTF8.GetString(client.Statstring));
         }
 
         public void UpdateUser(GameState client, byte[] statstring)
         {
-            UpdateUser(client, client.ChannelFlags, client.Ping, Encoding.ASCII.GetString(statstring));
+            UpdateUser(client, client.ChannelFlags, client.Ping, Encoding.UTF8.GetString(statstring));
         }
 
         public void UpdateUser(GameState client, string statstring)
@@ -592,13 +606,22 @@ namespace Atlasd.Battlenet
             UpdateUser(client, client.ChannelFlags, client.Ping, statstring);
         }
 
+        public void UpdateUser(GameState client, Account.Flags flags, Int32 ping, byte[] statstring)
+        {
+            client.ChannelFlags = flags;
+            client.Ping = ping;
+            client.Statstring = statstring;
+
+            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, client.ChannelFlags, client.Ping, client.OnlineName, client.Statstring), client);
+        }
+
         public void UpdateUser(GameState client, Account.Flags flags, Int32 ping, string statstring)
         {
             client.ChannelFlags = flags;
             client.Ping = ping;
-            client.Statstring = Encoding.ASCII.GetBytes(statstring);
+            client.Statstring = Encoding.UTF8.GetBytes(statstring);
 
-            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, client.ChannelFlags, client.Ping, client.OnlineName, Encoding.ASCII.GetString(client.Statstring)), client);
+            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, client.ChannelFlags, client.Ping, client.OnlineName, client.Statstring), client);
         }
 
         public void WriteChatEvent(ChatEvent chatEvent, GameState owner = null)

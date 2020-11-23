@@ -29,7 +29,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 return;
             }
 
-            var ipAddress = IPAddress.Parse(target.Client.RemoteEndPoint.ToString().Split(":")[0]);
+            var ipAddress = IPAddress.Parse(target.Client.RemoteEndPoint.ToString().Split(':')[0]);
 
             lock (context.GameState.SquelchedIPs)
             {
