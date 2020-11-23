@@ -163,14 +163,7 @@ namespace Atlasd.Battlenet
 
         public void Designate(GameState designator, GameState heir)
         {
-            if (!DesignatedHeirs.ContainsKey(designator))
-            {
-                DesignatedHeirs.Add(designator, heir);
-            }
-            else
-            {
-                DesignatedHeirs[designator] = heir;
-            }
+            DesignatedHeirs[designator] = heir;
         }
 
         public void Dispose()
