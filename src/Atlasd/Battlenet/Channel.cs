@@ -575,7 +575,11 @@ namespace Atlasd.Battlenet
                     var remoteAddress = IPAddress.Parse(user.Client.RemoteEndPoint.ToString().Split(':')[0]);
                     var squelched = client.SquelchedIPs.Contains(remoteAddress);
                     var flags = squelched ? user.ChannelFlags | Account.Flags.Squelched : user.ChannelFlags & ~Account.Flags.Squelched;
-                    new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, flags, user.Ping, user.OnlineName, user.Statstring).WriteTo(client.Client);
+
+                    if (user.ChannelFlags != flags)
+                    {
+                        new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, flags, user.Ping, user.OnlineName, user.Statstring).WriteTo(client.Client);
+                    }
                 }
             }
         }
