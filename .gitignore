@@ -344,3 +344,7 @@ healthchecksdb
 
 # Local launch settings
 src/*/Properties/launchSettings.json
+
+# Git Submodule Cache
+# <https://stackoverflow.com/a/18105940>
+.gitmodules
