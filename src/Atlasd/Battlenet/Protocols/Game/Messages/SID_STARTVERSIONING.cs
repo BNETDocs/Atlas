@@ -60,9 +60,20 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          *   (STRING) CheckRevision Formula
                          */
 
-                        var MPQFiletime = (UInt64)0;
-                        var MPQFilename = "ver-IX86-1.mpq";
-                        var Formula = "A=3845581634 B=880823580 C=1363937103 4 A=A-S B=B-C C=C-A A=A-B";
+                        ulong MPQFiletime = 0;
+                        string MPQFilename = "ver-IX86-1.mpq";
+                        string Formula = "A=3845581634 B=880823580 C=1363937103 4 A=A-S B=B-C C=C-A A=A-B";
+
+                        var fileinfo = new BNFTP.File(MPQFilename).GetFileInfo();
+                        if (fileinfo == null)
+                        {
+                            Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Client_Game, $"Version check file [{MPQFilename}] does not exist!");
+                        }
+                        else
+                        {
+                            MPQFilename = fileinfo.Name;
+                            MPQFiletime = (ulong)fileinfo.LastWriteTimeUtc.ToFileTimeUtc();
+                        }
 
                         Buffer = new byte[10 + Encoding.ASCII.GetByteCount(MPQFilename) + Encoding.ASCII.GetByteCount(Formula)];
 

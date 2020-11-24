@@ -78,9 +78,20 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          *      (VOID) 128-byte Server signature
                          */
 
-                        var MPQFiletime = (UInt64)0;
-                        var MPQFilename = "ver-IX86-1.mpq";
-                        var Formula = "A=3845581634 B=880823580 C=1363937103 4 A=A-S B=B-C C=C-A A=A-B";
+                        ulong MPQFiletime = 0;
+                        string MPQFilename = "ver-IX86-1.mpq";
+                        string Formula = "A=3845581634 B=880823580 C=1363937103 4 A=A-S B=B-C C=C-A A=A-B";
+
+                        var fileinfo = new BNFTP.File(MPQFilename).GetFileInfo();
+                        if (fileinfo == null)
+                        {
+                            Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Client_Game, $"Version check file [{MPQFilename}] does not exist!");
+                        }
+                        else
+                        {
+                            MPQFilename = fileinfo.Name;
+                            MPQFiletime = (ulong)fileinfo.LastWriteTimeUtc.ToFileTimeUtc();
+                        }
 
                         Buffer = new byte[22 + MPQFilename.Length + Formula.Length + (Product.IsWarcraftIII(context.Client.GameState.Product) ? 128 : 0)];
 
@@ -90,10 +101,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write((UInt32)context.Client.GameState.LogonType);
                         w.Write((UInt32)context.Client.GameState.ServerToken);
                         w.Write((UInt32)context.Client.GameState.UDPToken);
-                        w.Write(MPQFiletime);
-                        w.Write(MPQFilename);
-                        w.Write(Formula);
-                        
+                        w.Write((UInt64)MPQFiletime);
+                        w.Write((string)MPQFilename);
+                        w.Write((string)Formula);
+
                         if (Product.IsWarcraftIII(context.Client.GameState.Product))
                             w.Write(new byte[128]);
 
