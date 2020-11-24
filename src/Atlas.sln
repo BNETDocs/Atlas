@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atlasd", "Atlasd\Atlasd.csproj", "{E6E0DA5F-CDF0-41F6-A3B3-66EAEF70B9EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MBNCSUtil", "MBNCSUtil\MBNCSUtil.csproj", "{F66D19F8-4F97-4E87-9E18-444ECF289A83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MBNCSUtil", "..\vendor\MBNCSUtil\src\MBNCSUtil.csproj", "{C1DC2666-B308-4B01-A037-7C9F7ECFBD1E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{E6E0DA5F-CDF0-41F6-A3B3-66EAEF70B9EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6E0DA5F-CDF0-41F6-A3B3-66EAEF70B9EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6E0DA5F-CDF0-41F6-A3B3-66EAEF70B9EC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F66D19F8-4F97-4E87-9E18-444ECF289A83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F66D19F8-4F97-4E87-9E18-444ECF289A83}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F66D19F8-4F97-4E87-9E18-444ECF289A83}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F66D19F8-4F97-4E87-9E18-444ECF289A83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1DC2666-B308-4B01-A037-7C9F7ECFBD1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1DC2666-B308-4B01-A037-7C9F7ECFBD1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1DC2666-B308-4B01-A037-7C9F7ECFBD1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1DC2666-B308-4B01-A037-7C9F7ECFBD1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

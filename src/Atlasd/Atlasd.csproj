@@ -23,10 +23,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MBNCSUtil\MBNCSUtil.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -45,6 +41,10 @@
 
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\vendor\MBNCSUtil\src\MBNCSUtil.csproj" />
   </ItemGroup>
 
   <ItemGroup>
