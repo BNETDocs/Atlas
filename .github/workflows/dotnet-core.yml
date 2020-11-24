@@ -35,7 +35,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      working-directory: ./src/MBNCSUtil
+      working-directory: ./vendor/MBNCSUtil/src
 
     steps:
     - uses: actions/checkout@v2
