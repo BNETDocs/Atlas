@@ -63,6 +63,7 @@ namespace Atlasd
 
             return ExitCode;
         }
+
         private static void ParseCommandLineArgs(string[] args)
         {
             string arg;
