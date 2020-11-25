@@ -20,6 +20,9 @@ namespace Atlasd
         public static bool Exit = false;
         public static int ExitCode = 0;
 
+        // used for calculating tick count when process started
+        public static long TickCountAtInit { get; private set; } = Environment.TickCount64;
+
         public static async Task<int> Main(string[] args)
         {
             Thread.CurrentThread.Name = "Main";
