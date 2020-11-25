@@ -42,10 +42,11 @@ For Fedora or other Red Hat based systems:
 
 1. Install .NET: `sudo dnf install dotnet`
 2. Clone this repository: `git clone https://github.com/BNETDocs/Atlas.git`
-3. Change directory: `cd Atlas/src/Atlasd`
-4. Build source: `dotnet build`
-5. Run debugger: `dotnet run`
-6. See `dotnet --help` for other compile options
+3. Initialize submodules: `git submodule update --init --recursive`
+4. Change directory: `cd Atlas/src/Atlasd`
+5. Build source: `dotnet build`
+6. Run debugger: `dotnet run`
+7. See `dotnet --help` for other compile options
 
 ### Adjust settings
 
