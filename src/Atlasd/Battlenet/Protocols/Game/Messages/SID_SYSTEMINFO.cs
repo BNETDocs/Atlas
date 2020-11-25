@@ -39,8 +39,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
              * (UINT32) Free disk space
              */
 
-            var m = new MemoryStream(Buffer);
-            var r = new BinaryReader(m);
+            using var m = new MemoryStream(Buffer);
+            using var r = new BinaryReader(m);
 
             var cpuCount      = r.ReadUInt32();
             var cpuArch       = r.ReadUInt32();
@@ -49,9 +49,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             var totalRAM      = r.ReadUInt32();
             var totalSwap     = r.ReadUInt32();
             var freeDiskSpace = r.ReadUInt32();
-
-            r.Close();
-            m.Close();
 
             return true;
         }

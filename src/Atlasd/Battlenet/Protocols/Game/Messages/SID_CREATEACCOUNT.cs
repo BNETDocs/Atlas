@@ -42,14 +42,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (STRING) Username
                          */
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         var passwordHash = r.ReadBytes(20);
                         var username = r.ReadString();
-
-                        r.Close();
-                        m.Close();
 
                         Account.CreateStatus _status = Account.TryCreate(username, passwordHash, out var _);
                         var status = _status == Account.CreateStatus.Success ? Statuses.Success : Statuses.Failure;
@@ -66,13 +63,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[4];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)(Statuses)context.Arguments["status"]);
-
-                        w.Close();
-                        m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CREATEACCOUNT ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

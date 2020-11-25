@@ -43,14 +43,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
               * (STRING) Channel name
               */
 
-            var m = new MemoryStream(Buffer);
-            var r = new BinaryReader(m);
+            using var m = new MemoryStream(Buffer);
+            using var r = new BinaryReader(m);
 
             var flags = (Flags)r.ReadUInt32();
             var channelName = r.ReadString();
-
-            r.Close();
-            m.Close();
 
             if (channelName.Length < 1) throw new GameProtocolViolationException(context.Client, "Channel name must be greater than zero");
 

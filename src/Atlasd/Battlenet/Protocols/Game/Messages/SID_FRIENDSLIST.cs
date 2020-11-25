@@ -70,8 +70,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[size];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((byte)friends.Count);
                         foreach (var friend in friends)
@@ -82,9 +82,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             w.Write((uint)friend.GetProductCode());
                             w.Write(friend.GetLocationString());
                         }
-
-                        w.Close();
-                        m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_FRIENDSLIST ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

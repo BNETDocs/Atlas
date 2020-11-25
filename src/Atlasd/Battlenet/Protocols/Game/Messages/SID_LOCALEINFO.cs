@@ -1,7 +1,6 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
 using System;
-using System.Globalization;
 using System.IO;
 using System.Threading;
 

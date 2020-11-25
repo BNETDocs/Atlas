@@ -53,8 +53,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (STRING) Key owner name *
                          */
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         context.Client.GameState.SpawnKey = (r.ReadUInt32() == 1);
                         var keyLength = r.ReadUInt32();
@@ -64,9 +64,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         context.Client.GameState.ClientToken = r.ReadUInt32();
                         var hashedKeyData = r.ReadBytes(20);
                         context.Client.GameState.KeyOwner = r.ReadString();
-
-                        r.Close();
-                        m.Close();
 
                         if (serverToken != context.Client.GameState.ServerToken)
                             throw new GameProtocolViolationException(context.Client, "SID_CDKEY2 server token mismatch");
@@ -85,14 +82,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[5];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)Statuses.Success);
                         w.Write("");
-
-                        w.Close();
-                        m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CDKEY2 ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

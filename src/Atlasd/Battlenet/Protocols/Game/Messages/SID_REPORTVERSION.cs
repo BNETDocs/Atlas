@@ -39,8 +39,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (Buffer.Length < 21)
                             throw new GameProtocolViolationException(context.Client, "SID_REPORTVERSION buffer must be at least 21 bytes");
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         context.Client.GameState.Platform = (Platform.PlatformCode)r.ReadUInt32();
                         context.Client.GameState.Product = (Product.ProductCode)r.ReadUInt32();
@@ -48,9 +48,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         context.Client.GameState.Version.EXERevision = r.ReadUInt32();
                         context.Client.GameState.Version.EXEChecksum = r.ReadUInt32();
                         context.Client.GameState.Version.EXEInformation = r.ReadString();
-
-                        r.Close();
-                        m.Close();
 
                         return new SID_REPORTVERSION().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
                     }
@@ -66,14 +63,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[6 + Encoding.ASCII.GetByteCount(filename)];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)ResultIds.Success);
                         w.Write((string)filename);
-
-                        w.Close();
-                        m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_REPORTVERSION ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

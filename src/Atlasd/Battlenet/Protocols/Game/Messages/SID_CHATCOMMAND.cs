@@ -3,8 +3,6 @@ using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {

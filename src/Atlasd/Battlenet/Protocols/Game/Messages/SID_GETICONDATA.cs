@@ -29,7 +29,9 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 case MessageDirection.ClientToServer:
                     {
                         if (Buffer.Length != 0)
+                        {
                             throw new GameProtocolViolationException(context.Client, "SID_GETICONDATA buffer must be 0 bytes");
+                        }
 
                         return new SID_GETICONDATA().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
                     }
@@ -47,15 +49,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[9 + Encoding.UTF8.GetByteCount(fileName)];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((UInt64)fileTime);
                         w.Write(Encoding.UTF8.GetBytes(fileName));
                         w.Write((byte)0);
-
-                        w.Close();
-                        m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_GETICONDATA ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

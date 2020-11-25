@@ -3,7 +3,6 @@ using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
@@ -32,8 +31,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length < 8)
                 throw new GameProtocolViolationException(context.Client, "SID_WRITEUSERDATA buffer must be at least 8 bytes");
 
-            var m = new MemoryStream(Buffer);
-            var r = new BinaryReader(m);
+            using var m = new MemoryStream(Buffer);
+            using var r = new BinaryReader(m);
 
             var numAccounts = r.ReadUInt32();
             var numKeys = r.ReadUInt32();
@@ -55,9 +54,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 values.Add(r.ReadByteString());
             }
-
-            r.Close();
-            m.Close();
 
             var hasSudoPrivs = context.Client.GameState.ChannelFlags.HasFlag(Account.Flags.Admin) ||
                 context.Client.GameState.ChannelFlags.HasFlag(Account.Flags.Employee);

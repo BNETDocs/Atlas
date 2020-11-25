@@ -6,7 +6,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
     class SID_STOPADV : Message
     {
-
         public SID_STOPADV()
         {
             Id = (byte)MessageIds.SID_STOPADV;

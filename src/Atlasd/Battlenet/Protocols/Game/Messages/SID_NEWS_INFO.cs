@@ -37,13 +37,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (Buffer.Length != 4)
                             throw new GameProtocolViolationException(context.Client, "SID_GETFILETIME buffer must be 4 bytes");
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         var timestamp = r.ReadUInt32();
-
-                        r.Close();
-                        m.Close();
 
                         return new SID_NEWS_INFO().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "timestamp", timestamp }}));
                     }
@@ -68,8 +65,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[18 + Encoding.UTF8.GetByteCount(newsGreeting)];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write((byte)1);
                         w.Write((UInt32)(lastLogon.ToFileTimeUtc() >> 32));
@@ -78,9 +75,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write((UInt32)(newsTimestamp.ToFileTimeUtc() >> 32));
                         w.Write(Encoding.UTF8.GetBytes(newsGreeting));
                         w.Write((byte)0);
-
-                        w.Close();
-                        m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_NEWS_INFO ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

@@ -28,18 +28,15 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 throw new GameProtocolViolationException(context.Client, "SID_NOTIFYJOIN must be sent from client to server");
 
             if (Buffer.Length < 10)
-                throw new GameProtocolViolationException(context.Client, "SID_LEAVECHAT buffer must be at least 10 bytes");
+                throw new GameProtocolViolationException(context.Client, "SID_NOTIFYJOIN buffer must be at least 10 bytes");
 
-            var m = new MemoryStream(Buffer);
-            var r = new BinaryReader(m);
+            using var m = new MemoryStream(Buffer);
+            using var r = new BinaryReader(m);
 
             var productId = r.ReadUInt32();
             var productVersion = r.ReadUInt32();
             var gameName = r.ReadString();
             var gamePassword = r.ReadString();
-
-            r.Close();
-            m.Close();
 
             try
             {

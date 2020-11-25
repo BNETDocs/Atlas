@@ -62,16 +62,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[size];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         foreach (var channel in channels)
                             w.Write((string)channel);
 
                         w.Write((byte)0); // Official Blizzard servers end list with an empty string.
-
-                        w.Close();
-                        m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_GETCHANNELLIST ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

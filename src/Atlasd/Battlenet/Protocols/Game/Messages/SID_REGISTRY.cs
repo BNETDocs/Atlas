@@ -42,14 +42,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (Buffer.Length < 5)
                             throw new GameProtocolViolationException(context.Client, "SID_REGISTRY buffer must be at least 5 bytes");
 
-                        var m = new MemoryStream(Buffer);
-                        var r = new BinaryReader(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var r = new BinaryReader(m);
 
                         var cookie = r.ReadUInt32();
                         var value = r.ReadString();
-
-                        r.Close();
-                        m.Close();
 
                         return true;
                     }
@@ -62,16 +59,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         Buffer = new byte[10 + Encoding.ASCII.GetByteCount(keyPath) + Encoding.ASCII.GetByteCount(keyName)];
 
-                        var m = new MemoryStream(Buffer);
-                        var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
                         w.Write(cookie);
                         w.Write(hiveKeyId);
                         w.Write(keyPath);
                         w.Write(keyName);
-
-                        w.Close();
-                        m.Close();
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_REGISTRY ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
