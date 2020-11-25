@@ -72,9 +72,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
 
-                        w.Write(adId);
-                        w.Write(Encoding.UTF8.GetBytes(adUrl));
-                        w.Write((byte)0);
+                        w.Write((UInt32)adId);
+                        w.Write((string)adUrl);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_QUERYADURL ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

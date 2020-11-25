@@ -3,6 +3,7 @@ using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -57,7 +58,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         string info = context.Arguments.ContainsKey("info") ? (string)context.Arguments["info"] : "";
 
-                        Buffer = new byte[5 + info.Length];
+                        Buffer = new byte[5 + Encoding.UTF8.GetByteCount(info)];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);

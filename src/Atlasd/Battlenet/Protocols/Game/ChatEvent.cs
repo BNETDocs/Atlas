@@ -133,17 +133,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                         w.Write((UInt32)0xBAADF00D); // Account number (Defunct)
                         w.Write((UInt32)0xBAADF00D); // Registration authority (Defunct)
                         w.Write((string)Username);
-
-                        if (EventIdIsChatMessage(EventId))
-                        {
-                            // UTF-8 conversion is needed for localization reasons
-                            w.Write(Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(Text)));
-                        }
-                        else
-                        {
-                            w.Write(Text);
-                        }
-                        w.Write((byte)0);
+                        w.Write(Text);
 
                         return buf;
                     }

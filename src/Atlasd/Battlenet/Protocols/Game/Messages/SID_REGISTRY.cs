@@ -46,7 +46,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         using var r = new BinaryReader(m);
 
                         var cookie = r.ReadUInt32();
-                        var value = r.ReadString();
+                        var value = r.ReadByteString();
 
                         return true;
                     }
@@ -57,15 +57,15 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var keyPath = (string)context.Arguments["keyPath"];
                         var keyName = (string)context.Arguments["keyName"];
 
-                        Buffer = new byte[10 + Encoding.ASCII.GetByteCount(keyPath) + Encoding.ASCII.GetByteCount(keyName)];
+                        Buffer = new byte[10 + Encoding.UTF8.GetByteCount(keyPath) + Encoding.UTF8.GetByteCount(keyName)];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
 
-                        w.Write(cookie);
-                        w.Write(hiveKeyId);
-                        w.Write(keyPath);
-                        w.Write(keyName);
+                        w.Write((UInt32)cookie);
+                        w.Write((UInt32)hiveKeyId);
+                        w.Write((string)keyPath);
+                        w.Write((string)keyName);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_REGISTRY ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

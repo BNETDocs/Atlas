@@ -61,13 +61,14 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         var filename = "ver-IX86-1.mpq";
 
-                        Buffer = new byte[6 + Encoding.ASCII.GetByteCount(filename)];
+                        Buffer = new byte[6 + Encoding.UTF8.GetByteCount(filename)];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)ResultIds.Success);
                         w.Write((string)filename);
+                        w.Write((byte)0); // unknown
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_REPORTVERSION ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

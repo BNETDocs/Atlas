@@ -117,14 +117,13 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
                             using var wm = new MemoryStream(outBuf);
                             using var w = new BinaryWriter(wm);
 
-                            w.Write(HeaderLength);
+                            w.Write((UInt16)HeaderLength);
                             w.Write((UInt16)0); // "Type" ???
                             w.Write((UInt32)fileLength);
                             w.Write((UInt32)AdId);
                             w.Write((UInt32)AdFileExtension);
                             w.Write((UInt64)new FileInfo(file.Path).LastWriteTimeUtc.ToFileTimeUtc());
-                            w.Write(Encoding.UTF8.GetBytes(FileName));
-                            w.Write((byte)0);
+                            w.Write((string)FileName);
 
                             Write(outBuf);
                             Write(stream.ReadBytes(fileLength));

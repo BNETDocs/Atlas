@@ -125,6 +125,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         w.Write((UInt32)(Statuses)context.Arguments["status"]);
                         w.Write(info);
+                        if (info.Length > 0) w.Write((byte)0);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_LOGONRESPONSE2 ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

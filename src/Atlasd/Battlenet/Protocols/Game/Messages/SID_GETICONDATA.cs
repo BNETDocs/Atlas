@@ -53,8 +53,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         using var w = new BinaryWriter(m);
 
                         w.Write((UInt64)fileTime);
-                        w.Write(Encoding.UTF8.GetBytes(fileName));
-                        w.Write((byte)0);
+                        w.Write(fileName);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_GETICONDATA ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

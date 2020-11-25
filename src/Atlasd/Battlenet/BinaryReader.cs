@@ -5,7 +5,7 @@ namespace Atlasd.Battlenet
 {
     class BinaryReader : System.IO.BinaryReader
     {
-        public BinaryReader(Stream input) : base(input) { }
+        public BinaryReader(Stream input) : base(input, Encoding.UTF8) { }
         public BinaryReader(Stream input, Encoding encoding) : base(input, encoding) { }
         public BinaryReader(Stream input, Encoding encoding, bool leaveOpen) : base(input, encoding, leaveOpen) { }
 

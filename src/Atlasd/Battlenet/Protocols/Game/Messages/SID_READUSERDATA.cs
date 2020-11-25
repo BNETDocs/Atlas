@@ -204,8 +204,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         foreach (var value in values)
                         {
-                            w.Write(Encoding.UTF8.GetBytes(value));
-                            w.Write((byte)0);
+                            w.Write((string)value);
                         }
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_READUSERDATA ({4 + Buffer.Length} bytes)");

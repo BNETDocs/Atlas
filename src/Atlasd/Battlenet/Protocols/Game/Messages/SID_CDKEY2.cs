@@ -86,7 +86,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)Statuses.Success);
-                        w.Write("");
+                        w.Write((byte)0);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CDKEY2 ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

@@ -47,13 +47,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         using var m = new MemoryStream(Buffer);
                         using var r = new BinaryReader(m);
 
-                        var username = r.ReadString();
-                        var statstring = r.ReadBytes((int)(r.BaseStream.Length - r.BaseStream.Position - 1));
-
-                        if (username.Length > 0 && username.ToLower() != context.Client.GameState.Username.ToLower())
-                        {
-                            throw new GameProtocolViolationException(context.Client, $"Client tried entering chat with differnet username [{username}] than their account name [{context.Client.GameState.Username}]");
-                        }
+                        var username = r.ReadByteString(); // Defunct
+                        var statstring = r.ReadByteString();
 
                         var productId = (UInt32)context.Client.GameState.Product;
 
@@ -96,20 +91,24 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     }
                 case MessageDirection.ServerToClient:
                     {
+                        var uniqueName = context.Client.GameState.OnlineName;
+                        var statstring = context.Client.GameState.Statstring;
+                        var accountName = context.Client.GameState.Username;
+
                         /**
                          * (STRING) Unique name
                          * (STRING) Statstring
                          * (STRING) Account name
                          */
 
-                        Buffer = new byte[3 + context.Client.GameState.OnlineName.Length + context.Client.GameState.Statstring.Length + context.Client.GameState.Username.Length];
+                        Buffer = new byte[3 + Encoding.UTF8.GetByteCount(uniqueName) + statstring.Length + Encoding.UTF8.GetByteCount(accountName)];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
 
-                        w.Write((string)context.Client.GameState.OnlineName);
-                        w.Write((string)Encoding.ASCII.GetString(context.Client.GameState.Statstring));
-                        w.Write((string)context.Client.GameState.Username);
+                        w.Write((string)uniqueName);
+                        w.WriteByteString(statstring);
+                        w.Write((string)accountName);
 
                         lock (context.Client.GameState)
                         {
