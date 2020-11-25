@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet.Protocols.Http
 {
@@ -28,6 +30,20 @@ namespace Atlasd.Battlenet.Protocols.Http
             Close();
         }
 
+        private void ProcessAccept(SocketAsyncEventArgs e)
+        {
+            if (e.SocketError != SocketError.Success)
+            {
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Http, e.RemoteEndPoint, "HTTP listener socket error occurred!");
+            }
+
+            // Start the read loop on a new stack
+            Task.Run(new HttpSession(e.AcceptSocket).ConnectedEvent);
+
+            // Accept the next connection request
+            StartAccept(e);
+        }
+
         public void SetLocalEndPoint(IPEndPoint endp) /* part of IListener */
         {
             if (IsListening)
@@ -38,38 +54,47 @@ namespace Atlasd.Battlenet.Protocols.Http
             LocalEndPoint = endp;
         }
 
-        static void SocketAsyncCompleted(object sender, SocketAsyncEventArgs e)
-        {
-            if (e.SocketError != SocketError.Success)
-            {
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Http, e.RemoteEndPoint, "Listener socket error occurred!");
-            }
-
-            var client = e.AcceptSocket;
-
-            var m = "HTTP/1.0 500 Internal Server Error\r\nConnection: close\r\nContent-Type: text/html;charset=utf-8\r\n\r\n<!DOCTYPE html>\r\n<html lang=\"en\"><head><title>Atlas</title></head><body>This HTTP endpoint is extremely fragile. Please be gentle.</body></html>\r\n";
-            client.Send(Encoding.UTF8.GetBytes(m));
-            client.Disconnect(true);
-        }
-
         public void Start() /* part of IListener */
         {
             Stop();
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Server, $"Starting HTTP listener on [{LocalEndPoint}]");
 
-            Socket = new Socket(SocketType.Stream, System.Net.Sockets.ProtocolType.Tcp);
+            Socket = new Socket(LocalEndPoint.AddressFamily, SocketType.Stream, System.Net.Sockets.ProtocolType.Tcp)
+            {
+                ExclusiveAddressUse = true,
+                NoDelay = Daemon.Common.TcpNoDelay,
+                UseOnlyOverlappedIO = true,
+            };
             Socket.Bind(LocalEndPoint);
             Socket.Listen(-1);
 
-            var e = new SocketAsyncEventArgs();
-            e.Completed += new EventHandler<SocketAsyncEventArgs>(SocketAsyncCompleted);
+            StartAccept(null);
+        }
 
-            bool willRaiseEvent = Socket.AcceptAsync(e);
+        private void StartAccept(SocketAsyncEventArgs acceptEventArg)
+        {
+            if (acceptEventArg == null)
+            {
+                acceptEventArg = new SocketAsyncEventArgs();
+                acceptEventArg.Completed += new EventHandler<SocketAsyncEventArgs>(AcceptEventArg_Completed);
+            }
+            else
+            {
+                // socket must be cleared since the context object is being reused
+                acceptEventArg.AcceptSocket = null;
+            }
+
+            bool willRaiseEvent = Socket.AcceptAsync(acceptEventArg);
             if (!willRaiseEvent)
             {
-                SocketAsyncCompleted(this, e);
+                ProcessAccept(acceptEventArg);
             }
+        }
+
+        void AcceptEventArg_Completed(object sender, SocketAsyncEventArgs e)
+        {
+            ProcessAccept(e);
         }
 
         public void Stop() /* part of IListener */

@@ -9,7 +9,7 @@ namespace Atlasd
     class Program
     {
         // used for printing debug or release in version string
-        private const string DistributionMode =
+        public const string DistributionMode =
 #if DEBUG
             "debug";
 #else
