@@ -31,28 +31,3 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
       working-directory: ${{env.working-directory}}
-
-  build-mbncsutil:
-    name: Build MBNCSUtil
-
-    runs-on: ubuntu-latest
-    env:
-      working-directory: ./src
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Checkout submodules
-      run: git submodule update --init --recursive
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.301
-    - name: Install dependencies
-      run: dotnet restore
-      working-directory: ${{env.working-directory}}
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-      working-directory: ${{env.working-directory}}
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
-      working-directory: ${{env.working-directory}}
