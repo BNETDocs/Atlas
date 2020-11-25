@@ -78,8 +78,18 @@ namespace Atlasd.Battlenet.Protocols.Udp
                 buf += $"{e.Buffer[i]:X2} ";
                 pre += i > 32 && i < 127 ? (char)e.Buffer[i] : '.';
             }
+            buf += pre;
 
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_UDP, $"Received UDP datagram:{Environment.NewLine}{buf}");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_UDP, e.RemoteEndPoint, $"Received Datagram: {buf}");
+
+            // Start next read
+            e.RemoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            e.SetBuffer(new byte[2048], 0, 2048);
+            bool willRaiseEvent = Socket.ReceiveFromAsync(e);
+            if (!willRaiseEvent)
+            {
+                ReceiveFromAsyncCompleted(this, e);
+            }
         }
 
         public void Stop()
