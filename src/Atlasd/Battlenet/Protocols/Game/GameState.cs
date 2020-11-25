@@ -222,21 +222,21 @@ namespace Atlasd.Battlenet.Protocols.Game
                     var iconCode = (byte[])ActiveAccount.Get("System\\Icon", product);
 
                     w.Write(' ');
-                    w.Write(Encoding.ASCII.GetBytes(ladderRating.ToString()));
+                    w.Write(Encoding.UTF8.GetBytes(ladderRating.ToString()));
                     w.Write(' ');
-                    w.Write(Encoding.ASCII.GetBytes(ladderRank.ToString()));
+                    w.Write(Encoding.UTF8.GetBytes(ladderRank.ToString()));
                     w.Write(' ');
-                    w.Write(Encoding.ASCII.GetBytes(wins.ToString()));
+                    w.Write(Encoding.UTF8.GetBytes(wins.ToString()));
                     w.Write(' ');
                     w.Write(SpawnKey ? '1' : '0');
                     w.Write(' ');
-                    w.Write(Encoding.ASCII.GetBytes(leagueId.ToString()));
+                    w.Write(Encoding.UTF8.GetBytes(leagueId.ToString()));
                     w.Write(' ');
-                    w.Write(Encoding.ASCII.GetBytes(highLadderRating.ToString()));
+                    w.Write(Encoding.UTF8.GetBytes(highLadderRating.ToString()));
                     w.Write(' ');
-                    w.Write(Encoding.ASCII.GetBytes(ironManLadderRating.ToString()));
+                    w.Write(Encoding.UTF8.GetBytes(ironManLadderRating.ToString()));
                     w.Write(' ');
-                    w.Write(Encoding.ASCII.GetBytes(ironManLadderRank.ToString()));
+                    w.Write(Encoding.UTF8.GetBytes(ironManLadderRank.ToString()));
                     w.Write(' ');
                     w.Write(iconCode);
                 }
@@ -265,14 +265,14 @@ namespace Atlasd.Battlenet.Protocols.Game
                      */
 
                     //var iconCode = ActiveAccount.Get("System\\Icon", product);
-                    var iconCode = Encoding.ASCII.GetBytes("1R3W");
+                    var iconCode = 0x57335231; // W3R1
                     var ladderLevel = (uint)0;
                     var clanTag = (byte[])ActiveAccount.Get("System\\Clan", new byte[] { 0, 0, 0, 0 });
 
                     w.Write(' ');
                     w.Write(iconCode);
                     w.Write(' ');
-                    w.Write(Encoding.ASCII.GetBytes(ladderLevel.ToString()));
+                    w.Write(Encoding.UTF8.GetBytes(ladderLevel.ToString()));
 
                     if (!clanTag.SequenceEqual(new byte[] { 0, 0, 0, 0 }))
                     {
