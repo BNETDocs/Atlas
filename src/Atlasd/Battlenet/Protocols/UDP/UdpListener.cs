@@ -75,7 +75,7 @@ namespace Atlasd.Battlenet.Protocols.Udp
                             else
                             {
                                 Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_UDP, remoteEndpoint, $"Received UDP test [PKT_CONNTEST] ({datagram.Length} bytes)");
-                                var code = new byte[] { 0x74, 0x65, 0x6E, 0x62 }; // Value "bnet" for SID_UDPPINGRESPONSE
+                                var code = new byte[] { 0x05, 0x00, 0x00, 0x00, 0x74, 0x65, 0x6E, 0x62 }; // PKT_SERVERPING reply with value "bnet" for SID_UDPPINGRESPONSE
                                 Socket.SendTo(code, remoteEndpoint);
                             }
 
@@ -90,7 +90,7 @@ namespace Atlasd.Battlenet.Protocols.Udp
                             else
                             {
                                 Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_UDP, remoteEndpoint, $"Received UDP test [PKT_CONNTEST2] ({datagram.Length} bytes)");
-                                var code = new byte[] { 0x74, 0x65, 0x6E, 0x62 }; // Value "bnet" for SID_UDPPINGRESPONSE
+                                var code = new byte[] { 0x05, 0x00, 0x00, 0x00, 0x74, 0x65, 0x6E, 0x62 }; // PKT_SERVERPING reply with value "bnet" for SID_UDPPINGRESPONSE
                                 Socket.SendTo(code, remoteEndpoint);
                             }
 
