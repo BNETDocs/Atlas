@@ -60,16 +60,16 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             ad = Battlenet.Common.ActiveAds[(int)adId];
                         }
 
-                        Buffer = new byte[18 + Encoding.ASCII.GetByteCount(ad.Filename) + Encoding.ASCII.GetByteCount(ad.Url)];
+                        Buffer = new byte[18 + Encoding.UTF8.GetByteCount(ad.Filename) + Encoding.UTF8.GetByteCount(ad.Url)];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)adId);
                         w.Write((UInt32)0); // File extension
-                        w.Write(ad.Filetime.ToFileTimeUtc());
-                        w.Write(ad.Filename);
-                        w.Write(ad.Url);
+                        w.Write((UInt64)ad.Filetime.ToFileTimeUtc());
+                        w.Write((string)ad.Filename);
+                        w.Write((string)ad.Url);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CHECKAD ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

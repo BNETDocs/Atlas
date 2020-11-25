@@ -58,7 +58,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var size = (uint)1;
 
                         foreach (var channel in channels)
-                            size += (uint)(1 + Encoding.ASCII.GetByteCount(channel));
+                            size += (uint)(1 + Encoding.UTF8.GetByteCount(channel));
 
                         Buffer = new byte[size];
 

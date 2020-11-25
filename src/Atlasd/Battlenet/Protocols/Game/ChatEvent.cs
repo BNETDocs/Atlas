@@ -122,7 +122,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             switch (protocolType) {
                 case ProtocolType.Types.Game:
                     {
-                        var buf = new byte[26 + Encoding.ASCII.GetByteCount(Username) + Text.Length];
+                        var buf = new byte[26 + Encoding.UTF8.GetByteCount(Username) + Text.Length];
                         using var m = new MemoryStream(buf);
                         using var w = new BinaryWriter(m);
 
@@ -133,7 +133,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                         w.Write((UInt32)0xBAADF00D); // Account number (Defunct)
                         w.Write((UInt32)0xBAADF00D); // Registration authority (Defunct)
                         w.Write((string)Username);
-                        w.Write(Text);
+                        w.WriteByteString(Text);
 
                         return buf;
                     }

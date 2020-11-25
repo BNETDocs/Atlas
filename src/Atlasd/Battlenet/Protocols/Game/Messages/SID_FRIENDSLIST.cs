@@ -51,7 +51,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          *   (STRING) Location name
                          */
 
-                        var size = (uint)1;
+                        var bufferSize = (uint)1;
                         var friends = new List<Friend>();
                         var friendStrings = (List<string>)context.Client.GameState.ActiveAccount.Get(Account.FriendsKey);
 
@@ -59,7 +59,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         {
                             var friend = new Friend(friendString);
                             friends.Add(friend);
-                            size += (uint)(8 + Encoding.ASCII.GetByteCount(friend.Username) + Encoding.ASCII.GetByteCount(friend.GetLocationString()));
+                            bufferSize += (uint)(8 + Encoding.UTF8.GetByteCount(friend.Username) + Encoding.UTF8.GetByteCount(friend.GetLocationString()));
 
                             if (friends.Count == 255) // Hard limit based on counter in message format
                             {
@@ -68,7 +68,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             }
                         }
 
-                        Buffer = new byte[size];
+                        Buffer = new byte[bufferSize];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
