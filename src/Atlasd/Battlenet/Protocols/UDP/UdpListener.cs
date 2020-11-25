@@ -67,7 +67,7 @@ namespace Atlasd.Battlenet.Protocols.Udp
             var buf = string.Empty; // buffer
             var pre = string.Empty; // preview
 
-            for (var i = 0; i < e.Buffer.Length; i++)
+            for (var i = 0; i < e.BytesTransferred; i++)
             {
                 if (i % 16 == 0 && !string.IsNullOrEmpty(pre))
                 {
