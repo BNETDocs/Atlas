@@ -1,9 +1,9 @@
 ﻿using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
@@ -72,7 +72,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          *    (UINT32) UDP value
                          *  (FILETIME) CheckRevision MPQ filetime
                          *    (STRING) CheckRevision MPQ filename
-                         *    (STRING) CheckRevision Formula
+                         *    (BYTE[]) CheckRevision Formula
+                         *      (BYTE) 0
                          *
                          *  WAR3/W3XP Only:
                          *      (VOID) 128-byte Server signature
@@ -80,7 +81,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         ulong MPQFiletime = 0;
                         string MPQFilename = "ver-IX86-1.mpq";
-                        string Formula = "A=3845581634 B=880823580 C=1363937103 4 A=A-S B=B-C C=C-A A=A-B";
+                        byte[] Formula = Encoding.UTF8.GetBytes("A=3845581634 B=880823580 C=1363937103 4 A=A-S B=B-C C=C-A A=A-B");
 
                         var fileinfo = new BNFTP.File(MPQFilename).GetFileInfo();
                         if (fileinfo == null)
@@ -93,7 +94,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             MPQFiletime = (ulong)fileinfo.LastWriteTimeUtc.ToFileTimeUtc();
                         }
 
-                        Buffer = new byte[22 + MPQFilename.Length + Formula.Length + (Product.IsWarcraftIII(context.Client.GameState.Product) ? 128 : 0)];
+                        Buffer = new byte[22 + Encoding.UTF8.GetByteCount(MPQFilename) + Formula.Length + (Product.IsWarcraftIII(context.Client.GameState.Product) ? 128 : 0)];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
@@ -103,7 +104,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write((UInt32)context.Client.GameState.UDPToken);
                         w.Write((UInt64)MPQFiletime);
                         w.Write((string)MPQFilename);
-                        w.Write((string)Formula);
+                        w.Write(Formula);
+                        w.Write((byte)0);
 
                         if (Product.IsWarcraftIII(context.Client.GameState.Product))
                             w.Write(new byte[128]);

@@ -57,12 +57,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         /**
                          * (FILETIME) CheckRevision MPQ filetime
                          *   (STRING) CheckRevision MPQ filename
-                         *   (STRING) CheckRevision Formula
+                         *   (BYTE[]) CheckRevision Formula
+                         *     (BYTE) 0
                          */
 
                         ulong MPQFiletime = 0;
                         string MPQFilename = "ver-IX86-1.mpq";
-                        string Formula = "A=3845581634 B=880823580 C=1363937103 4 A=A-S B=B-C C=C-A A=A-B";
+                        byte[] Formula = Encoding.UTF8.GetBytes("A=3845581634 B=880823580 C=1363937103 4 A=A-S B=B-C C=C-A A=A-B");
 
                         var fileinfo = new BNFTP.File(MPQFilename).GetFileInfo();
                         if (fileinfo == null)
@@ -75,14 +76,15 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             MPQFiletime = (ulong)fileinfo.LastWriteTimeUtc.ToFileTimeUtc();
                         }
 
-                        Buffer = new byte[10 + Encoding.ASCII.GetByteCount(MPQFilename) + Encoding.ASCII.GetByteCount(Formula)];
+                        Buffer = new byte[10 + Encoding.UTF8.GetByteCount(MPQFilename) + Formula.Length];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
 
                         w.Write((UInt64)MPQFiletime);
                         w.Write((string)MPQFilename);
-                        w.Write((string)Formula);
+                        w.Write(Formula);
+                        w.Write((byte)0);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_STARTVERSIONING ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
