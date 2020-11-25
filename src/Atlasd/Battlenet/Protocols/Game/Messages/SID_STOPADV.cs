@@ -28,8 +28,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length != 0)
                 throw new GameProtocolViolationException(context.Client, "SID_STOPADV buffer must be 0 bytes");
 
-            if (context.Client.GameState.ActiveAccount == null)
-                throw new GameProtocolViolationException(context.Client, "SID_STOPADV was received before logon");
+            if (context.Client.GameState == null)
+                throw new GameProtocolViolationException(context.Client, "SID_STOPADV was received without an active GameState");
 
             context.Client.GameState.StopGameAd();
             return true;
