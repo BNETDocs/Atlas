@@ -66,6 +66,19 @@ namespace Atlasd.Battlenet.Protocols.Udp
 
                             break;
                         }
+                    case 0x07: // PKT_KEEPALIVE
+                        {
+                            if (datagram.Length != 8)
+                            {
+                                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_UDP, remoteEndpoint, $"Received keepalive [PKT_KEEPALIVE] ({datagram.Length} bytes != 8 bytes)");
+                            }
+                            else
+                            {
+                                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_UDP, remoteEndpoint, $"Received keepalive [PKT_KEEPALIVE] ({datagram.Length} bytes)");
+                            }
+
+                            break;
+                        }
                     case 0x08: // PKT_CONNTEST
                         {
                             if (datagram.Length != 8)
