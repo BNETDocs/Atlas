@@ -3,6 +3,7 @@ using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
@@ -70,10 +71,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                                 if (subGameType != 0 && subGameType != _ad.SubGameType) continue;
                             }
                             else if (viewingFilter == 0xFF80) { }
-                            else
-                            {
-                                continue;
-                            }
 
                             gameAds.Add(_ad);
                         }
@@ -114,15 +111,62 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             size += 35 + (ulong)gameAd.Name.Length + (ulong)gameAd.Password.Length + (ulong)gameAd.Statstring.Length;
                         }
 
-                        // TODO
+                        if (size == 0)
+                        {
+                            size = 4; // status
+                        }
 
-                        Buffer = new byte[8];
+                        Buffer = new byte[4 + size];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
 
-                        w.Write((UInt32)0); // number of games
-                        w.Write((UInt32)0); // status 0 = success
+                        w.Write((UInt32)gameAds.Count); // number of games
+                        if (gameAds.Count == 0)
+                        {
+                            w.Write((UInt32)0); // status 0 = success
+                        } else
+                        {
+                            foreach (var gameAd in gameAds)
+                            {
+                                w.Write(((UInt32)gameAd.GameType) | (((UInt32)gameAd.SubGameType) << 16));
+                                w.Write((UInt32)gameAd.Client.Locale.UserLanguageId);
+                                w.Write((UInt16)2); // always AF_INET
+                                UInt16 Port;
+                                if (gameAd.Client.GameDataPort != 0)
+                                {
+                                    Port = gameAd.Client.GameDataPort;
+                                }
+                                else
+                                {
+                                    Port = (UInt16) gameAd.GamePort;
+                                }
+                                // because this is a dumped sockaddr_in structure, the port is in reverse byte order
+                                w.Write((UInt16)((Port << 8) | (Port >> 8)));
+                                Byte[] bytes;
+                                if (gameAd.Client.GameDataAddress != null)
+                                {
+                                    bytes = gameAd.Client.GameDataAddress.MapToIPv4().GetAddressBytes();
+                                }
+                                else
+                                {
+                                    IPEndPoint ipEndPoint = gameAd.Client.Client.RemoteEndPoint as IPEndPoint;
+                                    bytes = ipEndPoint.Address.MapToIPv4().GetAddressBytes();
+                                }
+                                System.Diagnostics.Debug.Assert(bytes.Length == 4);
+                                for (int i = 0; i < bytes.Length; i++)
+                                {
+                                    w.Write(bytes[i]);
+                                }
+                                w.Write((UInt32)0);
+                                w.Write((UInt32)0);
+                                w.Write((UInt32)0); // TODO
+                                w.Write((UInt32)0); // TODO
+                                w.WriteByteString(gameAd.Name);
+                                w.WriteByteString(gameAd.Password);
+                                w.WriteByteString(gameAd.Statstring);
+                            }
+                        }
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_GETADVLISTEX ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
