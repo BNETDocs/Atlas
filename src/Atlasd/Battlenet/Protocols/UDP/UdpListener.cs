@@ -1,4 +1,5 @@
-﻿using Atlasd.Daemon;
+﻿using Atlasd.Battlenet;
+using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -107,6 +108,26 @@ namespace Atlasd.Battlenet.Protocols.Udp
                                 Socket.SendTo(code, remoteEndpoint);
                             }
 
+                            var serverToken = r.ReadUInt32();
+                            var udpToken = r.ReadUInt32();
+
+                            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_UDP, remoteEndpoint, $"({serverToken} - {udpToken})");
+                            foreach(ClientState state in Battlenet.Common.ActiveClientStates)
+                            {
+                                if (state.GameState.ServerToken == serverToken)
+                                {
+                                    if (state.GameState.UDPToken == udpToken)
+                                    {
+                                        var ipEndPoint = remoteEndpoint as IPEndPoint;
+                                        if (ipEndPoint != null)
+                                        {
+                                            state.GameState.GameDataAddress = ipEndPoint.Address;
+                                            state.GameState.GameDataPort = (ushort)ipEndPoint.Port;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
                             break;
                         }
                     default:
