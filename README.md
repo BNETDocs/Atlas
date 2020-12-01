@@ -50,7 +50,7 @@ For Fedora or other Red Hat based systems:
 
 ### Adjust settings
 
-1. Copy the `etc/atlasd.sample.json` to either the same directory or where you will store configs for this software. Name it whatever you wish, `atlad.json` is a good example. Point the Atlasd daemon at the file using the `-c` or `--config` command-line argument; e.g. `atlasd -c ../etc/atlasd.json`
+1. Copy the `etc/atlasd.sample.json` to either the same directory or where you will store configs for this software. Name it whatever you wish, `atlasd.json` is a good example. Point the Atlasd daemon at the file using the `-c` or `--config` command-line argument; e.g. `atlasd -c ../etc/atlasd.json`
 2. Change the settings as desired.
 3. Launch atlasd.
 4. If you find yourself wishing to change additional settings after atlasd has started, you may either restart atlasd, or send `/admin reload` as a command through a bot.
