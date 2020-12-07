@@ -30,7 +30,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 throw new GameProtocolViolationException(context.Client, "SID_UDPPINGRESPONSE buffer must be 4 bytes");
 
             // UDP reply must be given between S>C SID_AUTH_INFO and C>S SID_ENTERCHAT, not
-            // before or after.Technically, we could allow this while in chat and proceed then
+            // before or after. Technically, we could allow this while in chat and proceed then
             // by sending a chat event for the update, but the server by convention is not
             // supposed to allow it and should instead disconnect the client.
             if (!(context.Client.GameState.Statstring == null || context.Client.GameState.Statstring.Length == 0))
@@ -42,6 +42,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 udpToken = r.ReadUInt32();
 
             context.Client.GameState.UDPSupported = udpToken == 0x626E6574; // "bnet"
+
+            if (context.Client.GameState.UDPSupported && context.Client.GameState.ActiveChannel != null && context.Client.GameState.ChannelFlags.HasFlag(Account.Flags.NoUDP))
+            {
+                context.Client.GameState.ActiveChannel.UpdateUser(context.Client.GameState, context.Client.GameState.ChannelFlags & ~Account.Flags.NoUDP);
+            }
+
             return true;
         }
     }
