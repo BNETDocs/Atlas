@@ -56,26 +56,16 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (statstring.Length != 0 && (statstring.Length < 4 || statstring.Length > 128))
                             throw new GameProtocolViolationException(context.Client, "Client sent invalid statstring size in SID_ENTERCHAT");
 
-                        // Add the product id if size = 0
-                        if (statstring.Length == 0)
+                        if (statstring.Length < 4)
                         {
                             statstring = new byte[4];
-
-                            using var _m = new MemoryStream(statstring);
-                            using var _w = new BinaryWriter(_m);
-
-                            _w.Write(productId);
                         }
 
-                        // Verify the product matches
-                        if (statstring.Length >= 4)
-                        {
-                            using var _m = new MemoryStream(statstring);
-                            using var _r = new BinaryReader(_m);
+                        using var _m = new MemoryStream(statstring);
+                        using var _w = new BinaryWriter(_m);
 
-                            if (_r.ReadUInt32() != productId)
-                                throw new GameProtocolViolationException(context.Client, "Client attempted to set different product id in statstring");
-                        }
+                        _w.BaseStream.Position = 0;
+                        _w.Write(productId);
 
                         // Use their statstring if Diablo
                         if (Product.IsDiablo(context.Client.GameState.Product))
