@@ -63,7 +63,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var serverToken = r.ReadUInt32();
                         context.Client.GameState.ClientToken = r.ReadUInt32();
                         var hashedKeyData = r.ReadBytes(20);
-                        context.Client.GameState.KeyOwner = r.ReadString();
+                        context.Client.GameState.KeyOwner = r.ReadByteString();
 
                         if (serverToken != context.Client.GameState.ServerToken)
                             throw new GameProtocolViolationException(context.Client, "SID_CDKEY2 server token mismatch");

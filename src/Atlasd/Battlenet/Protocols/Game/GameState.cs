@@ -48,7 +48,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public string DoNotDisturb;
         public UInt32 FailedLogons;
         public ushort GameDataPort;
-        public string KeyOwner;
+        public byte[] KeyOwner;
         public string OnlineName;
         public Int32 Ping;
         public UInt32 PingToken;

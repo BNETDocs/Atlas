@@ -53,7 +53,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         context.Client.GameState.SpawnKey = r.ReadUInt32() == 1;
                         context.Client.GameState.GameKeys.Append(new GameKey(r.ReadString()));
-                        context.Client.GameState.KeyOwner = r.ReadString();
+                        context.Client.GameState.KeyOwner = r.ReadByteString();
 
                         return new SID_CDKEY().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
                     }
