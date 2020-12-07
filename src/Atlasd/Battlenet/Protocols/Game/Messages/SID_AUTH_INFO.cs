@@ -54,7 +54,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         context.Client.GameState.Product = (Product.ProductCode)r.ReadUInt32();
                         context.Client.GameState.Version.VersionByte = r.ReadUInt32();
                         context.Client.GameState.Locale.LanguageCode = r.ReadUInt32();
-                        context.Client.GameState.LocalIPAddress = IPAddress.Parse(r.ReadUInt32().ToString());
+                        context.Client.GameState.LocalIPAddress = new IPAddress(r.ReadBytes(4));
                         context.Client.GameState.TimezoneBias = r.ReadInt32();
                         context.Client.GameState.Locale.UserLocaleId = r.ReadUInt32();
                         context.Client.GameState.Locale.UserLanguageId = r.ReadUInt32();
