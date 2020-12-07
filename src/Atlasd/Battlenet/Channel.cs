@@ -135,12 +135,12 @@ namespace Atlasd.Battlenet
                         // Add Diablo II character name:
                         if (Product.IsDiabloII(user.Product))
                         {
-                            subuserName = $"{subuser.CharacterName}*{subuserName}";
+                            subuserName = $"{Encoding.UTF8.GetString(subuser.CharacterName)}*{subuserName}";
                         }
 
                         if (Product.IsDiabloII(subuser.Product))
                         {
-                            userName = $"{user.CharacterName}*{userName}";
+                            userName = $"{Encoding.UTF8.GetString(user.CharacterName)}*{userName}";
                         }
 
                         // Tell this user about everyone in the channel:
