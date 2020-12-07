@@ -118,13 +118,38 @@ namespace Atlasd.Battlenet
                 {
                     foreach (var subuser in users)
                     {
+                        var userFlags = user.ChannelFlags;
+                        var userName = user.OnlineName;
+                        var userRemoteAddress = IPAddress.Parse(user.Client.RemoteEndPoint.ToString().Split(':')[0]);
+                        var userSquelched = subuser.SquelchedIPs.Contains(userRemoteAddress);
+
+                        var subuserFlags = subuser.ChannelFlags;
+                        var subuserName = subuser.OnlineName;
+                        var subuserRemoteAddress = IPAddress.Parse(subuser.Client.RemoteEndPoint.ToString().Split(':')[0]);
+                        var subuserSquelched = user.SquelchedIPs.Contains(subuserRemoteAddress);
+
+                        // Add or remove squelched flag:
+                        userFlags = userSquelched ? userFlags | Account.Flags.Squelched : userFlags & ~Account.Flags.Squelched;
+                        subuserFlags = subuserSquelched ? subuserFlags | Account.Flags.Squelched : subuserFlags & ~Account.Flags.Squelched;
+
+                        // Add Diablo II character name:
+                        if (Product.IsDiabloII(user.Product))
+                        {
+                            subuserName = $"{subuser.CharacterName}*{subuserName}";
+                        }
+
+                        if (Product.IsDiabloII(subuser.Product))
+                        {
+                            userName = $"{user.CharacterName}*{userName}";
+                        }
+
                         // Tell this user about everyone in the channel:
-                        new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, subuser.ChannelFlags, subuser.Ping, subuser.OnlineName, subuser.Statstring).WriteTo(user.Client);
+                        new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, subuserFlags, subuser.Ping, subuserName, subuser.Statstring).WriteTo(user.Client);
 
                         // Tell everyone else about this user entering the channel:
                         if (subuser != user)
                         {
-                            new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, user.ChannelFlags, user.Ping, user.OnlineName, user.Statstring).WriteTo(subuser.Client);
+                            new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, userFlags, user.Ping, userName, user.Statstring).WriteTo(subuser.Client);
                         }
                     }
                 }

@@ -44,6 +44,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public VersionInfo Version;
 
         public string Away;
+        public byte[] CharacterName;
         public UInt32 ClientToken;
         public string DoNotDisturb;
         public UInt32 FailedLogons;
@@ -88,6 +89,7 @@ namespace Atlasd.Battlenet.Protocols.Game
 
             Away = null;
             DoNotDisturb = null;
+            CharacterName = new byte[0];
             ClientToken = 0;
             FailedLogons = 0;
             GameDataPort = 0;
