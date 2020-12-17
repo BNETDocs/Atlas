@@ -118,38 +118,13 @@ namespace Atlasd.Battlenet
                 {
                     foreach (var subuser in users)
                     {
-                        var userFlags = user.ChannelFlags;
-                        var userName = user.OnlineName;
-                        var userRemoteAddress = IPAddress.Parse(user.Client.RemoteEndPoint.ToString().Split(':')[0]);
-                        var userSquelched = subuser.SquelchedIPs.Contains(userRemoteAddress);
-
-                        var subuserFlags = subuser.ChannelFlags;
-                        var subuserName = subuser.OnlineName;
-                        var subuserRemoteAddress = IPAddress.Parse(subuser.Client.RemoteEndPoint.ToString().Split(':')[0]);
-                        var subuserSquelched = user.SquelchedIPs.Contains(subuserRemoteAddress);
-
-                        // Add or remove squelched flag:
-                        userFlags = userSquelched ? userFlags | Account.Flags.Squelched : userFlags & ~Account.Flags.Squelched;
-                        subuserFlags = subuserSquelched ? subuserFlags | Account.Flags.Squelched : subuserFlags & ~Account.Flags.Squelched;
-
-                        // Add Diablo II character name:
-                        if (Product.IsDiabloII(user.Product))
-                        {
-                            subuserName = $"{Encoding.UTF8.GetString(subuser.CharacterName)}*{subuserName}";
-                        }
-
-                        if (Product.IsDiabloII(subuser.Product))
-                        {
-                            userName = $"{Encoding.UTF8.GetString(user.CharacterName)}*{userName}";
-                        }
-
                         // Tell this user about everyone in the channel:
-                        new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, subuserFlags, subuser.Ping, subuserName, subuser.Statstring).WriteTo(user.Client);
+                        new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, RenderChannelFlags(user, subuser), subuser.Ping, RenderOnlineName(user, subuser), subuser.Statstring).WriteTo(user.Client);
 
                         // Tell everyone else about this user entering the channel:
                         if (subuser != user)
                         {
-                            new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, userFlags, user.Ping, userName, user.Statstring).WriteTo(subuser.Client);
+                            new ChatEvent(ChatEvent.EventIds.EID_USERJOIN, RenderChannelFlags(subuser, user), user.Ping, RenderOnlineName(subuser, user), user.Statstring).WriteTo(subuser.Client);
                         }
                     }
                 }
@@ -214,7 +189,7 @@ namespace Atlasd.Battlenet
             Channel channel = null;
 
             if (string.IsNullOrEmpty(name)) return channel;
-            if (name[0] == '#') name = name.Substring(1);
+            if (name[0] == '#') name = name[1..];
 
             lock (Common.ActiveChannels)
             {
@@ -444,6 +419,10 @@ namespace Atlasd.Battlenet
             {
                 lock (user)
                 {
+                    var remoteAddress = IPAddress.Parse(user.Client.RemoteEndPoint.ToString().Split(':')[0]);
+                    var squelched = user.SquelchedIPs.Contains(remoteAddress);
+                    var flags = squelched ? user.ChannelFlags | Account.Flags.Squelched : user.ChannelFlags & ~Account.Flags.Squelched;
+
                     user.ActiveChannel = null;
                     var wasChannelOp = user.ChannelFlags.HasFlag(Account.Flags.Employee)
                         || user.ChannelFlags.HasFlag(Account.Flags.ChannelOp)
@@ -453,7 +432,7 @@ namespace Atlasd.Battlenet
                     foreach (var subuser in users)
                     {
                         // Tell everyone else about this user leaving the channel:
-                        new ChatEvent(ChatEvent.EventIds.EID_USERLEAVE, user.ChannelFlags, user.Ping, user.OnlineName, new byte[0]).WriteTo(subuser.Client);
+                        new ChatEvent(ChatEvent.EventIds.EID_USERLEAVE, RenderChannelFlags(subuser, user), user.Ping, RenderOnlineName(subuser, user), new byte[0]).WriteTo(subuser.Client);
                     }
 
                     lock (DesignatedHeirs)
@@ -481,6 +460,43 @@ namespace Atlasd.Battlenet
             }
 
             if (Count == 0 && !ActiveFlags.HasFlag(Flags.Public)) Dispose();
+        }
+
+        /**
+         * <remarks>Renders the in-channel flags in context-aware situations, used when considering the squelched flag is necessary.</remarks>
+         * <param name="context">The user that will receive this chat event, whom this render will be presented to.</param>
+         * <param name="target">The target user that is being rendered for the context user.</param>
+         */
+        public static Account.Flags RenderChannelFlags(GameState context, GameState target)
+        {
+            var targetFlags = target.ChannelFlags;
+            var targetRemoteAddress = IPAddress.Parse(target.Client.RemoteEndPoint.ToString().Split(':')[0]);
+            var targetSquelched = context.SquelchedIPs.Contains(targetRemoteAddress);
+
+            // Add or remove squelched flag:
+            targetFlags = targetSquelched ? targetFlags | Account.Flags.Squelched : targetFlags & ~Account.Flags.Squelched;
+
+            return targetFlags;
+        }
+
+        /**
+         * <remarks>Renders the full online name of a user in context-aware situations, used with Diablo II character names and realms, and gateway names.</remarks>
+         * <param name="context">The user that will receive this chat event, whom this render will be presented to.</param>
+         * <param name="target">The target user that is being rendered for the context user.</param>
+         */
+        public static string RenderOnlineName(GameState context, GameState target)
+        {
+            var targetName = target.OnlineName;
+
+            // Add Diablo II character name:
+            if (Product.IsDiabloII(context.Product))
+            {
+                targetName = $"{Encoding.UTF8.GetString(target.CharacterName)}*{targetName}";
+            }
+
+            // Todo: Suffix "#{gateway}" or "@{gateway}" name, such as: JoeUser#Azeroth
+
+            return targetName;
         }
 
         public string RenderTopic(GameState receiver)
@@ -658,6 +674,34 @@ namespace Atlasd.Battlenet
                     }
 
                     msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
+                    user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
+                }
+            }
+        }
+
+        /**
+         * <remarks>Writes a chat message on behalf of <paramref name="owner"/>, either EID_TALK or EID_EMOTE depending on <paramref name="emote"/>, to the channel.</remarks>
+         * <param name="owner">The user that is sending this message.</param>
+         * <param name="message">The message that the <paramref name="owner"/> wishes to send to the channel.</param>
+         * <param name="emote">Whether to write the message with EID_TALK (false) or EID_EMOTE (true) event id type. Defaults to EID_TALK (false).</param>
+         */
+        public void WriteChatMessage(GameState owner, byte[] message, bool emote = false)
+        {
+            var msg = new SID_CHATEVENT();
+
+            lock (Users)
+            {
+                foreach (var user in Users)
+                {
+                    if (owner != null && user == owner && !emote)
+                    {
+                        // Dropping EID_TALK from being echoed back to sender
+                        continue;
+                    }
+
+                    var e = new ChatEvent(emote ? ChatEvent.EventIds.EID_EMOTE : ChatEvent.EventIds.EID_TALK, RenderChannelFlags(user, owner), owner.Ping, RenderOnlineName(user, owner), message);
+
+                    msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, dynamic>() {{ "chatEvent", e }}));
                     user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
                 }
             }

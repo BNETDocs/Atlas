@@ -59,7 +59,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 }
                 else
                 {
-                    context.Client.GameState.ActiveChannel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_TALK, context.Client.GameState.ChannelFlags, context.Client.GameState.Ping, context.Client.GameState.OnlineName, raw), context.Client.GameState);
+                    context.Client.GameState.ActiveChannel.WriteChatMessage(context.Client.GameState, raw, false);
                 }
 
                 return true;

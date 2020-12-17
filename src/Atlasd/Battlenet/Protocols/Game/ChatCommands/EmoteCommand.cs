@@ -20,7 +20,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 return;
             }
 
-            context.GameState.ActiveChannel.WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_EMOTE, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, RawBuffer), context.GameState);
+            context.GameState.ActiveChannel.WriteChatMessage(context.GameState, RawBuffer, true);
 
             if (context.GameState.ActiveChannel.Count <= 1 || context.GameState.ActiveChannel.ActiveFlags.HasFlag(Channel.Flags.Silent))
             {
