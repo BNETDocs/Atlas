@@ -218,9 +218,23 @@ namespace Atlasd.Battlenet
 
         public static bool GetClientByOnlineName(string target, out GameState client)
         {
+            var t = target;
+
+            // Escape out of Diablo II character name designation
+            if (t.Contains('*'))
+            {
+                t = t[(t.IndexOf('*') + 1)..];
+            }
+
+            // Escape out of gateway designation
+            if (t.Contains('#'))
+            {
+                t = t[0..t.IndexOf('#')];
+            }
+
             lock (ActiveGameStates)
             {
-                return ActiveGameStates.TryGetValue(target, out client);
+                return ActiveGameStates.TryGetValue(t, out client);
             }
         }
 

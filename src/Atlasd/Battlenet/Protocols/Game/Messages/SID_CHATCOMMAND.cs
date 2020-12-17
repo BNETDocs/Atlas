@@ -65,6 +65,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 return true;
             }
 
+            var onlineName = context.Client.GameState.OnlineName;
             var command = ChatCommand.FromByteArray(raw[1..]); // remove slash before calling FromByteArray()
             var commandEnvironment = new Dictionary<string, string>()
             {
@@ -73,14 +74,14 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 { "game", Product.ProductName(context.Client.GameState.Product, true) },
                 { "host", "BNETDocs" },
                 { "localTime", context.Client.GameState.LocalTime.ToString(Common.HumanDateTimeFormat) },
-                { "name", context.Client.GameState.OnlineName },
-                { "onlineName", context.Client.GameState.OnlineName },
+                { "name", onlineName },
+                { "onlineName", onlineName },
                 { "realm", "Battle.net" },
                 { "realmTime", DateTime.Now.ToString(Common.HumanDateTimeFormat) },
                 { "realmTimezone", $"UTC{DateTime.Now:zzz}" },
-                { "user", context.Client.GameState.OnlineName },
-                { "username", context.Client.GameState.OnlineName },
-                { "userName", context.Client.GameState.OnlineName },
+                { "user", onlineName },
+                { "username", onlineName },
+                { "userName", onlineName },
             };
             var commandContext = new ChatCommandContext(command, commandEnvironment, context.Client.GameState);
 

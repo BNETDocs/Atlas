@@ -34,7 +34,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
 
             // Get the target state, or return not logged on
-            if (!Battlenet.Common.ActiveGameStates.TryGetValue(target, out var targetState) || targetState == null)
+            if (!Battlenet.Common.GetClientByOnlineName(target, out var targetState) || targetState == null)
             {
                 new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, Resources.UserNotLoggedOn).WriteTo(context.GameState.Client);
                 return;
@@ -54,7 +54,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
 
             // Notify the source we whispered the target
-            new ChatEvent(ChatEvent.EventIds.EID_WHISPERTO, targetState.ChannelFlags, targetState.Ping, targetState.OnlineName, RawBuffer).WriteTo(context.GameState.Client);
+            new ChatEvent(ChatEvent.EventIds.EID_WHISPERTO, Channel.RenderChannelFlags(context.GameState, targetState), targetState.Ping, Channel.RenderOnlineName(context.GameState, targetState), RawBuffer).WriteTo(context.GameState.Client);
 
             // Check if target is marked away
             if (!string.IsNullOrEmpty(targetState.Away))
@@ -64,11 +64,11 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 r = r.Replace("{user}", targetState.OnlineName);
                 r = r.Replace("{message}", targetState.Away);
 
-                new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, r).WriteTo(context.GameState.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, Channel.RenderChannelFlags(context.GameState, targetState), context.GameState.Ping, Channel.RenderOnlineName(context.GameState, targetState), r).WriteTo(context.GameState.Client);
             }
 
             // Notify the target they were whispered by the source
-            new ChatEvent(ChatEvent.EventIds.EID_WHISPERFROM, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, RawBuffer).WriteTo(targetState.Client);
+            new ChatEvent(ChatEvent.EventIds.EID_WHISPERFROM, Channel.RenderChannelFlags(targetState, context.GameState), context.GameState.Ping, Channel.RenderOnlineName(targetState, context.GameState), RawBuffer).WriteTo(targetState.Client);
         }
     }
 }

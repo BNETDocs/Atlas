@@ -20,6 +20,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             var t = Arguments.Count == 0 ? "" : Arguments[0]; // target
             string r; // reply
 
+            // quick check
             if (t.ToLower() == context.GameState.OnlineName.ToLower())
             {
                 new WhoAmICommand(RawBuffer, Arguments).Invoke(context);
@@ -31,6 +32,12 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 r = Resources.UserNotLoggedOn;
                 foreach (var line in r.Split(Battlenet.Common.NewLine))
                     new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
+                return;
+            }
+
+            if (target == context.GameState)
+            {
+                new WhoAmICommand(RawBuffer, Arguments).Invoke(context);
                 return;
             }
 
@@ -49,14 +56,14 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 { "game", Product.ProductName(target.Product, true) },
                 { "host", "BNETDocs" },
                 { "localTime", target.LocalTime.ToString(Common.HumanDateTimeFormat).Replace(" 0", "  ") },
-                { "name", target.OnlineName },
-                { "onlineName", target.OnlineName },
+                { "name", Channel.RenderOnlineName(context.GameState, target) },
+                { "onlineName", Channel.RenderOnlineName(context.GameState, target) },
                 { "realm", "BNETDocs" },
                 { "realmTime", DateTime.Now.ToString(Common.HumanDateTimeFormat).Replace(" 0", "  ") },
                 { "realmTimezone", $"UTC{DateTime.Now:zzz}" },
-                { "user", target.OnlineName },
-                { "username", target.OnlineName },
-                { "userName", target.OnlineName },
+                { "user", Channel.RenderOnlineName(context.GameState, target) },
+                { "username", Channel.RenderOnlineName(context.GameState, target) },
+                { "userName", Channel.RenderOnlineName(context.GameState, target) },
             };
             var env = targetEnv.Concat(context.Environment);
 
@@ -65,7 +72,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 str = str.Replace("{" + kv.Key + "}", kv.Value);
             }
 
-            new ChatEvent(ChatEvent.EventIds.EID_INFO, target.ChannelFlags, target.Ping, target.OnlineName, str).WriteTo(context.GameState.Client);
+            new ChatEvent(ChatEvent.EventIds.EID_INFO, Channel.RenderChannelFlags(context.GameState, target), target.Ping, Channel.RenderOnlineName(context.GameState, target), str).WriteTo(context.GameState.Client);
         }
     }
 }

@@ -272,7 +272,7 @@ namespace Atlasd.Battlenet
             return false;
         }
 
-        public string GetUsersAsString()
+        public string GetUsersAsString(GameState context)
         {
             if (ActiveFlags.HasFlag(Flags.Silent)) return "";
 
@@ -282,14 +282,15 @@ namespace Atlasd.Battlenet
             {
                 foreach (var user in Users)
                 {
+                    var userName = RenderOnlineName(context, user);
                     if (user.ChannelFlags.HasFlag(Account.Flags.Employee) ||
                         user.ChannelFlags.HasFlag(Account.Flags.ChannelOp) ||
                         user.ChannelFlags.HasFlag(Account.Flags.Admin))
                     {
-                        names.AddFirst($"[{user.OnlineName.ToUpper()}]");
+                        names.AddFirst($"[{userName.ToUpper()}]");
                     } else
                     {
-                        names.AddLast(user.OnlineName);
+                        names.AddLast(userName);
                     }
                 }
             }
@@ -494,7 +495,7 @@ namespace Atlasd.Battlenet
                 targetName = $"{Encoding.UTF8.GetString(target.CharacterName)}*{targetName}";
             }
 
-            // Todo: Suffix "#{gateway}" or "@{gateway}" name, such as: JoeUser#Azeroth
+            // TODO: Suffix "#{gateway}" or "@{gateway}" name, such as: JoeUser#Azeroth
 
             return targetName;
         }

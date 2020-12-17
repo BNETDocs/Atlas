@@ -38,7 +38,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             r = Resources.WhoCommand;
 
             r = r.Replace("{channel}", ch == null ? "(null)" : ch.Name);
-            r = r.Replace("{users}", ch.GetUsersAsString());
+            r = r.Replace("{users}", ch.GetUsersAsString(context.GameState));
 
             foreach (var kv in context.Environment)
             {
