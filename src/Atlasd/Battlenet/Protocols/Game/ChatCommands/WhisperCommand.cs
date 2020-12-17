@@ -1,5 +1,6 @@
 ﻿using Atlasd.Localization;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
@@ -65,6 +66,12 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 r = r.Replace("{message}", targetState.Away);
 
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, Channel.RenderChannelFlags(context.GameState, targetState), context.GameState.Ping, Channel.RenderOnlineName(context.GameState, targetState), r).WriteTo(context.GameState.Client);
+            }
+
+            // Check for squelched status
+            if (targetState.SquelchedIPs.Contains(IPAddress.Parse(context.GameState.Client.RemoteEndPoint.ToString().Split(':')[0])))
+            {
+                return;
             }
 
             // Notify the target they were whispered by the source
