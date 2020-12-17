@@ -530,11 +530,9 @@ namespace Atlasd.Battlenet
                     // Show users in channel or display info about no chat:
                     if (!ActiveFlags.HasFlag(Flags.Silent))
                     {
-                        var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, user.ChannelFlags, user.Ping, user.OnlineName, user.Statstring);
-
                         foreach (var subuser in Users)
                         {
-                            WriteChatEvent(chatEvent, subuser.Client.GameState);
+                            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, RenderChannelFlags(subuser, user), user.Ping, RenderOnlineName(subuser, user), user.Statstring), subuser.Client.GameState);
                         }
                     }
                     else
@@ -606,14 +604,7 @@ namespace Atlasd.Battlenet
             {
                 foreach (var user in Users)
                 {
-                    var remoteAddress = IPAddress.Parse(user.Client.RemoteEndPoint.ToString().Split(':')[0]);
-                    var squelched = client.SquelchedIPs.Contains(remoteAddress);
-                    var flags = squelched ? user.ChannelFlags | Account.Flags.Squelched : user.ChannelFlags & ~Account.Flags.Squelched;
-
-                    if (user.ChannelFlags != flags)
-                    {
-                        new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, flags, user.Ping, user.OnlineName, user.Statstring).WriteTo(client.Client);
-                    }
+                    new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, RenderChannelFlags(client, user), user.Ping, RenderOnlineName(client, user), user.Statstring).WriteTo(client.Client);
                 }
             }
         }
@@ -646,11 +637,35 @@ namespace Atlasd.Battlenet
 
         public void UpdateUser(GameState client, Account.Flags flags, Int32 ping, byte[] statstring)
         {
-            client.ChannelFlags = flags;
-            client.Ping = ping;
-            client.Statstring = statstring;
+            var changed = false;
 
-            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, client.ChannelFlags, client.Ping, client.OnlineName, client.Statstring), client);
+            if (client.ChannelFlags != flags)
+            {
+                client.ChannelFlags = flags;
+                changed = true;
+            }
+
+            if (client.Ping != ping)
+            {
+                client.Ping = ping;
+                changed = true;
+            }
+
+            if (client.Statstring != statstring)
+            {
+                client.Statstring = statstring;
+                changed = true;
+            }
+
+            if (!changed) return; // don't emit ChatEvent for unnecessary calls to UpdateUser() if nothing changed
+
+            lock (Users)
+            {
+                foreach (var user in Users)
+                {
+                    new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, RenderChannelFlags(user, client), client.Ping, RenderOnlineName(user, client), client.Statstring).WriteTo(user.Client);
+                }
+            }
         }
 
         public void UpdateUser(GameState client, Account.Flags flags, Int32 ping, string statstring)
