@@ -115,7 +115,16 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to parse your grace period request, please see https://bit.ly/34Sgl2w.
+        ///   Looks up a localized string similar to There is no shutdown event scheduled for the server..
+        /// </summary>
+        public static string AdminShutdownCommandNotScheduled {
+            get {
+                return ResourceManager.GetString("AdminShutdownCommandNotScheduled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to parse your grace period in seconds, please see https://bit.ly/34Sgl2w.
         /// </summary>
         public static string AdminShutdownCommandParseError {
             get {
@@ -150,9 +159,28 @@ namespace Atlasd.Localization {
         ///- Decimal: Any whole number, not prefixed with zero (octal indication)
         ///Example: 0x10 = 16 decimal.
         /// </summary>
-        public static string AdminSpoofUserFlagsCommandBadNumber {
+        public static string AdminSpoofUserFlagsCommandBadValue {
             get {
-                return ResourceManager.GetString("AdminSpoofUserFlagsCommandBadNumber", resourceCulture);
+                return ResourceManager.GetString("AdminSpoofUserFlagsCommandBadValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set {user}&apos;s game to {game}..
+        /// </summary>
+        public static string AdminSpoofUserGameCommand {
+            get {
+                return ResourceManager.GetString("AdminSpoofUserGameCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to parse the game value into a product.
+        ///Examples: SEXP, pxes.
+        /// </summary>
+        public static string AdminSpoofUserGameCommandBadValue {
+            get {
+                return ResourceManager.GetString("AdminSpoofUserGameCommandBadValue", resourceCulture);
             }
         }
         
@@ -174,9 +202,9 @@ namespace Atlasd.Localization {
         ///- Decimal: Any whole number, not prefixed with zero (octal indication)
         ///Example: 0x10 = 16 decimal.
         /// </summary>
-        public static string AdminSpoofUserPingCommandBadNumber {
+        public static string AdminSpoofUserPingCommandBadValue {
             get {
-                return ResourceManager.GetString("AdminSpoofUserPingCommandBadNumber", resourceCulture);
+                return ResourceManager.GetString("AdminSpoofUserPingCommandBadValue", resourceCulture);
             }
         }
         
@@ -524,7 +552,25 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A server shutdown has been rescheduled in {period}..
+        ///   Looks up a localized string similar to The server shutdown has been cancelled..
+        /// </summary>
+        public static string ServerShutdownCancelled {
+            get {
+                return ResourceManager.GetString("ServerShutdownCancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The server shutdown has been cancelled ({message})..
+        /// </summary>
+        public static string ServerShutdownCancelledWithMessage {
+            get {
+                return ResourceManager.GetString("ServerShutdownCancelledWithMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The server has been rescheduled for shutdown in {period}..
         /// </summary>
         public static string ServerShutdownRescheduled {
             get {
@@ -533,7 +579,7 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A server shutdown has been rescheduled in {period} ({message})..
+        ///   Looks up a localized string similar to The server has been rescheduled for shutdown in {period} ({message})..
         /// </summary>
         public static string ServerShutdownRescheduledWithMessage {
             get {
@@ -542,7 +588,7 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A server shutdown has been scheduled in {period}..
+        ///   Looks up a localized string similar to The server has been scheduled for shutdown in {period}..
         /// </summary>
         public static string ServerShutdownScheduled {
             get {
@@ -551,7 +597,7 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A server shutdown has been scheduled in {period} ({message})..
+        ///   Looks up a localized string similar to The server has been scheduled for shutdown in {period} ({message})..
         /// </summary>
         public static string ServerShutdownScheduledWithMessage {
             get {

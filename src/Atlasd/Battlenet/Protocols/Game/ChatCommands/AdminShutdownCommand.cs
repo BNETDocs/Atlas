@@ -15,19 +15,30 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            string periodStr = "0";
-            if (Arguments.Count > 0) {
-                periodStr = Arguments[0];
-                Arguments.RemoveAt(0);
-            }
+            var periodStr = Arguments.Count == 0 ? "" : Arguments[0];
+            if (Arguments.Count > 0) Arguments.RemoveAt(0);
+            var message = string.Join(' ', Arguments);
+            if (message.Length == 0) message = null;
 
-            if (!double.TryParse(periodStr, out var periodDbl))
+            if (periodStr.Length == 0)
             {
-                new ChatEvent(ChatEvent.EventIds.EID_ERROR, (uint)0, context.GameState.Ping, context.GameState.OnlineName, Resources.AdminShutdownCommandParseError).WriteTo(context.GameState.Client);
-                return;
+                periodStr = "30"; // default 30 seconds delay if empty periodStr
             }
 
-            Battlenet.Common.ScheduleShutdown(TimeSpan.FromSeconds(periodDbl), string.Join(' ', Arguments), context);
+            if (periodStr.Equals("cancel"))
+            {
+                Battlenet.Common.ScheduleShutdownCancelled(message, context);
+            }
+            else
+            {
+                if (!double.TryParse(periodStr, out var periodDbl))
+                {
+                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, (uint)0, context.GameState.Ping, context.GameState.OnlineName, Resources.AdminShutdownCommandParseError).WriteTo(context.GameState.Client);
+                    return;
+                }
+
+                Battlenet.Common.ScheduleShutdown(TimeSpan.FromSeconds(periodDbl), message, context);
+            }
         }
     }
 }

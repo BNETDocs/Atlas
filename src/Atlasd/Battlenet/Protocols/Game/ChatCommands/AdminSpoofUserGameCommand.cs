@@ -2,14 +2,15 @@
 using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
-    class AdminSpoofUserFlagsCommand : ChatCommand
+    class AdminSpoofUserGameCommand : ChatCommand
     {
-        public AdminSpoofUserFlagsCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
+        public AdminSpoofUserGameCommand(byte[] rawBuffer, List<string> arguments) : base(rawBuffer, arguments) { }
 
         public override bool CanInvoke(ChatCommandContext context)
         {
@@ -33,31 +34,41 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             // Calculates and removes (target+' ') from (raw) which prints into (newRaw):
             RawBuffer = RawBuffer[(Encoding.UTF8.GetByteCount(t) + (Arguments.Count > 0 ? 1 : 0))..];
 
-            var strFlags = Arguments.Count == 0 ? "0" : Arguments[0];
-            if (!Daemon.Common.TryToUInt32FromString(strFlags, out uint targetFlags))
+            var strGame = Arguments.Count == 0 ? "" : Arguments[0];
+            var targetGame = Product.StringToProduct(strGame);
+            if (targetGame == Product.ProductCode.None)
             {
-                r = Resources.AdminSpoofUserFlagsCommandBadValue;
+                r = Resources.AdminSpoofUserGameCommandBadValue;
                 foreach (var line in r.Split(Battlenet.Common.NewLine))
                     new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
                 return;
             }
 
-            if (target.ActiveChannel == null)
+            lock (target.Statstring)
             {
-                r = Resources.UserNotInChannel;
-                foreach (var line in r.Split(Battlenet.Common.NewLine))
-                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
-                return;
-            }
+                var newStatstring = new byte[target.Statstring.Length];
 
-            target.ActiveChannel.UpdateUser(target, (Account.Flags)targetFlags); // also sets target.ChannelFlags = (Account.Flags)targetFlags
+                using var m = new MemoryStream(newStatstring);
+                using var w = new BinaryWriter(m);
+
+                w.Write((UInt32)targetGame);
+                w.Write(target.Statstring[4..]);
+
+                if (target.ActiveChannel != null)
+                {
+                    target.ActiveChannel.UpdateUser(target, newStatstring); // also sets target.Statstring = newStatstring
+                }
+                else
+                {
+                    target.Statstring = newStatstring;
+                }
+            }
 
             var targetEnv = new Dictionary<string, string>()
             {
                 { "accountName", target.Username },
                 { "channel", target.ActiveChannel == null ? "(null)" : target.ActiveChannel.Name },
-                { "flags", $"0x{targetFlags:X8}" },
-                { "game", Product.ProductName(target.Product, true) },
+                { "game", Product.ProductName(targetGame, true) },
                 { "host", "BNETDocs" },
                 { "localTime", target.LocalTime.ToString(Common.HumanDateTimeFormat).Replace(" 0", "  ") },
                 { "name", target.OnlineName },
@@ -71,7 +82,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             };
             var env = targetEnv.Concat(context.Environment);
 
-            r = Resources.AdminSpoofUserFlagsCommand;
+            r = Resources.AdminSpoofUserGameCommand;
 
             foreach (var kv in env)
             {

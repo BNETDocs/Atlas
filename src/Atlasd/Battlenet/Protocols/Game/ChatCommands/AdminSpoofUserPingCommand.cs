@@ -36,7 +36,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             var strPing = Arguments.Count == 0 ? "0" : Arguments[0];
             if (!Daemon.Common.TryToInt32FromString(strPing, out int targetPing))
             {
-                r = Resources.AdminSpoofUserPingCommandBadNumber;
+                r = Resources.AdminSpoofUserPingCommandBadValue;
                 foreach (var line in r.Split(Battlenet.Common.NewLine))
                     new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
                 return;
