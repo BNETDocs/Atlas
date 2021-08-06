@@ -86,6 +86,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 case "spoofuserflag":
                 case "spoofuserflags":
                     new AdminSpoofUserFlagsCommand(RawBuffer, Arguments).Invoke(context); return;
+                case "spoofuserping":
+                    new AdminSpoofUserPingCommand(RawBuffer, Arguments).Invoke(context); return;
                 default:
                     r = "That is not a valid admin command. Type /admin help or /admin ? for more info.";
                     break;

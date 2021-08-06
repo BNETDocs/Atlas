@@ -52,6 +52,62 @@ namespace Atlasd.Daemon
             return new string(charArray);
         }
 
+        public static bool TryToInt32FromString(string value, out int number, int defaultNumber = 0)
+        {
+            string v = value;
+
+            try
+            {
+                if (v.StartsWith("0b") || v.StartsWith("0B")
+                    || v.StartsWith("&b") || v.StartsWith("&B"))
+                {
+                    number = Convert.ToInt32(v[2..], 2);
+                }
+                if (v.StartsWith("-0b") || v.StartsWith("-0B")
+                    || v.StartsWith("-&b") || v.StartsWith("-&B"))
+                {
+                    number = 0 - Convert.ToInt32(v[3..], 2);
+                }
+                else if (v.StartsWith("0x") || v.StartsWith("0X")
+                    || v.StartsWith("&h") || v.StartsWith("&H"))
+                {
+                    number = Convert.ToInt32(v[2..], 16);
+                }
+                else if (v.StartsWith("-0x") || v.StartsWith("-0X")
+                    || v.StartsWith("-&h") || v.StartsWith("-&H"))
+                {
+                    number = Convert.ToInt32(v[3..], 16);
+                }
+                else if (v.StartsWith("0") && v.Length > 1)
+                {
+                    number = Convert.ToInt32(v[1..], 8);
+                }
+                else if (v.StartsWith("-0") && v.Length > 2)
+                {
+                    number = Convert.ToInt32(v[2..], 8);
+                }
+                else
+                {
+                    number = Convert.ToInt32(v, 10);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex is ArgumentException || ex is ArgumentOutOfRangeException
+                    || ex is FormatException || ex is OverflowException)
+                {
+                    number = defaultNumber;
+                    return false;
+                }
+                else
+                {
+                    throw ex;
+                }
+            }
+
+            return true;
+        }
+
         public static bool TryToUInt32FromString(string value, out uint number, uint defaultNumber = 0)
         {
             string v = value;
@@ -61,16 +117,16 @@ namespace Atlasd.Daemon
                 if (v.StartsWith("0b") || v.StartsWith("0B")
                     || v.StartsWith("&b") || v.StartsWith("&B"))
                 {
-                    number = Convert.ToUInt32(v.Substring(2), 2);
+                    number = Convert.ToUInt32(v[2..], 2);
                 }
                 else if (v.StartsWith("0x") || v.StartsWith("0X")
                     || v.StartsWith("&h") || v.StartsWith("&H"))
                 {
-                    number = Convert.ToUInt32(v.Substring(2), 16);
+                    number = Convert.ToUInt32(v[2..], 16);
                 }
                 else if (v.StartsWith("0") && v.Length > 1)
                 {
-                    number = Convert.ToUInt32(v.Substring(1), 8);
+                    number = Convert.ToUInt32(v[1..], 8);
                 }
                 else
                 {

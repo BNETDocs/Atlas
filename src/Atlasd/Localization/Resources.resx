@@ -153,6 +153,18 @@ Supported number prefixes:
 - Decimal: Any whole number, not prefixed with zero (octal indication)
 Example: 0x10 = 16 decimal</value>
   </data>
+  <data name="AdminSpoofUserPingCommand" xml:space="preserve">
+    <value>Set {user}'s ping to {ping}ms.</value>
+  </data>
+  <data name="AdminSpoofUserPingCommandBadNumber" xml:space="preserve">
+    <value>Unable to parse the ping into an unsigned 32-bit integer.
+Supported number prefixes:
+- Binary: 0b, 0B, &amp;b, &amp;B
+- Hex: 0x, 0X, &amp;h, &amp;H
+- Octal: 0
+- Decimal: Any whole number, not prefixed with zero (octal indication)
+Example: 0x10 = 16 decimal</value>
+  </data>
   <data name="AwayCommandOff" xml:space="preserve">
     <value>You are no longer marked as away.</value>
   </data>
