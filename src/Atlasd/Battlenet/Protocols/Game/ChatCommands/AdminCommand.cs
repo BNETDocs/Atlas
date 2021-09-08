@@ -1,4 +1,4 @@
-﻿using Atlasd.Localization;
+﻿using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,12 +17,22 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
+            var grantSudoToSpoofedAdmins = Settings.GetBoolean(new string[] { "battlenet", "emulation", "grant_sudo_to_spoofed_admins" }, false);
             var hasSudo = false;
 
             lock (context.GameState)
             {
-                hasSudo = context.GameState.ChannelFlags.HasFlag(Account.Flags.Admin)
-                    || context.GameState.ChannelFlags.HasFlag(Account.Flags.Employee);
+                var userFlags = (Account.Flags)context.GameState.ActiveAccount.Get(Account.FlagsKey);
+                hasSudo =
+                    (
+                        grantSudoToSpoofedAdmins && (
+                            context.GameState.ChannelFlags.HasFlag(Account.Flags.Admin)
+                            || context.GameState.ChannelFlags.HasFlag(Account.Flags.Employee)
+                        )
+                    )
+                    || userFlags.HasFlag(Account.Flags.Admin)
+                    || userFlags.HasFlag(Account.Flags.Employee)
+                ;
             }
 
             if (!hasSudo)
@@ -76,7 +86,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 case "spoofuserping":
                     new AdminSpoofUserPingCommand(RawBuffer, Arguments).Invoke(context); return;
                 default:
-                    r = "That is not a valid admin command. Type /admin help or /admin ? for more info.";
+                    r = Localization.Resources.InvalidAdminCommand;
                     break;
             }
 

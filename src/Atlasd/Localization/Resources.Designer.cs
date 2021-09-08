@@ -516,6 +516,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to That is not a valid admin command. Type /admin help or /admin ? for more info..
+        /// </summary>
+        public static string InvalidAdminCommand {
+            get {
+                return ResourceManager.GetString("InvalidAdminCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid channel name..
         /// </summary>
         public static string InvalidChannelName {

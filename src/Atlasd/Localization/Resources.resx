@@ -296,6 +296,9 @@ Type /help TOPIC for information about a specific topic.</value>
     <value>/time
 Displays the current {realm} Time ({realmTimezone}).</value>
   </data>
+  <data name="InvalidAdminCommand" xml:space="preserve">
+    <value>That is not a valid admin command. Type /admin help or /admin ? for more info.</value>
+  </data>
   <data name="InvalidChannelName" xml:space="preserve">
     <value>Invalid channel name.</value>
   </data>
