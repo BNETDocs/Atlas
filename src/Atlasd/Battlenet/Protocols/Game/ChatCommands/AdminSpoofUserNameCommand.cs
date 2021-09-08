@@ -31,7 +31,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 return;
             }
 
-            if (n2.Length == 0)
+            if (n2.Length == 0 || (n2.Contains("#") && n2[0..n2.IndexOf("#")].Length == 0))
             {
                 r = Resources.AdminSpoofUserNameCommandBadValue;
                 foreach (var kv in context.Environment)
@@ -69,16 +69,6 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             {
                 var searchName = n2.Contains("#") ? n2[0..n2.IndexOf("#")] : n2;
                 int serial = 1;
-
-                if (searchName.Length == 0)
-                {
-                    r = Resources.AdminSpoofUserNameCommandBadValue;
-                    foreach (var kv in context.Environment)
-                        r = r.Replace("{" + kv.Key + "}", kv.Value);
-                    foreach (var line in r.Split(Battlenet.Common.NewLine))
-                        new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
-                    return;
-                }
 
                 var onlineName = searchName;
                 while (Battlenet.Common.ActiveAccounts.ContainsKey(onlineName))
