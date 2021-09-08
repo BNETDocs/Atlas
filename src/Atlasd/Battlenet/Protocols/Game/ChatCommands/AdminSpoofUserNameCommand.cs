@@ -67,12 +67,13 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             // get a new unique name from n2 (instead of target.Username)
             lock (Battlenet.Common.ActiveAccounts)
             {
-                var serial = 1;
-                var onlineName = n2;
+                var searchName = n2.Contains("#") ? n2[0..n2.IndexOf("#")] : n2;
+                int serial = 1;
 
+                var onlineName = searchName;
                 while (Battlenet.Common.ActiveAccounts.ContainsKey(onlineName))
                 {
-                    onlineName = $"{n2}#{++serial}";
+                    onlineName = $"{searchName}#{++serial}";
                 }
 
                 lock (target.ActiveAccount)
