@@ -58,24 +58,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                     new AdminDisconnectCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "help":
                 case "?":
-                    r = string.Join(Battlenet.Common.NewLine, new List<string>() {
-                        { "/admin ? (alias: /admin help)" },
-                        { "/admin announce (alias: /admin broadcast)" },
-                        { "/admin broadcast <message>" },
-                        { "/admin dc (alias: /admin disconnect)" },
-                        { "/admin disconnect <user> [reason]" },
-                        { "/admin help (this text)" },
-                        { "/admin move (alias: /admin moveuser)" },
-                        { "/admin moveuser <user> <channel>" },
-                        { "/admin shutdown [(cancel [message])|(delay-seconds|30 [message])]" },
-                        { "/admin spoofuserflag (alias: /admin spoofuserflags)" },
-                        { "/admin spoofuserflags <user> <flags>" },
-                        { "/admin spoofusergame <user> <game>" },
-                        { "/admin spoofusername <oldname> <newname>" },
-                        { "/admin spoofuserping <user> <ping>" },
-                        { "" },
-                    });
-                    break;
+                    new AdminHelpCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "moveuser":
                 case "move":
                     new AdminMoveUserCommand(RawBuffer, Arguments).Invoke(context); return;

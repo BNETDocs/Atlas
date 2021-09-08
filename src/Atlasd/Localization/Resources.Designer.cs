@@ -79,6 +79,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Admin Command List:.
+        /// </summary>
+        public static string AdminHelpCommand {
+            get {
+                return ResourceManager.GetString("AdminHelpCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Forcefully moved {user} to the channel {channel}..
         /// </summary>
         public static string AdminMoveUserCommand {

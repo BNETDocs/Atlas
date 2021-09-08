@@ -123,6 +123,9 @@
   <data name="AdminDisconnectCommand" xml:space="preserve">
     <value>{user} was disconnected.</value>
   </data>
+  <data name="AdminHelpCommand" xml:space="preserve">
+    <value>Admin Command List:</value>
+  </data>
   <data name="AdminMoveUserCommand" xml:space="preserve">
     <value>Forcefully moved {user} to the channel {channel}.</value>
   </data>
