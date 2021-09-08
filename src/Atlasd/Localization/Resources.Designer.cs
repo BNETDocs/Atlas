@@ -194,6 +194,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Set {name1}&apos;s name to {name2}..
+        /// </summary>
+        public static string AdminSpoofUserNameCommand {
+            get {
+                return ResourceManager.GetString("AdminSpoofUserNameCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unacceptable new name for target..
+        /// </summary>
+        public static string AdminSpoofUserNameCommandBadValue {
+            get {
+                return ResourceManager.GetString("AdminSpoofUserNameCommandBadValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Set {user}&apos;s ping to {ping}ms..
         /// </summary>
         public static string AdminSpoofUserPingCommand {

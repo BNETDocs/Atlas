@@ -81,8 +81,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                     new AdminSpoofUserFlagsCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "spoofusergame":
                     new AdminSpoofUserGameCommand(RawBuffer, Arguments).Invoke(context); return;
-                //case "spoofusername":
-                //    new AdminSpoofUserNameCommand(RawBuffer, Arguments).Invoke(context); return;
+                case "spoofusername":
+                    new AdminSpoofUserNameCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "spoofuserping":
                     new AdminSpoofUserPingCommand(RawBuffer, Arguments).Invoke(context); return;
                 default:

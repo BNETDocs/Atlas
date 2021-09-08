@@ -166,6 +166,12 @@ Example: 0x10 = 16 decimal</value>
     <value>Unable to parse the game value into a product.
 Examples: SEXP, pxes</value>
   </data>
+  <data name="AdminSpoofUserNameCommand" xml:space="preserve">
+    <value>Set {name1}'s name to {name2}.</value>
+  </data>
+  <data name="AdminSpoofUserNameCommandBadValue" xml:space="preserve">
+    <value>Unacceptable new name for target.</value>
+  </data>
   <data name="AdminSpoofUserPingCommand" xml:space="preserve">
     <value>Set {user}'s ping to {ping}ms.</value>
   </data>
