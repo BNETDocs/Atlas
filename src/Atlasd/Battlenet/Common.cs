@@ -231,7 +231,7 @@ namespace Atlasd.Battlenet
             // Escape out of gateway designation
             if (t.Contains('#'))
             {
-                t = t[0..t.IndexOf('#')];
+                t = t[0..t.LastIndexOf('#')];
             }
 
             lock (ActiveGameStates)
