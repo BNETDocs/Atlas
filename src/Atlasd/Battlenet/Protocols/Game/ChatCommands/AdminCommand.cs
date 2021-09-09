@@ -63,6 +63,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 case "announce":
                 case "broadcast":
                     new AdminBroadcastCommand(RawBuffer, Arguments).Invoke(context); return;
+                case "channel":
+                case "chan":
+                    new AdminChannelCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "disconnect":
                 case "dc":
                     new AdminDisconnectCommand(RawBuffer, Arguments).Invoke(context); return;
