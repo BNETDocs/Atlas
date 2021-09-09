@@ -70,7 +70,14 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 var searchName = n2.Contains("#") ? n2[0..n2.IndexOf("#")] : n2;
                 int serial = 1;
 
-                var onlineName = searchName;
+                if (n2.Contains("#"))
+                {
+                    var fields = n2.Split("#");
+                    int.TryParse(fields[1], out serial);
+                    if (serial < 1) serial = 1;
+                }
+
+                var onlineName = serial == 1 ? searchName : $"{searchName}#{serial}";
                 while (Battlenet.Common.ActiveAccounts.ContainsKey(onlineName))
                 {
                     onlineName = $"{searchName}#{++serial}";
@@ -84,7 +91,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 }
             }
 
-            // reset active states
+            // re-key target in active states
             lock (Battlenet.Common.ActiveGameStates)
             {
                 Battlenet.Common.ActiveGameStates.Remove(oldOnlineName);
