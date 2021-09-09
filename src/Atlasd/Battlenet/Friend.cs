@@ -1,4 +1,6 @@
-﻿namespace Atlasd.Battlenet
+﻿using System;
+
+namespace Atlasd.Battlenet
 {
     class Friend
     {
@@ -12,6 +14,7 @@
             InPasswordGame = 0x05,
         };
 
+        [Flags]
         public enum Status : byte
         {
             None = 0x00,
