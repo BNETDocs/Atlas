@@ -56,8 +56,6 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             // Calculates and removes (cmd+' ') from (raw) which prints into (newRaw):
             RawBuffer = RawBuffer[(Encoding.UTF8.GetByteCount(cmd) + (Arguments.Count > 0 ? 1 : 0))..];
 
-            string r;
-
             switch (cmd.ToLower())
             {
                 case "announce":
@@ -89,17 +87,19 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 case "spoofuserping":
                     new AdminSpoofUserPingCommand(RawBuffer, Arguments).Invoke(context); return;
                 default:
-                    r = Localization.Resources.InvalidAdminCommand;
-                    break;
-            }
+                    {
+                        var r = Localization.Resources.InvalidAdminCommand;
 
-            foreach (var kv in context.Environment)
-            {
-                r = r.Replace("{" + kv.Key + "}", kv.Value);
-            }
+                        foreach (var kv in context.Environment)
+                        {
+                            r = r.Replace("{" + kv.Key + "}", kv.Value);
+                        }
 
-            foreach (var line in r.Split(Battlenet.Common.NewLine))
-                new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
+                        foreach (var line in r.Split(Battlenet.Common.NewLine))
+                            new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
+                        break;
+                    }
+            }
         }
     }
 }
