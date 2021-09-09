@@ -56,6 +56,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             // process n1 → n2
 
             var oldOnlineName = target.OnlineName;
+            var oldFlags = target.ChannelFlags;
             var activeChannel = target.ActiveChannel;
 
             // remove user from their channel
@@ -102,6 +103,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             new SID_ENTERCHAT().Invoke(new MessageContext(target.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {}));
 
             // put them back in their channel
+            target.ChannelFlags = oldFlags;
             activeChannel.AcceptUser(target, true);
 
             // print result to admin
