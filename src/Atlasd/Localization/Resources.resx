@@ -238,6 +238,9 @@ This server is hosted by {host}.
     <value>That channel does not exist.
 (If you are trying to search for a user, use the /whois command.)</value>
   </data>
+  <data name="ChannelTopicChanged" xml:space="preserve">
+    <value>The channel topic was changed to:</value>
+  </data>
   <data name="ChannelWasRenamed" xml:space="preserve">
     <value>The channel {oldName} was renamed to {newName}.</value>
   </data>
