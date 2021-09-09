@@ -346,11 +346,38 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This channel is now private, new users are rejected..
+        /// </summary>
+        public static string ChannelIsNowPrivate {
+            get {
+                return ResourceManager.GetString("ChannelIsNowPrivate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This channel is now public, new users are allowed..
+        /// </summary>
+        public static string ChannelIsNowPublic {
+            get {
+                return ResourceManager.GetString("ChannelIsNowPublic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to That channel is restricted..
         /// </summary>
         public static string ChannelIsRestricted {
             get {
                 return ResourceManager.GetString("ChannelIsRestricted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The upper user limit for this channel was changed to {maxUsers}..
+        /// </summary>
+        public static string ChannelMaxUsersChanged {
+            get {
+                return ResourceManager.GetString("ChannelMaxUsersChanged", resourceCulture);
             }
         }
         
@@ -361,6 +388,15 @@ namespace Atlasd.Localization {
         public static string ChannelNotFound {
             get {
                 return ResourceManager.GetString("ChannelNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The channel {oldName} was renamed to {newName}..
+        /// </summary>
+        public static string ChannelWasRenamed {
+            get {
+                return ResourceManager.GetString("ChannelWasRenamed", resourceCulture);
             }
         }
         

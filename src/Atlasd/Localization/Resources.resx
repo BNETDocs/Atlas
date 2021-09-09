@@ -222,12 +222,24 @@ This server is hosted by {host}.
   <data name="ChannelIsFull" xml:space="preserve">
     <value>That channel is full.</value>
   </data>
+  <data name="ChannelIsNowPrivate" xml:space="preserve">
+    <value>This channel is now private, new users are rejected.</value>
+  </data>
+  <data name="ChannelIsNowPublic" xml:space="preserve">
+    <value>This channel is now public, new users are allowed.</value>
+  </data>
   <data name="ChannelIsRestricted" xml:space="preserve">
     <value>That channel is restricted.</value>
+  </data>
+  <data name="ChannelMaxUsersChanged" xml:space="preserve">
+    <value>The upper user limit for this channel was changed to {maxUsers}.</value>
   </data>
   <data name="ChannelNotFound" xml:space="preserve">
     <value>That channel does not exist.
 (If you are trying to search for a user, use the /whois command.)</value>
+  </data>
+  <data name="ChannelWasRenamed" xml:space="preserve">
+    <value>The channel {oldName} was renamed to {newName}.</value>
   </data>
   <data name="CharacterNotLoggedOn" xml:space="preserve">
     <value>That character is not logged on.  Try using *username to message a user or character@realm to message a character in a different realm.</value>

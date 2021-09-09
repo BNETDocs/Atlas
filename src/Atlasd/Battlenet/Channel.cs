@@ -559,14 +559,16 @@ namespace Atlasd.Battlenet
         {
             AllowNewUsers = allowNewUsers;
 
-            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, "This channel is now " + (AllowNewUsers ? "public, new users are allowed" : "private, new users are rejected") + "."));
+            var r = allowNewUsers ? Resources.ChannelIsNowPublic : Resources.ChannelIsNowPrivate;
+            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, r));
         }
 
         public void SetMaxUsers(int maxUsers)
         {
             MaxUsers = maxUsers;
 
-            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, String.Format("The upper user limit for this channel was changed to {0:D}.", MaxUsers)));
+            var r = Resources.ChannelMaxUsersChanged.Replace("{maxUsers}", $"{maxUsers}");
+            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, r));
         }
 
         public void SetName(string newName)
@@ -575,7 +577,8 @@ namespace Atlasd.Battlenet
             Name = newName;
             if (Users.Count == 0) return;
 
-            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, $"The channel {oldName} was renamed to {newName}."));
+            var r = Resources.ChannelWasRenamed.Replace("{oldName}", oldName).Replace("{newName}", newName);
+            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, r));
             Resync();
         }
 

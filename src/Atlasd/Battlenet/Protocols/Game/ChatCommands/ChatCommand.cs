@@ -57,6 +57,8 @@ namespace Atlasd.Battlenet.Protocols.Game
                     return new AdminCommand(_raw, args);
                 case "away":
                     return new AwayCommand(_raw, args);
+                case "clan":
+                    return new ClanCommand(_raw, args);
                 case "channel":
                 case "join":
                 case "j":
