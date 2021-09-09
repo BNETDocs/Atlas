@@ -586,7 +586,7 @@ namespace Atlasd.Battlenet
         {
             Topic = newTopic;
 
-            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, "The channel topic was changed to:"));
+            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, Resources.ChannelTopicChanged));
 
             lock (Users)
             {

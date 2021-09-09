@@ -392,6 +392,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The channel topic was changed to:.
+        /// </summary>
+        public static string ChannelTopicChanged {
+            get {
+                return ResourceManager.GetString("ChannelTopicChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The channel {oldName} was renamed to {newName}..
         /// </summary>
         public static string ChannelWasRenamed {
