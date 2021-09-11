@@ -274,7 +274,7 @@ namespace Atlasd.Battlenet
 
         public string GetUsersAsString(GameState context)
         {
-            if (ActiveFlags.HasFlag(Flags.Silent)) return "";
+            if (ActiveFlags.HasFlag(Flags.Silent)) return string.Empty;
 
             var names = new LinkedList<string>();
 
@@ -405,6 +405,7 @@ namespace Atlasd.Battlenet
             bool notify = false;
             GameState[] users;
 
+            // Get a copy of the Users list for use later, that way the lock time is short
             lock (Users)
             {
                 if (Users.Contains(user))
@@ -416,46 +417,53 @@ namespace Atlasd.Battlenet
                 users = Users.ToArray();
             }
 
-            if (notify)
+            // If the user is not in the Users list, then we give up here
+            if (!notify)
             {
-                lock (user)
+                if (Count == 0 && !ActiveFlags.HasFlag(Flags.Public)) Dispose();
+                return;
+            }
+
+            lock (user)
+            {
+                var remoteAddress = IPAddress.Parse(user.Client.RemoteEndPoint.ToString().Split(':')[0]);
+                var squelched = user.SquelchedIPs.Contains(remoteAddress);
+                var flags = squelched ? user.ChannelFlags | Account.Flags.Squelched : user.ChannelFlags & ~Account.Flags.Squelched;
+
+                user.ActiveChannel = null;
+                var wasChannelOp = user.ChannelFlags.HasFlag(Account.Flags.Employee)
+                    || user.ChannelFlags.HasFlag(Account.Flags.ChannelOp)
+                    || user.ChannelFlags.HasFlag(Account.Flags.Admin);
+                user.ChannelFlags &= ~Account.Flags.ChannelOp; // remove channel op
+
+                if (!ActiveFlags.HasFlag(Flags.Silent))
                 {
-                    var remoteAddress = IPAddress.Parse(user.Client.RemoteEndPoint.ToString().Split(':')[0]);
-                    var squelched = user.SquelchedIPs.Contains(remoteAddress);
-                    var flags = squelched ? user.ChannelFlags | Account.Flags.Squelched : user.ChannelFlags & ~Account.Flags.Squelched;
-
-                    user.ActiveChannel = null;
-                    var wasChannelOp = user.ChannelFlags.HasFlag(Account.Flags.Employee)
-                        || user.ChannelFlags.HasFlag(Account.Flags.ChannelOp)
-                        || user.ChannelFlags.HasFlag(Account.Flags.Admin);
-                    user.ChannelFlags &= ~Account.Flags.ChannelOp; // remove channel op
-
                     var emptyStatstring = new byte[0];
                     foreach (var subuser in users)
                     {
                         // Tell everyone else about this user leaving the channel:
                         new ChatEvent(ChatEvent.EventIds.EID_USERLEAVE, RenderChannelFlags(subuser, user), user.Ping, RenderOnlineName(subuser, user), emptyStatstring).WriteTo(subuser.Client);
                     }
+                }
 
-                    lock (DesignatedHeirs)
+                lock (DesignatedHeirs)
+                {
+                    var designatedHeirExists = DesignatedHeirs.ContainsKey(user);
+
+                    if (wasChannelOp && designatedHeirExists && Users.Contains(DesignatedHeirs[user]))
                     {
-                        var designatedHeirExists = DesignatedHeirs.ContainsKey(user);
+                        var heir = DesignatedHeirs[user];
 
-                        if (wasChannelOp && designatedHeirExists && Users.Contains(DesignatedHeirs[user]))
+                        if (heir != null && heir.ActiveChannel == this && !heir.ChannelFlags.HasFlag(Account.Flags.ChannelOp))
                         {
-                            var heir = DesignatedHeirs[user];
-
-                            if (heir != null && heir.ActiveChannel == this && !heir.ChannelFlags.HasFlag(Account.Flags.ChannelOp))
-                            {
-                                // Promote the designated heir.
-                                UpdateUser(heir, heir.ChannelFlags | Account.Flags.ChannelOp);
-                            }
+                            // Promote the designated heir.
+                            UpdateUser(heir, heir.ChannelFlags | Account.Flags.ChannelOp);
                         }
+                    }
 
-                        if (designatedHeirExists)
-                        {
-                            DesignatedHeirs.Remove(user);
-                        }
+                    if (designatedHeirExists)
+                    {
+                        DesignatedHeirs.Remove(user);
                     }
                 }
             }
