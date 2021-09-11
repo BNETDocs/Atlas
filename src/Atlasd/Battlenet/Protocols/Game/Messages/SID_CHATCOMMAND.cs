@@ -22,19 +22,19 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
         public override bool Invoke(MessageContext context)
         {
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CHATCOMMAND ({4 + Buffer.Length} bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
             if (context.Direction != MessageDirection.ClientToServer)
-                throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND may only be transmitted from client to server");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} may only be transmitted from client to server");
 
             if (context.Client.GameState == null)
-                throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND requires a GameState object");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} requires a GameState object");
 
             if (Buffer.Length < 2)
-                throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND buffer must be at least 2 bytes");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 2 bytes");
 
             if (Buffer.Length > 224)
-                throw new GameProtocolViolationException(context.Client, "SID_CHATCOMMAND buffer must be at most 224 bytes");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at most 224 bytes");
 
             var raw = Buffer[0..^1]; // remove null-terminator before processing
 

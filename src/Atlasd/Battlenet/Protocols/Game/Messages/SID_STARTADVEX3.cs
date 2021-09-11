@@ -35,7 +35,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_STARTADVEX3 ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
                         /**
                          * (UINT32) Game State
@@ -50,10 +50,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          */
 
                         if (Buffer.Length < 23)
-                            throw new GameProtocolViolationException(context.Client, "SID_STARTADVEX3 buffer must be at least 23 bytes");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 23 bytes");
 
                         if (context.Client.GameState.ActiveAccount == null)
-                            throw new GameProtocolViolationException(context.Client, "SID_STARTADVEX3 was received before logon");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} was received before logon");
 
                         using var m = new MemoryStream(Buffer);
                         using var r = new BinaryReader(m);
@@ -110,7 +110,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         w.Write((UInt32)Statuses.Success);
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_STARTADVEX3 ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }

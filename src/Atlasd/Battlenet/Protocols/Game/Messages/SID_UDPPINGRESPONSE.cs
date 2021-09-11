@@ -21,20 +21,20 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
         public override bool Invoke(MessageContext context)
         {
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_UDPPINGRESPONSE ({4 + Buffer.Length} bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
             if (context.Direction != MessageDirection.ClientToServer)
-                throw new GameProtocolViolationException(context.Client, "SID_UDPPINGRESPONSE must be sent from client to server");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} must be sent from client to server");
 
             if (Buffer.Length != 4)
-                throw new GameProtocolViolationException(context.Client, "SID_UDPPINGRESPONSE buffer must be 4 bytes");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be 4 bytes");
 
             // UDP reply must be given between S>C SID_AUTH_INFO and C>S SID_ENTERCHAT, not
             // before or after. Technically, we could allow this while in chat and proceed then
             // by sending a chat event for the update, but the server by convention is not
             // supposed to allow it and should instead disconnect the client.
             if (!(context.Client.GameState.Statstring == null || context.Client.GameState.Statstring.Length == 0))
-                throw new GameProtocolViolationException(context.Client, "SID_UDPPINGRESPONSE cannot be sent while in chat");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} cannot be sent while in chat");
 
             UInt32 udpToken;
             using (var m = new MemoryStream(Buffer))

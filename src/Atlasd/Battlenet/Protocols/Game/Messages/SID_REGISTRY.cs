@@ -37,10 +37,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_REGISTRY ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
                         if (Buffer.Length < 5)
-                            throw new GameProtocolViolationException(context.Client, "SID_REGISTRY buffer must be at least 5 bytes");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 5 bytes");
 
                         using var m = new MemoryStream(Buffer);
                         using var r = new BinaryReader(m);
@@ -67,7 +67,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write((string)keyPath);
                         w.Write((string)keyName);
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_REGISTRY ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }

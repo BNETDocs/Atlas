@@ -38,10 +38,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CDKEY2 ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
                         if (Buffer.Length < 45)
-                            throw new GameProtocolViolationException(context.Client, "SID_CDKEY2 must be at least 45 bytes");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} must be at least 45 bytes");
                         /**
                          * (UINT32) Spawn Key (1 is TRUE, 0 is FALSE)
                          * (UINT32) Key length
@@ -66,7 +66,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         context.Client.GameState.KeyOwner = r.ReadByteString();
 
                         if (serverToken != context.Client.GameState.ServerToken)
-                            throw new GameProtocolViolationException(context.Client, "SID_CDKEY2 server token mismatch");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} server token mismatch");
 
                         var gameKey = new GameKey(keyLength, productValue, publicValue, hashedKeyData);
                         context.Client.GameState.GameKeys.Append(gameKey);
@@ -88,7 +88,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write((UInt32)Statuses.Success);
                         w.Write((byte)0);
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CDKEY2 ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }

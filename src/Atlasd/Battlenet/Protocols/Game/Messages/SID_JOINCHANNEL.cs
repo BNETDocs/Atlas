@@ -31,12 +31,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
         public override bool Invoke(MessageContext context)
         {
             if (context.Direction == MessageDirection.ServerToClient)
-                throw new GameProtocolViolationException(context.Client, "Server isn't allowed to send SID_JOINCHANNEL");
+                throw new GameProtocolViolationException(context.Client, $"Server isn't allowed to send {MessageName(Id)}");
 
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_JOINCHANNEL ({4 + Buffer.Length} bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
             if (Buffer.Length < 5)
-                throw new GameProtocolViolationException(context.Client, "SID_JOINCHANNEL buffer must be at least 5 bytes");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 5 bytes");
 
             /**
               * (UINT32) Flags
@@ -78,7 +78,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             catch (Exception ex)
             {
                 if (!(ex is ArgumentNullException || ex is NullReferenceException)) throw;
-                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, ex.GetType().Name + " error occurred while processing SID_JOINCHANNEL for GameState object");
+                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"{ex.GetType().Name} error occurred while processing {MessageName(Id)} for GameState object");
                 return false;
             }
 
@@ -121,7 +121,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 catch (Exception ex)
                 {
                     if (!(ex is ArgumentNullException || ex is NullReferenceException)) throw;
-                    Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, ex.GetType().Name + " error occurred while processing SID_JOINCHANNEL for GameState object");
+                    Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"{ex.GetType().Name} error occurred while processing {MessageName(Id)} for GameState object");
                     return false;
                 }
 

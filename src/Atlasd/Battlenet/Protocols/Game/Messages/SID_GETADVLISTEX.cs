@@ -28,7 +28,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_GETADVLISTEX ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
                         /**
                          * (UINT16) Game Type
@@ -42,7 +42,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          */
 
                         if (Buffer.Length < 19)
-                            throw new GameProtocolViolationException(context.Client, "SID_GETADVLISTEX buffer must be at least 19 bytes");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 19 bytes");
 
                         using var m = new MemoryStream(Buffer);
                         using var r = new BinaryReader(m);
@@ -168,7 +168,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             }
                         }
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_GETADVLISTEX ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }

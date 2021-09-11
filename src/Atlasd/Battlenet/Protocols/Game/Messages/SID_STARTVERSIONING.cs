@@ -22,7 +22,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
         public override bool Invoke(MessageContext context)
         {
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_STARTVERSIONING ({4 + Buffer.Length} bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
             switch (context.Direction)
             {
@@ -36,7 +36,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          */
 
                         if (Buffer.Length != 16)
-                            throw new GameProtocolViolationException(context.Client, "SID_STARTVERSIONING buffer must be 16 bytes");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be 16 bytes");
 
                         using var m = new MemoryStream(Buffer);
                         using var r = new BinaryReader(m);
@@ -48,7 +48,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var unknown0 = r.ReadUInt32();
 
                         if (unknown0 != 0)
-                            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, string.Format("[" + Common.DirectionToString(context.Direction) + "] SID_STARTVERSIONING unknown field is non-zero (0x{0:X8})", unknown0));
+                            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, string.Format("[" + Common.DirectionToString(context.Direction) + "] {MessageName(Id)} unknown field is non-zero (0x{0:X8})", unknown0));
 
                         return new SID_STARTVERSIONING().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
                     }
@@ -85,7 +85,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write((string)MPQFilename);
                         w.WriteByteString(Formula);
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_STARTVERSIONING ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }

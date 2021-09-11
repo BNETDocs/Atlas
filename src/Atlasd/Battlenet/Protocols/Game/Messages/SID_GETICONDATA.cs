@@ -22,7 +22,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
         public override bool Invoke(MessageContext context)
         {
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_GETICONDATA ({4 + Buffer.Length} bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
             switch (context.Direction)
             {
@@ -30,7 +30,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     {
                         if (Buffer.Length != 0)
                         {
-                            throw new GameProtocolViolationException(context.Client, "SID_GETICONDATA buffer must be 0 bytes");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be 0 bytes");
                         }
 
                         return new SID_GETICONDATA().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
@@ -55,7 +55,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write((UInt64)fileTime);
                         w.Write(fileName);
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_GETICONDATA ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }

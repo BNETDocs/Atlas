@@ -125,7 +125,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_READUSERDATA ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
                         /**
                          * (UINT32)   Number of Accounts
@@ -136,10 +136,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          */
 
                         if (Buffer.Length < 12)
-                            throw new GameProtocolViolationException(context.Client, "SID_READUSERDATA buffer must be at least 12 bytes");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 12 bytes");
 
                         if (context.Client.GameState == null || context.Client.GameState.Version == null || context.Client.GameState.Version.VersionByte == 0)
-                            throw new GameProtocolViolationException(context.Client, "SID_READUSERDATA cannot be processed without an active version");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} cannot be processed without an active version");
 
                         using var m = new MemoryStream(Buffer);
                         using var r = new BinaryReader(m);
@@ -165,7 +165,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         if (numKeys > 31)
                         {
-                            throw new GameProtocolViolationException(context.Client, "SID_READUSERDATA must request no more than 31 keys");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} must request no more than 31 keys");
                         }
 
                         return new SID_READUSERDATA().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {
@@ -207,7 +207,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             w.Write((string)value);
                         }
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_READUSERDATA ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }

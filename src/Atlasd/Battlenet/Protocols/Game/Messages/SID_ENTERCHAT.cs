@@ -27,16 +27,16 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_ENTERCHAT ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
                         if (Buffer.Length < 2)
                         {
-                            throw new GameProtocolViolationException(context.Client, "SID_ENTERCHAT buffer must be at least 2 bytes");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 2 bytes");
                         }
 
                         if (context.Client.GameState.ActiveAccount == null || string.IsNullOrEmpty(context.Client.GameState.OnlineName))
                         {
-                            throw new GameProtocolViolationException(context.Client, "SID_ENTERCHAT received before logon");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} received before logon");
                         }
 
                         /**
@@ -54,7 +54,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         // Statstring length is either 0 bytes or 4-128 bytes, not including the null-terminator.
                         if (statstring.Length != 0 && (statstring.Length < 4 || statstring.Length > 128))
-                            throw new GameProtocolViolationException(context.Client, "Client sent invalid statstring size in SID_ENTERCHAT");
+                            throw new GameProtocolViolationException(context.Client, $"Client sent invalid statstring size in {MessageName(Id)}");
 
                         if (statstring.Length < 4)
                         {
@@ -111,7 +111,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             }
                         }
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_ENTERCHAT ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }

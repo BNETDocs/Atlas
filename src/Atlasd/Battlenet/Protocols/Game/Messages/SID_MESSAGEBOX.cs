@@ -22,13 +22,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
         public override bool Invoke(MessageContext context)
         {
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_MESSAGEBOX ({4 + Buffer.Length} bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
             if (context.Direction != MessageDirection.ServerToClient)
-                throw new GameProtocolViolationException(context.Client, "SID_MESSAGEBOX must be sent from server to client");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} must be sent from server to client");
 
             if (Buffer.Length < 6)
-                throw new GameProtocolViolationException(context.Client, "SID_MESSAGEBOX buffer must be at least 6 bytes");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 6 bytes");
 
             var style = (UInt32)context.Arguments["style"];
             var text = (string)context.Arguments["text"];
@@ -43,7 +43,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             w.Write((string)text);
             w.Write((string)caption);
 
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_MESSAGEBOX ({4 + Buffer.Length} bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
             context.Client.Send(ToByteArray(context.Client.ProtocolType));
             return true;
         }

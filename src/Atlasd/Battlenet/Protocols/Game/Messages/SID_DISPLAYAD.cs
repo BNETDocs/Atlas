@@ -20,13 +20,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
         public override bool Invoke(MessageContext context)
         {
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_DISPLAYAD ({4 + Buffer.Length} bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
             if (context.Direction != MessageDirection.ClientToServer)
-                throw new GameProtocolViolationException(context.Client, "SID_DISPLAYAD must be sent from client to server");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} must be sent from client to server");
 
             if (Buffer.Length < 14)
-                throw new GameProtocolViolationException(context.Client, "SID_DISPLAYAD buffer must be at least 14 bytes");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 14 bytes");
 
             using var m = new MemoryStream(Buffer);
             using var r = new BinaryReader(m);

@@ -21,13 +21,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
         public override bool Invoke(MessageContext context)
         {
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_SYSTEMINFO ({4 + Buffer.Length} bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
             if (context.Direction != MessageDirection.ClientToServer)
-                throw new GameProtocolViolationException(context.Client, "SID_SYSTEMINFO must be sent from client to server");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} must be sent from client to server");
 
             if (Buffer.Length != 28)
-                throw new GameProtocolViolationException(context.Client, "SID_SYSTEMINFO buffer must be 28 bytes");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be 28 bytes");
 
             /**
              * (UINT32) Number of processors

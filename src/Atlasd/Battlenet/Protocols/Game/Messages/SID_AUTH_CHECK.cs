@@ -46,10 +46,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_AUTH_CHECK ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
                         if (Buffer.Length < 22)
-                            throw new Exceptions.GameProtocolViolationException(context.Client, "SID_AUTH_CHECK must be at least 22 bytes");
+                            throw new Exceptions.GameProtocolViolationException(context.Client, $"{MessageName(Id)} must be at least 22 bytes");
                         /**
                          * (UINT32) Client Token
                          * (UINT32) EXE Version
@@ -143,7 +143,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write((UInt32)status);
                         w.Write((string)info);
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_AUTH_CHECK ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
 
                         return status == (uint)Statuses.Success;

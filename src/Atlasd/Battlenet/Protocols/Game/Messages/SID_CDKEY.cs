@@ -38,10 +38,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CDKEY ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
                         if (Buffer.Length < 6)
-                            throw new GameProtocolViolationException(context.Client, "SID_CDKEY must be at least 6 bytes");
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} must be at least 6 bytes");
                         /**
                          * (UINT32) Spawn Key (1 is TRUE, 0 is FALSE)
                          * (STRING) Game Key
@@ -72,7 +72,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write((UInt32)Statuses.Success);
                         w.Write((byte)0);
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CDKEY ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }

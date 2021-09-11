@@ -22,10 +22,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
         public override bool Invoke(MessageContext context)
         {
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_LOCALEINFO ({4 + Buffer.Length} bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
             if (context.Direction != MessageDirection.ClientToServer)
-                throw new GameProtocolViolationException(context.Client, "SID_LOCALEINFO must be sent client to server");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} must be sent client to server");
 
             /**
                 * (FILETIME) System time
@@ -41,7 +41,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 */
 
             if (Buffer.Length < 36)
-                throw new GameProtocolViolationException(context.Client, "SID_LOCALEINFO buffer must be at least 36 bytes");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 36 bytes");
 
             using var m = new MemoryStream(Buffer);
             using var r = new BinaryReader(m);

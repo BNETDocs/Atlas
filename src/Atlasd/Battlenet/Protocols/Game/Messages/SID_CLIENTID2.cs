@@ -21,10 +21,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
         public override bool Invoke(MessageContext context)
         {
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] SID_CLIENTID2 ({4 + Buffer.Length} bytes)");
+            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
             if (context.Direction != MessageDirection.ClientToServer)
-                throw new GameProtocolViolationException(context.Client, "SID_CLIENTID2 must be sent from client to server");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} must be sent from client to server");
 
             /**
              * (UINT32) Server version
@@ -44,7 +44,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
              */
 
             if (Buffer.Length < 22)
-                throw new GameProtocolViolationException(context.Client, "SID_CLIENTID2 buffer must be at least 22 bytes");
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 22 bytes");
 
             using var m = new MemoryStream(Buffer);
             using var r = new BinaryReader(m);
@@ -67,7 +67,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     break;
                 }
                 default:
-                    throw new GameProtocolViolationException(context.Client, string.Format("SID_CLIENTID2 has invalid server version [{0:d}]", serverVersion));
+                    throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} has invalid server version [{serverVersion:X8}]");
             }
 
             var accountNumber = r.ReadUInt32();
