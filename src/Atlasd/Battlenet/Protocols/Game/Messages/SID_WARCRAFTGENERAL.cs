@@ -36,6 +36,9 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
         {
             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
+            if (context.Client.GameState == null || !Product.IsWarcraftIII(context.Client.GameState.Product))
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} is Warcraft III game client exclusive");
+
             if (Buffer.Length < 1)
                 throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 1 byte");
 
@@ -46,7 +49,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} received subcommand {subcommand:X2}");
 
-            // TODO: Compare subcommand variable with SubCommands enum and do procedures, for now just ignore the client
+            // TODO: Compare subcommand variable with SubCommands enum and do procedures, for now just ignore
 
             return true;
         }
