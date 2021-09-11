@@ -16,10 +16,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
+            var hasAdmin = HasAdmin(context.GameState, true); // includeChannelOp=true
             var replyEventId = ChatEvent.EventIds.EID_ERROR;
             var reply = string.Empty;
-            var subcommand = Arguments.Count == 0 ? "" : Arguments[0];
-            var hasAdmin = HasAdmin(context.GameState, true); // includeChannelOp=true
 
             if (!hasAdmin || context.GameState.ActiveChannel == null)
             {
@@ -27,6 +26,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
             else
             {
+                var subcommand = Arguments.Count > 0 ? Arguments[0] : string.Empty;
+                if (!string.IsNullOrEmpty(subcommand)) Arguments.RemoveAt(0);
+
                 switch (subcommand.ToLower())
                 {
                     case "motd":

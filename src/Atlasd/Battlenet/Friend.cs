@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Atlasd.Battlenet.Protocols.Game;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Atlasd.Battlenet
 {
@@ -23,31 +26,96 @@ namespace Atlasd.Battlenet
             Away = 0x04,
         };
 
-        public string Username { get; private set; }
+        public Location LocationId { get; private set; }
+        public byte[] LocationString { get; private set; }
+        public Status StatusId { get; private set; }
+        public Product.ProductCode ProductCode { get; private set; }
+        public byte[] Username { get; private set; }
 
-        public Friend(string username)
+        /**
+         * <param name="source">The context GameState to sync from.</param>
+         * <param name="username">The online name of the user to befriend.</param>
+         */
+        public Friend(GameState source, byte[] username)
         {
             Username = username;
+            Sync(source);
         }
 
-        public Location GetLocation()
+        /**
+         * <remarks>Syncs the object properties with the context of the source GameState.</remarks>
+         * <param name="source">The context GameState to sync from.</param>
+         */
+        public void Sync(GameState source)
         {
-            return Location.Offline; // TODO : Set an actual Location
-        }
+            LocationId = Location.Offline;
+            LocationString = new byte[0];
+            ProductCode = Product.ProductCode.None;
+            StatusId = Status.None;
 
-        public string GetLocationString()
-        {
-            return ""; // TODO : Set an actual Location string
-        }
+            if (source == null || source.ActiveAccount == null ||
+                !Common.GetClientByOnlineName(Encoding.UTF8.GetString(Username), out var target) ||
+                target == null || target.ActiveAccount == null)
+            {
+                return;
+            }
 
-        public Product.ProductCode GetProductCode()
-        {
-            return Product.ProductCode.None; // TODO : Set an actual ProductCode
-        }
+            lock (source)
+            {
+                lock (target)
+                {
+                    var admin = ChatCommand.HasAdmin(source);
+                    var mutual = false;
+                    var sourceFriendStrings = (List<byte[]>)source.ActiveAccount.Get(Account.FriendsKey, new List<byte[]>());
+                    var targetFriendStrings = (List<byte[]>)target.ActiveAccount.Get(Account.FriendsKey, new List<byte[]>());
 
-        public Status GetStatus()
-        {
-            return Status.None; // TODO : Set an actual Status
+                    foreach (var targetFriendString in targetFriendStrings)
+                    {
+                        foreach (var sourceFriendString in sourceFriendStrings)
+                        {
+                            string aString = Encoding.UTF8.GetString(sourceFriendString);
+                            string bString = Encoding.UTF8.GetString(targetFriendString);
+                            if (string.Equals(aString, bString, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                mutual = true;
+                                break;
+                            }
+                        }
+                        if (mutual) break;
+                    }
+
+                    if (mutual) StatusId |= Status.Mutual;
+                    if (!string.IsNullOrEmpty(target.Away)) StatusId |= Status.Away;
+                    if (!string.IsNullOrEmpty(target.DoNotDisturb)) StatusId |= Status.DoNotDisturb;
+
+                    if (target.ActiveChannel == null && target.GameAd == null)
+                    {
+                        LocationId = Location.NotInChat;
+                    }
+                    else if (target.ActiveChannel != null)
+                    {
+                        LocationId = Location.InChat;
+                        if (mutual || admin) LocationString = Encoding.UTF8.GetBytes(target.ActiveChannel.Name);
+                    }
+                    else if (target.GameAd != null)
+                    {
+                        if (!target.GameAd.ActiveStateFlags.HasFlag(GameAd.StateFlags.Private) && target.GameAd.Password.Length == 0)
+                        {
+                            LocationId = Location.InPublicGame;
+                            LocationString = target.GameAd.Name;
+                        }
+                        else if (!(mutual || admin))
+                        {
+                            LocationId = Location.InPrivateGame;
+                        }
+                        else
+                        {
+                            LocationId = Location.InPasswordGame;
+                            LocationString = target.GameAd.Name;
+                        }
+                    }
+                }
+            }
         }
     }
 }

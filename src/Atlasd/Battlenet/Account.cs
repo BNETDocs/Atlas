@@ -64,7 +64,7 @@ namespace Atlasd.Battlenet
                 { new AccountKeyValue(AccountCreatedKey, DateTime.Now, AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.ReadOnly) },
                 { new AccountKeyValue(FailedLogonsKey, (long)0, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
                 { new AccountKeyValue(FlagsKey, Flags.None, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
-                { new AccountKeyValue(FriendsKey, new List<string>() { "Carl" }, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
+                { new AccountKeyValue(FriendsKey, new List<byte[]>(), AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
                 { new AccountKeyValue(IPAddressKey, IPAddress.Any, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
                 { new AccountKeyValue(LastLogoffKey, DateTime.Now, AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.Internal) },
                 { new AccountKeyValue(LastLogonKey, DateTime.Now, AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.Internal) },

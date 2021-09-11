@@ -120,6 +120,12 @@
   <data name="AccountIsAlreadyLoggedOn" xml:space="preserve">
     <value>That account is already logged on.</value>
   </data>
+  <data name="AddedFriend" xml:space="preserve">
+    <value>Added {friend} to your friends list.</value>
+  </data>
+  <data name="AddFriendEmptyTarget" xml:space="preserve">
+    <value>Who do you want to add?</value>
+  </data>
   <data name="AdminDisconnectCommand" xml:space="preserve">
     <value>{user} was disconnected.</value>
   </data>
@@ -183,6 +189,12 @@ Supported number prefixes:
 - Octal: 0
 - Decimal: Any whole number, not prefixed with zero (octal indication)
 Example: 0x10 = 16 decimal</value>
+  </data>
+  <data name="AlreadyAddedFriend" xml:space="preserve">
+    <value>{friend} is already in your friends list.</value>
+  </data>
+  <data name="AlreadyRemovedFriend" xml:space="preserve">
+    <value>{friend} is not in your friends list.</value>
   </data>
   <data name="AwayCommandOff" xml:space="preserve">
     <value>You are no longer marked as away.</value>
@@ -341,6 +353,12 @@ Displays the current {realm} Time ({realmTimezone}).</value>
   <data name="NoOneHearsYou" xml:space="preserve">
     <value>No one hears you.</value>
   </data>
+  <data name="RemovedFriend" xml:space="preserve">
+    <value>Removed {friend} from your friends list.</value>
+  </data>
+  <data name="RemoveFriendEmptyTarget" xml:space="preserve">
+    <value>Who do you want to remove?</value>
+  </data>
   <data name="ServerShutdownCancelled" xml:space="preserve">
     <value>The server shutdown has been cancelled.</value>
   </data>
@@ -447,6 +465,9 @@ Your local time: {localTime}</value>
   </data>
   <data name="YourFriendLoggedOn" xml:space="preserve">
     <value>Your friend {friend} has entered {realm}.</value>
+  </data>
+  <data name="YourFriendsList" xml:space="preserve">
+    <value>Your friends list:</value>
   </data>
   <data name="YouWereKickedFromChannel" xml:space="preserve">
     <value>{source} kicked you out of the channel!</value>

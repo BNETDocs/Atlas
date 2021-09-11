@@ -70,6 +70,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Added {friend} to your friends list..
+        /// </summary>
+        public static string AddedFriend {
+            get {
+                return ResourceManager.GetString("AddedFriend", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Who do you want to add?.
+        /// </summary>
+        public static string AddFriendEmptyTarget {
+            get {
+                return ResourceManager.GetString("AddFriendEmptyTarget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {user} was disconnected..
         /// </summary>
         public static string AdminDisconnectCommand {
@@ -232,6 +250,24 @@ namespace Atlasd.Localization {
         public static string AdminSpoofUserPingCommandBadValue {
             get {
                 return ResourceManager.GetString("AdminSpoofUserPingCommandBadValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {friend} is already in your friends list..
+        /// </summary>
+        public static string AlreadyAddedFriend {
+            get {
+                return ResourceManager.GetString("AlreadyAddedFriend", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {friend} is not in your friends list..
+        /// </summary>
+        public static string AlreadyRemovedFriend {
+            get {
+                return ResourceManager.GetString("AlreadyRemovedFriend", resourceCulture);
             }
         }
         
@@ -645,6 +681,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Removed {friend} from your friends list..
+        /// </summary>
+        public static string RemovedFriend {
+            get {
+                return ResourceManager.GetString("RemovedFriend", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Who do you want to remove?.
+        /// </summary>
+        public static string RemoveFriendEmptyTarget {
+            get {
+                return ResourceManager.GetString("RemoveFriendEmptyTarget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The server shutdown has been cancelled..
         /// </summary>
         public static string ServerShutdownCancelled {
@@ -958,6 +1012,15 @@ namespace Atlasd.Localization {
         public static string YourFriendLoggedOn {
             get {
                 return ResourceManager.GetString("YourFriendLoggedOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your friends list:.
+        /// </summary>
+        public static string YourFriendsList {
+            get {
+                return ResourceManager.GetString("YourFriendsList", resourceCulture);
             }
         }
         

@@ -53,17 +53,17 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         var bufferSize = (uint)1;
                         var friends = new List<Friend>();
-                        var friendStrings = (List<string>)context.Client.GameState.ActiveAccount.Get(Account.FriendsKey);
+                        var friendStrings = (List<byte[]>)context.Client.GameState.ActiveAccount.Get(Account.FriendsKey, new List<byte[]>());
 
                         foreach (var friendString in friendStrings)
                         {
-                            var friend = new Friend(friendString);
+                            var friend = new Friend(context.Client.GameState, friendString);
                             friends.Add(friend);
-                            bufferSize += (uint)(8 + Encoding.UTF8.GetByteCount(friend.Username) + Encoding.UTF8.GetByteCount(friend.GetLocationString()));
+                            bufferSize += (uint)(8 + friend.Username.Length + friend.LocationString.Length);
 
                             if (friends.Count == 255) // Hard limit based on counter in message format
                             {
-                                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, $"Hard limit of 255 friends reached, dropping remaining {friends.Count - 255} friends from {MessageName(Id)} reply");
+                                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, $"Hard limit of 255 friends reached, dropping remaining {friendStrings.Count - 255} friends from {MessageName(Id)} reply");
                                 break;
                             }
                         }
@@ -76,11 +76,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write((byte)friends.Count);
                         foreach (var friend in friends)
                         {
-                            w.Write(friend.Username);
-                            w.Write((byte)friend.GetStatus());
-                            w.Write((byte)friend.GetLocation());
-                            w.Write((uint)friend.GetProductCode());
-                            w.Write(friend.GetLocationString());
+                            w.WriteByteString(friend.Username);
+                            w.Write((byte)friend.StatusId);
+                            w.Write((byte)friend.LocationId);
+                            w.Write((uint)friend.ProductCode);
+                            w.WriteByteString(friend.LocationString);
                         }
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
