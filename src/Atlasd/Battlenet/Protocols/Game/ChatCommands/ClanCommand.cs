@@ -19,33 +19,14 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             var replyEventId = ChatEvent.EventIds.EID_INFO;
             var reply = string.Empty;
             var subcommand = Arguments.Count == 0 ? "" : Arguments[0];
-
-            var grantSudoToSpoofedAdmins = Settings.GetBoolean(new string[] { "battlenet", "emulation", "grant_sudo_to_spoofed_admins" }, false);
-            var hasSudo = false;
-
-            lock (context.GameState)
-            {
-                var userFlags = (Account.Flags)context.GameState.ActiveAccount.Get(Account.FlagsKey);
-                hasSudo =
-                    (
-                        grantSudoToSpoofedAdmins && (
-                            context.GameState.ChannelFlags.HasFlag(Account.Flags.Admin)
-                            || context.GameState.ChannelFlags.HasFlag(Account.Flags.Employee)
-                        )
-                    )
-                    || context.GameState.ChannelFlags.HasFlag(Account.Flags.ChannelOp)
-                    || userFlags.HasFlag(Account.Flags.Admin)
-                    || userFlags.HasFlag(Account.Flags.ChannelOp)
-                    || userFlags.HasFlag(Account.Flags.Employee)
-                ;
-            }
+            var hasAdmin = HasAdmin(context.GameState, true); // includeChannelOp=true
 
             switch (subcommand.ToLower())
             {
                 case "public":
                 case "pub":
                     {
-                        if (!hasSudo || context.GameState.ActiveChannel == null)
+                        if (!hasAdmin || context.GameState.ActiveChannel == null)
                         {
                             replyEventId = ChatEvent.EventIds.EID_ERROR;
                             reply = Resources.YouAreNotAChannelOperator;
@@ -59,7 +40,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 case "private":
                 case "priv":
                     {
-                        if (!hasSudo || context.GameState.ActiveChannel == null)
+                        if (!hasAdmin || context.GameState.ActiveChannel == null)
                         {
                             replyEventId = ChatEvent.EventIds.EID_ERROR;
                             reply = Resources.YouAreNotAChannelOperator;

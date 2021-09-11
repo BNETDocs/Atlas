@@ -1,4 +1,5 @@
 ﻿using Atlasd.Battlenet.Protocols.Game.ChatCommands;
+using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,34 @@ namespace Atlasd.Battlenet.Protocols.Game
         public static ChatCommand FromString(string text)
         {
             return Parse(text, Encoding.UTF8.GetBytes(text));
+        }
+
+        /**
+         * <remarks>Checks whether a user has administrative power on the server.</remarks>
+         * <param name="user">The user to check whether they have admin status.</param>
+         * <param name="includeChannelOp">Defaults to false. If user has flags 0x02 ChannelOp and includeChannelOp is true, then they will be considered having admin.</param>
+         */
+        public static bool HasAdmin(GameState user, bool includeChannelOp = false)
+        {
+            var grantSudoToSpoofedAdmins = Settings.GetBoolean(new string[] { "battlenet", "emulation", "grant_sudo_to_spoofed_admins" }, false);
+            var hasSudo = false;
+            lock (user)
+            {
+                var userFlags = (Account.Flags)user.ActiveAccount.Get(Account.FlagsKey);
+                hasSudo =
+                    (
+                        grantSudoToSpoofedAdmins && (
+                            user.ChannelFlags.HasFlag(Account.Flags.Admin) ||
+                            (user.ChannelFlags.HasFlag(Account.Flags.ChannelOp) && includeChannelOp) ||
+                            user.ChannelFlags.HasFlag(Account.Flags.Employee)
+                        )
+                    )
+                    || userFlags.HasFlag(Account.Flags.Admin)
+                    || (userFlags.HasFlag(Account.Flags.ChannelOp) && includeChannelOp)
+                    || userFlags.HasFlag(Account.Flags.Employee)
+                ;
+            }
+            return hasSudo;
         }
 
         private static ChatCommand Parse(string text, byte[] raw)

@@ -17,25 +17,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            var grantSudoToSpoofedAdmins = Settings.GetBoolean(new string[] { "battlenet", "emulation", "grant_sudo_to_spoofed_admins" }, false);
-            var hasSudo = false;
-
-            lock (context.GameState)
-            {
-                var userFlags = (Account.Flags)context.GameState.ActiveAccount.Get(Account.FlagsKey);
-                hasSudo =
-                    (
-                        grantSudoToSpoofedAdmins && (
-                            context.GameState.ChannelFlags.HasFlag(Account.Flags.Admin)
-                            || context.GameState.ChannelFlags.HasFlag(Account.Flags.Employee)
-                        )
-                    )
-                    || userFlags.HasFlag(Account.Flags.Admin)
-                    || userFlags.HasFlag(Account.Flags.Employee)
-                ;
-            }
-
-            if (!hasSudo)
+            if (!HasAdmin(context.GameState))
             {
                 new InvalidCommand(RawBuffer, Arguments).Invoke(context);
                 return;
