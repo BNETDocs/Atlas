@@ -16,14 +16,13 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            var replyEventId = ChatEvent.EventIds.EID_INFO;
+            var replyEventId = ChatEvent.EventIds.EID_ERROR;
             var reply = string.Empty;
             var subcommand = Arguments.Count == 0 ? "" : Arguments[0];
             var hasAdmin = HasAdmin(context.GameState, true); // includeChannelOp=true
 
             if (!hasAdmin || context.GameState.ActiveChannel == null)
             {
-                replyEventId = ChatEvent.EventIds.EID_ERROR;
                 reply = Resources.YouAreNotAChannelOperator;
             }
             else
@@ -49,7 +48,6 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                         }
                     default:
                         {
-                            replyEventId = ChatEvent.EventIds.EID_ERROR;
                             reply = Resources.InvalidChatCommand;
                             break;
                         }
