@@ -521,30 +521,43 @@ namespace Atlasd.Battlenet
 
         public void Resync()
         {
+            var args = new Dictionary<string, object> {{ "chatEvent", null }};
+            var msg = new SID_CHATEVENT();
+
             lock (Users)
             {
                 foreach (var user in Users)
                 {
                     // Tell users they re-entered the channel:
-                    WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_CHANNELJOIN, ActiveFlags, 0, "", Name), user.Client.GameState);
+                    args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_CHANNELJOIN, ActiveFlags, 0, "", Name);
+                    msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
+                    user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
 
                     // Show users in channel or display info about no chat:
                     if (!ActiveFlags.HasFlag(Flags.Silent))
                     {
                         foreach (var subuser in Users)
                         {
-                            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, RenderChannelFlags(subuser, user), user.Ping, RenderOnlineName(subuser, user), user.Statstring), subuser.Client.GameState);
+                            args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, RenderChannelFlags(user, subuser), subuser.Ping, RenderOnlineName(user, subuser), subuser.Statstring);
+                            msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
+                            user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
                         }
                     }
                     else
                     {
-                        WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, Resources.ChannelIsChatRestricted), user.Client.GameState);
+                        args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, Resources.ChannelIsChatRestricted);
+                        msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
+                        user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
                     }
 
                     // Channel topic:
                     var topic = RenderTopic(user);
                     foreach (var line in topic.Split("\n"))
-                        WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line), user.Client.GameState);
+                    {
+                        args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line);
+                        msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
+                        user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
+                    }
                 }
             }
         }
