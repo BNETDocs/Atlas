@@ -21,42 +21,39 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             var subcommand = Arguments.Count == 0 ? "" : Arguments[0];
             var hasAdmin = HasAdmin(context.GameState, true); // includeChannelOp=true
 
-            switch (subcommand.ToLower())
+            if (!hasAdmin || context.GameState.ActiveChannel == null)
             {
-                case "public":
-                case "pub":
-                    {
-                        if (!hasAdmin || context.GameState.ActiveChannel == null)
+                replyEventId = ChatEvent.EventIds.EID_ERROR;
+                reply = Resources.YouAreNotAChannelOperator;
+            }
+            else
+            {
+                switch (subcommand.ToLower())
+                {
+                    case "motd":
                         {
-                            replyEventId = ChatEvent.EventIds.EID_ERROR;
-                            reply = Resources.YouAreNotAChannelOperator;
+                            context.GameState.ActiveChannel.SetTopic(string.Join(" ", Arguments));
+                            break;
                         }
-                        else
+                    case "public":
+                    case "pub":
                         {
                             context.GameState.ActiveChannel.SetAllowNewUsers(true);
+                            break;
                         }
-                        break;
-                    }
-                case "private":
-                case "priv":
-                    {
-                        if (!hasAdmin || context.GameState.ActiveChannel == null)
-                        {
-                            replyEventId = ChatEvent.EventIds.EID_ERROR;
-                            reply = Resources.YouAreNotAChannelOperator;
-                        }
-                        else
+                    case "private":
+                    case "priv":
                         {
                             context.GameState.ActiveChannel.SetAllowNewUsers(false);
+                            break;
                         }
-                        break;
-                    }
-                default:
-                    {
-                        replyEventId = ChatEvent.EventIds.EID_ERROR;
-                        reply = Resources.InvalidChatCommand;
-                        break;
-                    }
+                    default:
+                        {
+                            replyEventId = ChatEvent.EventIds.EID_ERROR;
+                            reply = Resources.InvalidChatCommand;
+                            break;
+                        }
+                }
             }
 
             if (string.IsNullOrEmpty(reply)) return;
