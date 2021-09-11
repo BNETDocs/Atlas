@@ -447,8 +447,7 @@ namespace Atlasd.Battlenet
                             if (heir != null && heir.ActiveChannel == this && !heir.ChannelFlags.HasFlag(Account.Flags.ChannelOp))
                             {
                                 // Promote the designated heir.
-                                heir.ChannelFlags |= Account.Flags.ChannelOp;
-                                UpdateUser(heir, heir.ChannelFlags);
+                                UpdateUser(heir, heir.ChannelFlags | Account.Flags.ChannelOp);
                             }
                         }
 
