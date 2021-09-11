@@ -97,6 +97,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                 case "emote":
                 case "me":
                     return new EmoteCommand(_raw, args);
+                case "friends":
                 case "friend":
                 case "f":
                     return new FriendCommand(_raw, args);
