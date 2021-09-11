@@ -1,5 +1,5 @@
-﻿using Atlasd.Localization;
-using System;
+﻿using Atlasd.Daemon;
+using Atlasd.Localization;
 using System.Collections.Generic;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
@@ -15,12 +15,37 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            var topic = Arguments.Count == 0 ? "" : Arguments[0];
-            var subtopic = Arguments.Count <= 1 ? "" : Arguments[1];
-            var remarks = Resources.HelpCommandRemarks;
+            var hasSudo = false;
+            lock (context.GameState)
+            {
+                var grantSudoToSpoofedAdmins = Settings.GetBoolean(new string[] { "battlenet", "emulation", "grant_sudo_to_spoofed_admins" }, false);
+                var userFlags = (Account.Flags)context.GameState.ActiveAccount.Get(Account.FlagsKey);
+                hasSudo =
+                    (
+                        grantSudoToSpoofedAdmins && (
+                            context.GameState.ChannelFlags.HasFlag(Account.Flags.Admin)
+                            || context.GameState.ChannelFlags.HasFlag(Account.Flags.Employee)
+                        )
+                    )
+                    || userFlags.HasFlag(Account.Flags.Admin)
+                    || userFlags.HasFlag(Account.Flags.Employee)
+                ;
+            }
+
+            var topic = Arguments.Count > 0 ? Arguments[0] : string.Empty;
+            if (!string.IsNullOrEmpty(topic)) Arguments.RemoveAt(0);
+            var remarks = hasSudo ? Resources.HelpCommandRemarksWithAdmin : Resources.HelpCommandRemarks;
 
             switch (topic.ToLower())
             {
+                case "admin":
+                    {
+                        if (hasSudo)
+                        {
+                            new AdminHelpCommand(RawBuffer, Arguments).Invoke(context); return;
+                        }
+                        break;
+                    }
                 case "advanced":
                     remarks = Resources.HelpCommandAdvancedRemarks; break;
                 case "aliases":

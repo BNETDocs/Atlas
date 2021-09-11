@@ -569,6 +569,18 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Battle.net help topics:
+        ///commands  aliases  advanced
+        ///Type /help TOPIC for information about a specific topic.
+        ///Type /admin help for the administrator command list..
+        /// </summary>
+        public static string HelpCommandRemarksWithAdmin {
+            get {
+                return ResourceManager.GetString("HelpCommandRemarksWithAdmin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to /time
         ///Displays the current {realm} Time ({realmTimezone})..
         /// </summary>

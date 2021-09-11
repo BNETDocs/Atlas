@@ -313,6 +313,12 @@ Example: /channel Blizzard Tech Support</value>
 commands  aliases  advanced
 Type /help TOPIC for information about a specific topic.</value>
   </data>
+  <data name="HelpCommandRemarksWithAdmin" xml:space="preserve">
+    <value>Battle.net help topics:
+commands  aliases  advanced
+Type /help TOPIC for information about a specific topic.
+Type /admin help for the administrator command list.</value>
+  </data>
   <data name="HelpCommandTimeRemarks" xml:space="preserve">
     <value>/time
 Displays the current {realm} Time ({realmTimezone}).</value>
