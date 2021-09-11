@@ -430,10 +430,11 @@ namespace Atlasd.Battlenet
                         || user.ChannelFlags.HasFlag(Account.Flags.Admin);
                     user.ChannelFlags &= ~Account.Flags.ChannelOp; // remove channel op
 
+                    var emptyStatstring = new byte[0];
                     foreach (var subuser in users)
                     {
                         // Tell everyone else about this user leaving the channel:
-                        new ChatEvent(ChatEvent.EventIds.EID_USERLEAVE, RenderChannelFlags(subuser, user), user.Ping, RenderOnlineName(subuser, user), new byte[0]).WriteTo(subuser.Client);
+                        new ChatEvent(ChatEvent.EventIds.EID_USERLEAVE, RenderChannelFlags(subuser, user), user.Ping, RenderOnlineName(subuser, user), emptyStatstring).WriteTo(subuser.Client);
                     }
 
                     lock (DesignatedHeirs)
