@@ -29,6 +29,22 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             {
                 switch (subcommand.ToLower())
                 {
+                    case "flags":
+                    case "flag":
+                        {
+                            if (Arguments.Count < 1)
+                            {
+                                eventId = ChatEvent.EventIds.EID_ERROR;
+                                reply = Resources.InvalidAdminCommand;
+                            }
+                            else
+                            {
+                                int.TryParse(Arguments[0], out var flags);
+                                reply = string.Empty;
+                                channel.SetActiveFlags((Channel.Flags)flags);
+                            }
+                            break;
+                        }
                     case "rename":
                     case "name":
                         {
@@ -59,6 +75,12 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                                 reply = string.Empty;
                                 channel.SetMaxUsers(maxUsers);
                             }
+                            break;
+                        }
+                    case "resync":
+                    case "sync":
+                        {
+                            channel.Resync();
                             break;
                         }
                     case "topic":
