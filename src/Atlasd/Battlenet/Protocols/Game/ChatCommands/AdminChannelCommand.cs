@@ -36,6 +36,11 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                             if (!string.IsNullOrEmpty(newName))
                             {
                                 reply = string.Empty;
+                                lock (Battlenet.Common.ActiveChannels)
+                                {
+                                    Battlenet.Common.ActiveChannels.Remove(channel.Name);
+                                    Battlenet.Common.ActiveChannels.Add(newName, channel);
+                                }
                                 channel.SetName(newName);
                             }
                             break;
