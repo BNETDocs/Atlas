@@ -73,6 +73,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                             var friendString = Encoding.UTF8.GetString(friend);
                             reply += $"{friendCount}: {friendString}{Battlenet.Common.NewLine}";
                         }
+                        if (friendCount > 0) reply = reply[0..(reply.Length - Battlenet.Common.NewLine.Length)]; // strip last newline
 
                         break;
                     }
