@@ -57,6 +57,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         if (account == null)
                         {
+                            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Account [{context.Client.GameState.Username}] does not exist");
                             return new SID_LOGONRESPONSE().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.Failure }}));
                         }
 
@@ -64,6 +65,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var compareHash = OldAuth.CheckDoubleHashData(passwordHashDb, clientToken, serverToken);
                         if (!compareHash.SequenceEqual(passwordHash))
                         {
+                            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Account [{context.Client.GameState.Username}] logon failed password mismatch");
                             account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
                             return new SID_LOGONRESPONSE().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.Failure }}));
                         }
@@ -71,6 +73,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var flags = (Account.Flags)account.Get(Account.FlagsKey, Account.Flags.None);
                         if ((flags & Account.Flags.Closed) != 0)
                         {
+                            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Account [{context.Client.GameState.Username}] logon failed account closed");
                             account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
                             return new SID_LOGONRESPONSE().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.Failure }}));
                         }
@@ -105,6 +108,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             Battlenet.Common.ActiveGameStates.Add(context.Client.GameState.OnlineName, context.Client.GameState);
                         }
 
+                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Account [{context.Client.GameState.Username}] logon success as [{context.Client.GameState.OnlineName}]");
                         return new SID_LOGONRESPONSE().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.Success }}));
                     }
                 case MessageDirection.ServerToClient:
@@ -113,14 +117,16 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (UINT32) Status
                          */
 
+                        var status = (UInt32)(Statuses)context.Arguments["status"];
+
                         Buffer = new byte[4];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
 
-                        w.Write((UInt32)(Statuses)context.Arguments["status"]);
+                        w.Write(status);
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes) (status: 0x{status:X8})");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }
