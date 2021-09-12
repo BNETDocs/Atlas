@@ -390,6 +390,15 @@ Your local time: {localTime}</value>
   <data name="UserBannedFromChannel" xml:space="preserve">
     <value>{target} was banned by {source}</value>
   </data>
+  <data name="UserBannedFromChannelWithReason" xml:space="preserve">
+    <value>{target} was banned by {source} ({reason}).</value>
+  </data>
+  <data name="UserIsAlreadyBanned" xml:space="preserve">
+    <value>{target} is already banned from the channel!</value>
+  </data>
+  <data name="UserIsNotBanned" xml:space="preserve">
+    <value>{target} is not banned from the channel</value>
+  </data>
   <data name="UserIsUsingDiablo2InAPrivateGame" xml:space="preserve">
     <value>{character}#{characterRealm} (*{username}) is using {game} in a private game.</value>
   </data>
@@ -451,6 +460,9 @@ Your local time: {localTime}</value>
   <data name="YouAreUsingGameInTheChannel" xml:space="preserve">
     <value>You are {name}, using {game} in the channel {channel}.</value>
   </data>
+  <data name="YouCannotBanAChannelOperator" xml:space="preserve">
+    <value>You can't ban a channel operator.</value>
+  </data>
   <data name="YouCannotKickAChannelOperator" xml:space="preserve">
     <value>You can't kick a channel operator.</value>
   </data>
@@ -468,6 +480,9 @@ Your local time: {localTime}</value>
   </data>
   <data name="YourFriendsList" xml:space="preserve">
     <value>Your friends list:</value>
+  </data>
+  <data name="YouWereBannedFromChannel" xml:space="preserve">
+    <value>{source} banned you from the channel!</value>
   </data>
   <data name="YouWereKickedFromChannel" xml:space="preserve">
     <value>{source} kicked you out of the channel!</value>

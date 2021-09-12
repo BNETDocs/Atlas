@@ -161,6 +161,81 @@ namespace Atlasd.Battlenet
                 UpdateUser(user, user.ChannelFlags | Account.Flags.ChannelOp);
         }
 
+        public void BanUser(GameState source, string target, string reason)
+        {
+            if (!Common.GetClientByOnlineName(target, out var targetClient) || targetClient == null)
+            {
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, Resources.InvalidUser).WriteTo(source.Client);
+                return;
+            }
+
+            BanUser(source, targetClient, reason);
+        }
+
+        public void BanUser(GameState source, GameState target, string reason)
+        {
+            if (target == null)
+            {
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, Resources.InvalidUser).WriteTo(source.Client);
+                return;
+            }
+
+            var sourceSudoPrivs = source.ChannelFlags.HasFlag(Account.Flags.Admin)
+                || source.ChannelFlags.HasFlag(Account.Flags.Employee);
+            var targetSudoPrivs = target.ChannelFlags.HasFlag(Account.Flags.Admin)
+                || target.ChannelFlags.HasFlag(Account.Flags.ChannelOp)
+                || target.ChannelFlags.HasFlag(Account.Flags.Employee);
+
+            if (targetSudoPrivs && !sourceSudoPrivs)
+            {
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, Resources.YouCannotBanAChannelOperator).WriteTo(source.Client);
+                return;
+            }
+
+            lock (BannedUsers)
+            {
+                if (BannedUsers.Contains(target))
+                {
+                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, Resources.UserIsAlreadyBanned.Replace("{target}", target.OnlineName)).WriteTo(source.Client);
+                    return;
+                }
+                BannedUsers.Add(target);
+            }
+
+            var sourceName = source.OnlineName;
+            var maskAdminsInBanMessage = Settings.GetBoolean(new string[] { "battlenet", "emulation", "mask_admins_in_ban_message" }, false);
+            if (maskAdminsInBanMessage
+                && (source.ChannelFlags.HasFlag(Account.Flags.Employee)
+                || source.ChannelFlags.HasFlag(Account.Flags.Admin)))
+            {
+                sourceName = $"a {Resources.BattlenetRepresentative}";
+            }
+
+            var bannedStr = string.IsNullOrEmpty(reason) ? Resources.UserBannedFromChannel : Resources.UserBannedFromChannelWithReason;
+
+            bannedStr = bannedStr.Replace("{reason}", reason);
+            bannedStr = bannedStr.Replace("{source}", sourceName);
+            bannedStr = bannedStr.Replace("{target}", target.OnlineName);
+
+            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, source.ChannelFlags, source.Ping, source.OnlineName, bannedStr));
+
+            if (Users.Contains(target))
+            {
+                RemoveUser(target);
+
+                bannedStr = Resources.YouWereBannedFromChannel;
+
+                bannedStr = bannedStr.Replace("{reason}", reason);
+                bannedStr = bannedStr.Replace("{source}", sourceName);
+                bannedStr = bannedStr.Replace("{target}", target.OnlineName);
+
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, source.ChannelFlags, source.Ping, source.OnlineName, bannedStr).WriteTo(target.Client);
+
+                var theVoid = GetChannelByName(Resources.TheVoid, true);
+                MoveUser(target, theVoid, true);
+            }
+        }
+
         public void Designate(GameState designator, GameState heir)
         {
             DesignatedHeirs[designator] = heir;
@@ -632,6 +707,55 @@ namespace Atlasd.Battlenet
                     new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, RenderChannelFlags(client, user), user.Ping, RenderOnlineName(client, user), user.Statstring).WriteTo(client.Client);
                 }
             }
+        }
+        public void UnBanUser(GameState source, string target)
+        {
+            if (!Common.GetClientByOnlineName(target, out var targetClient) || targetClient == null)
+            {
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, Resources.UserNotLoggedOn).WriteTo(source.Client);
+                return;
+            }
+
+            UnBanUser(source, targetClient);
+        }
+
+        public void UnBanUser(GameState source, GameState target)
+        {
+            if (target == null)
+            {
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, Resources.InvalidUser).WriteTo(source.Client);
+                return;
+            }
+
+            var wasBanned = false;
+            lock (BannedUsers)
+            {
+                if (BannedUsers.Contains(target))
+                {
+                    BannedUsers.Remove(target);
+                    wasBanned = true;
+                }
+            }
+
+            if (!wasBanned)
+            {
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, ActiveFlags, 0, Name, Resources.UserIsNotBanned.Replace("{target}", target.OnlineName)).WriteTo(source.Client);
+                return;
+            }
+
+            var sourceName = source.OnlineName;
+            var maskAdminsInBanMessage = Settings.GetBoolean(new string[] { "battlenet", "emulation", "mask_admins_in_ban_message" }, false);
+            if (maskAdminsInBanMessage
+                && (source.ChannelFlags.HasFlag(Account.Flags.Employee)
+                || source.ChannelFlags.HasFlag(Account.Flags.Admin)))
+            {
+                sourceName = $"a {Resources.BattlenetRepresentative}";
+            }
+
+            var bannedStr = Resources.UserUnBannedFromChannel;
+            bannedStr = bannedStr.Replace("{source}", sourceName);
+            bannedStr = bannedStr.Replace("{target}", target.OnlineName);
+            WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, source.ChannelFlags, source.Ping, source.OnlineName, bannedStr));
         }
 
         // This function should only be called if any of the attributes were modified outside of this class.

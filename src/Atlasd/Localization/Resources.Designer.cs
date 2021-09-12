@@ -790,6 +790,33 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {target} was banned by {source} ({reason})..
+        /// </summary>
+        public static string UserBannedFromChannelWithReason {
+            get {
+                return ResourceManager.GetString("UserBannedFromChannelWithReason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {target} is already banned from the channel!.
+        /// </summary>
+        public static string UserIsAlreadyBanned {
+            get {
+                return ResourceManager.GetString("UserIsAlreadyBanned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {target} is not banned from the channel.
+        /// </summary>
+        public static string UserIsNotBanned {
+            get {
+                return ResourceManager.GetString("UserIsNotBanned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {character}#{characterRealm} (*{username}) is using {game} in a private game..
         /// </summary>
         public static string UserIsUsingDiablo2InAPrivateGame {
@@ -971,6 +998,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t ban a channel operator..
+        /// </summary>
+        public static string YouCannotBanAChannelOperator {
+            get {
+                return ResourceManager.GetString("YouCannotBanAChannelOperator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You can&apos;t kick a channel operator..
         /// </summary>
         public static string YouCannotKickAChannelOperator {
@@ -1021,6 +1057,15 @@ namespace Atlasd.Localization {
         public static string YourFriendsList {
             get {
                 return ResourceManager.GetString("YourFriendsList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {source} banned you from the channel!.
+        /// </summary>
+        public static string YouWereBannedFromChannel {
+            get {
+                return ResourceManager.GetString("YouWereBannedFromChannel", resourceCulture);
             }
         }
         

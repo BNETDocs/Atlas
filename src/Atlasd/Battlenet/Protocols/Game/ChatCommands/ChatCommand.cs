@@ -86,6 +86,8 @@ namespace Atlasd.Battlenet.Protocols.Game
                     return new AdminCommand(_raw, args);
                 case "away":
                     return new AwayCommand(_raw, args);
+                case "ban":
+                    return new BanCommand(_raw, args);
                 case "clan":
                     return new ClanCommand(_raw, args);
                 case "channel":
@@ -114,6 +116,8 @@ namespace Atlasd.Battlenet.Protocols.Game
                     return new ReJoinCommand(_raw, args);
                 case "time":
                     return new TimeCommand(_raw, args);
+                case "unban":
+                    return new UnBanCommand(_raw, args);
                 case "unignore":
                 case "unsquelch":
                     return new UnsquelchCommand(_raw, args);
