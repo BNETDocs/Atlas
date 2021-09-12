@@ -69,9 +69,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                         var friendCount = 0;
                         foreach (var friend in friends)
                         {
-                            if (friendCount++ == 0) reply += Environment.NewLine;
+                            if (friendCount++ == 0) reply += Battlenet.Common.NewLine;
                             var friendString = Encoding.UTF8.GetString(friend);
-                            reply += $"{friendCount}: {friendString}{Environment.NewLine}";
+                            reply += $"{friendCount}: {friendString}{Battlenet.Common.NewLine}";
                         }
 
                         break;
