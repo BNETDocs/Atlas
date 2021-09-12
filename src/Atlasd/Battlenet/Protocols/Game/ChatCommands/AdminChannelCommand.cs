@@ -80,6 +80,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                     case "resync":
                     case "sync":
                         {
+                            reply = string.Empty;
                             channel.Resync();
                             break;
                         }
