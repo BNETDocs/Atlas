@@ -21,7 +21,13 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             var reply = string.Empty;
 
             var subcommand = Arguments.Count > 0 ? Arguments[0] : string.Empty;
-            if (!string.IsNullOrEmpty(subcommand)) Arguments.RemoveAt(0);
+            if (!string.IsNullOrEmpty(subcommand))
+            {
+                Arguments.RemoveAt(0);
+                // Calculates and removes (subcmd+' ') from (RawBuffer) which prints into (RawBuffer):
+                var stripSize = subcommand.Length + (RawBuffer.Length - subcommand.Length > 0 ? 1 : 0);
+                RawBuffer = RawBuffer[stripSize..];
+            }
 
             var friends = (List<byte[]>)context.GameState.ActiveAccount.Get(Account.FriendsKey, new List<byte[]>());
 
