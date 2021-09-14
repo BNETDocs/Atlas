@@ -47,7 +47,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         context.Client.GameState.Version.VersionByte = r.ReadUInt32();
                         context.Client.GameState.Version.EXERevision = r.ReadUInt32();
                         context.Client.GameState.Version.EXEChecksum = r.ReadUInt32();
-                        context.Client.GameState.Version.EXEInformation = r.ReadString();
+                        context.Client.GameState.Version.EXEInformation = r.ReadByteString();
 
                         return new SID_REPORTVERSION().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
                     }

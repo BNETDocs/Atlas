@@ -106,7 +106,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             }
                         }
 
-                        context.Client.GameState.Version.EXEInformation = r.ReadString();
+                        context.Client.GameState.Version.EXEInformation = r.ReadByteString();
                         context.Client.GameState.KeyOwner = r.ReadByteString();
 
                         var status = Statuses.Success;
