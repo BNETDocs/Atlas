@@ -110,7 +110,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         context.Client.GameState.KeyOwner = r.ReadByteString();
 
                         var status = Statuses.Success;
-                        var info = "";
+                        byte[] info = new byte[0];
 
                         var requiredKeyCount = GameKey.RequiredKeyCount(context.Client.GameState.Product);
                         if (context.Client.GameState.GameKeys.Count < requiredKeyCount)
@@ -133,15 +133,15 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          */
 
                         var status = (uint)(Statuses)context.Arguments["status"];
-                        var info = (string)context.Arguments["info"];
+                        var info = (byte[])context.Arguments["info"];
 
-                        Buffer = new byte[5 + Encoding.UTF8.GetByteCount(info)];
+                        Buffer = new byte[5 + info.Length];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)status);
-                        w.Write((string)info);
+                        w.WriteByteString(info);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
