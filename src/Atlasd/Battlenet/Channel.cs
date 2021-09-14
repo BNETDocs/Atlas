@@ -3,10 +3,12 @@ using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet
 {
@@ -38,7 +40,7 @@ namespace Atlasd.Battlenet
         public int MaxUsers { get; protected set; }
         public string Name { get; protected set; }
         public string Topic { get; protected set; }
-        protected List<GameState> Users { get; private set; }
+        protected ConcurrentBag<GameState> Users { get; private set; }
 
         private Channel(string name, Flags flags = Flags.None, int maxUsers = -1, string topic = "")
         {
@@ -49,7 +51,7 @@ namespace Atlasd.Battlenet
             MaxUsers = maxUsers;
             Name = name;
             Topic = topic;
-            Users = new List<GameState>();
+            Users = new ConcurrentBag<GameState>();
         }
 
         public void AcceptUser(GameState user, bool ignoreLimits = false, bool extendedErrors = false)
@@ -219,7 +221,8 @@ namespace Atlasd.Battlenet
 
             WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, source.ChannelFlags, source.Ping, source.OnlineName, bannedStr));
 
-            if (Users.Contains(target))
+            var users = new List<GameState>(Users);
+            if (users.Contains(target))
             {
                 RemoveUser(target);
 
@@ -478,18 +481,18 @@ namespace Atlasd.Battlenet
         public void RemoveUser(GameState user)
         {
             bool notify = false;
-            GameState[] users;
+            List<GameState> users;
 
-            // Get a copy of the Users list for use later, that way the lock time is short
             lock (Users)
             {
-                if (Users.Contains(user))
+                users = new List<GameState>(Users);
+                if (users.Contains(user))
                 {
-                    Users.Remove(user);
+                    users.Remove(user);
+                    Users = new ConcurrentBag<GameState>(users);
                     notify = true;
                 }
 
-                users = Users.ToArray();
             }
 
             // If the user is not in the Users list, then we give up here
@@ -525,7 +528,7 @@ namespace Atlasd.Battlenet
                 {
                     var designatedHeirExists = DesignatedHeirs.ContainsKey(user);
 
-                    if (wasChannelOp && designatedHeirExists && Users.Contains(DesignatedHeirs[user]))
+                    if (wasChannelOp && designatedHeirExists && users.Contains(DesignatedHeirs[user]))
                     {
                         var heir = DesignatedHeirs[user];
 
