@@ -17,7 +17,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            if (!HasAdmin(context.GameState))
+            if (!context.GameState.HasAdmin())
             {
                 new InvalidCommand(RawBuffer, Arguments).Invoke(context);
                 return;

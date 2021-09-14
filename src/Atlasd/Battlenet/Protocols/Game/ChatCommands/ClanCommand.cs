@@ -16,7 +16,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            var hasAdmin = HasAdmin(context.GameState, true); // includeChannelOp=true
+            var hasAdmin = context.GameState.HasAdmin(true); // includeChannelOp=true
             var replyEventId = ChatEvent.EventIds.EID_ERROR;
             var reply = string.Empty;
 

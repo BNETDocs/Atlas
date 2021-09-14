@@ -64,7 +64,7 @@ namespace Atlasd.Battlenet
             {
                 lock (target)
                 {
-                    var admin = ChatCommand.HasAdmin(source);
+                    var admin = source.HasAdmin();
                     var mutual = false;
                     var sourceFriendStrings = (List<byte[]>)source.ActiveAccount.Get(Account.FriendsKey, new List<byte[]>());
                     var targetFriendStrings = (List<byte[]>)target.ActiveAccount.Get(Account.FriendsKey, new List<byte[]>());

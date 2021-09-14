@@ -300,6 +300,42 @@ namespace Atlasd.Battlenet.Protocols.Game
             }
         }
 
+        /**
+         * <remarks>Checks whether a user has administrative power on the server.</remarks>
+         * <param name="user">The user to check whether they have admin status.</param>
+         * <param name="includeChannelOp">Defaults to false. If user has flags 0x02 ChannelOp and includeChannelOp is true, then they will be considered having admin.</param>
+         */
+        public static bool HasAdmin(GameState user, bool includeChannelOp = false)
+        {
+            var grantSudoToSpoofedAdmins = Settings.GetBoolean(new string[] { "battlenet", "emulation", "grant_sudo_to_spoofed_admins" }, false);
+            var hasSudo = false;
+            lock (user)
+            {
+                var userFlags = (Account.Flags)user.ActiveAccount.Get(Account.FlagsKey);
+                hasSudo =
+                    (
+                        grantSudoToSpoofedAdmins && (
+                            user.ChannelFlags.HasFlag(Account.Flags.Admin) ||
+                            (user.ChannelFlags.HasFlag(Account.Flags.ChannelOp) && includeChannelOp) ||
+                            user.ChannelFlags.HasFlag(Account.Flags.Employee)
+                        )
+                    )
+                    || userFlags.HasFlag(Account.Flags.Admin)
+                    || (userFlags.HasFlag(Account.Flags.ChannelOp) && includeChannelOp)
+                    || userFlags.HasFlag(Account.Flags.Employee)
+                ;
+            }
+            return hasSudo;
+        }
+
+        /**
+         * Aliases GameState.HasAdmin(GameState, bool)
+         */
+        public bool HasAdmin(bool includeChannelOp = false)
+        {
+            return HasAdmin(this, includeChannelOp);
+        }
+
         public void SetLocale()
         {
             // TODO : Fix this so it works with the asynchronous stuff.

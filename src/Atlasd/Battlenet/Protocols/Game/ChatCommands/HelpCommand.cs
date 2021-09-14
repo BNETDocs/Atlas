@@ -15,7 +15,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            var hasAdmin = ChatCommand.HasAdmin(context.GameState);
+            var hasAdmin = context.GameState.HasAdmin();
             var topic = Arguments.Count > 0 ? Arguments[0] : string.Empty;
             if (!string.IsNullOrEmpty(topic)) Arguments.RemoveAt(0);
             var remarks = hasAdmin ? Resources.HelpCommandRemarksWithAdmin : Resources.HelpCommandRemarks;
