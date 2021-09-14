@@ -37,6 +37,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             var adFilename = r.ReadString();
             var adUrl = r.ReadString();
 
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Ad [Id: 0x{adId:X8}] was displayed!");
+
             return true;
         }
     }

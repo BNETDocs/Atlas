@@ -35,6 +35,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             var adId = r.ReadUInt32();
             var requestType = r.ReadUInt32();
 
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Ad [Id: 0x{adId:X8}] was clicked!");
+
             return true;
         }
     }
