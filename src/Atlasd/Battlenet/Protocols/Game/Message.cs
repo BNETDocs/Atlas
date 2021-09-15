@@ -77,8 +77,10 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_AUTH_INFO => new Messages.SID_AUTH_INFO(buffer),
                 MessageIds.SID_AUTH_CHECK => new Messages.SID_AUTH_CHECK(buffer),
                 MessageIds.SID_FRIENDSLIST => new Messages.SID_FRIENDSLIST(buffer),
+                MessageIds.SID_FRIENDSUPDATE => new Messages.SID_FRIENDSUPDATE(buffer),
                 MessageIds.SID_FRIENDSADD => new Messages.SID_FRIENDSADD(buffer),
                 MessageIds.SID_FRIENDSREMOVE => new Messages.SID_FRIENDSREMOVE(buffer),
+                MessageIds.SID_FRIENDSPOSITION => new Messages.SID_FRIENDSPOSITION(buffer),
                 MessageIds.SID_CLANMEMBERLIST => new Messages.SID_CLANMEMBERLIST(buffer),
                 /*
                 MessageIds.SID_ => new Messages.SID_(buffer),
