@@ -1,9 +1,6 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
