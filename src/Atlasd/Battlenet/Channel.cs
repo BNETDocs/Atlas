@@ -761,7 +761,9 @@ namespace Atlasd.Battlenet
             WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, source.ChannelFlags, source.Ping, source.OnlineName, bannedStr));
         }
 
-        // This function should only be called if any of the attributes were modified outside of this class.
+        /**
+         * <remarks>This function should only be called if any of the attributes were modified outside of this class.</remarks>
+         */
         public void UpdateUser(GameState client)
         {
             UpdateUser(client, client.ChannelFlags, client.Ping, client.Statstring);
@@ -787,7 +789,15 @@ namespace Atlasd.Battlenet
             UpdateUser(client, client.ChannelFlags, client.Ping, statstring);
         }
 
-        public void UpdateUser(GameState client, Account.Flags flags, Int32 ping, byte[] statstring)
+        /**
+         * <remarks>Updates the client's flags, ping, and/or statstring, and then sends a ChatEvent to tell other clients about the change.</remarks>
+         * <param name="client">The client which is being updated or was updated earlier outside of this context.</param>
+         * <param name="flags">The new flags. (Optional)</param>
+         * <param name="ping">The new ping. (Optional)</param>
+         * <param name="statstring">The new statstring. (Optional)</param>
+         * <param name="forceEvent">Whether to send a ChatEvent regardless if no alteration was made. Useful if the client was updated before calling this function, instead of using the properties of this function to alter the client.</param>
+         */
+        public void UpdateUser(GameState client, Account.Flags flags, Int32 ping, byte[] statstring, bool forceEvent = false)
         {
             var changed = false;
 
@@ -809,7 +819,7 @@ namespace Atlasd.Battlenet
                 changed = true;
             }
 
-            if (!changed) return; // don't emit ChatEvent for unnecessary calls to UpdateUser() if nothing changed
+            if (!changed && !forceEvent) return; // don't emit ChatEvent for unnecessary calls to UpdateUser() if nothing changed
 
             lock (Users)
             {
