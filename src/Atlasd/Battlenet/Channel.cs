@@ -40,7 +40,7 @@ namespace Atlasd.Battlenet
         public int MaxUsers { get; protected set; }
         public string Name { get; protected set; }
         public string Topic { get; protected set; }
-        protected ConcurrentDictionary<DateTime, GameState> Users { get; private set; }
+        protected ConcurrentBag<GameState> Users { get; private set; }
 
         private Channel(string name, Flags flags = Flags.None, int maxUsers = -1, string topic = "")
         {
@@ -51,7 +51,7 @@ namespace Atlasd.Battlenet
             MaxUsers = maxUsers;
             Name = name;
             Topic = topic;
-            Users = new ConcurrentDictionary<DateTime, GameState>();
+            Users = new ConcurrentBag<GameState>();
         }
 
         public void AcceptUser(GameState user, bool ignoreLimits = false, bool extendedErrors = false)
@@ -106,22 +106,15 @@ namespace Atlasd.Battlenet
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Channel, string.Format("[{0}] Accepting user [{1}] (ignoreLimits: {2})", Name, user.OnlineName, ignoreLimits));
 
             // Add this user to the channel:
-            Users.AddOrUpdate(
-                DateTime.UtcNow, // new key
-                (key) => { // on add
-                    user.ActiveChannelTSKey = key; return user;
-                },
-                (key, oldUser) => { // on update; oldUser is discarded
-                    user.ActiveChannelTSKey = key; return user;
-                }
-            );
+            lock (Users) Users.Add(user);
 
             // Tell this user they entered the channel:
             new ChatEvent(ChatEvent.EventIds.EID_CHANNELJOIN, ActiveFlags, 0, "", Name).WriteTo(user.Client);
 
             if (!ActiveFlags.HasFlag(Flags.Silent))
             {
-                var users = Users.Values;
+                GameState[] users;
+                lock (Users) users = Users.ToArray();
 
                 lock (user)
                 {
@@ -228,7 +221,7 @@ namespace Atlasd.Battlenet
 
             WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, source.ChannelFlags, source.Ping, source.OnlineName, bannedStr));
 
-            var users = Users.Values;
+            var users = new List<GameState>(Users);
             if (users.Contains(target))
             {
                 RemoveUser(target);
@@ -259,7 +252,7 @@ namespace Atlasd.Battlenet
             if (Users != null)
             {
                 var theVoid = GetChannelByName(Resources.TheVoid, true);
-                foreach (var user in Users.Values) MoveUser(user, theVoid, true);
+                foreach (var user in Users) MoveUser(user, theVoid, true);
             }
 
             lock (Common.ActiveChannels)
@@ -363,18 +356,20 @@ namespace Atlasd.Battlenet
 
             var names = new LinkedList<string>();
 
-            var users = Users.Values;
-            foreach (var user in users)
+            lock (Users)
             {
-                var userName = RenderOnlineName(context, user);
-                if (user.ChannelFlags.HasFlag(Account.Flags.Employee) ||
-                    user.ChannelFlags.HasFlag(Account.Flags.ChannelOp) ||
-                    user.ChannelFlags.HasFlag(Account.Flags.Admin))
+                foreach (var user in Users)
                 {
-                    names.AddFirst($"[{userName.ToUpper()}]");
-                } else
-                {
-                    names.AddLast(userName);
+                    var userName = RenderOnlineName(context, user);
+                    if (user.ChannelFlags.HasFlag(Account.Flags.Employee) ||
+                        user.ChannelFlags.HasFlag(Account.Flags.ChannelOp) ||
+                        user.ChannelFlags.HasFlag(Account.Flags.Admin))
+                    {
+                        names.AddFirst($"[{userName.ToUpper()}]");
+                    } else
+                    {
+                        names.AddLast(userName);
+                    }
                 }
             }
 
@@ -410,13 +405,15 @@ namespace Atlasd.Battlenet
         {
             GameState targetClient = null;
 
-            var users = Users.Values;
-            foreach (var client in users)
+            lock (Users)
             {
-                if (client.OnlineName == target)
+                foreach (var client in Users)
                 {
-                    targetClient = client;
-                    break;
+                    if (client.OnlineName == target)
+                    {
+                        targetClient = client;
+                        break;
+                    }
                 }
             }
 
@@ -481,15 +478,29 @@ namespace Atlasd.Battlenet
             channel.AcceptUser(client, ignoreLimits);
         }
 
-        public void RemoveUser(GameState userToRemove)
+        public void RemoveUser(GameState user)
         {
-            if (!Users.TryRemove(userToRemove.ActiveChannelTSKey, out var user))
+            bool notify = false;
+            List<GameState> users;
+
+            lock (Users)
+            {
+                users = new List<GameState>(Users);
+                if (users.Contains(user))
+                {
+                    users.Remove(user);
+                    Users = new ConcurrentBag<GameState>(users);
+                    notify = true;
+                }
+
+            }
+
+            // If the user is not in the Users list, then we give up here
+            if (!notify)
             {
                 if (Count == 0 && !ActiveFlags.HasFlag(Flags.Public)) Dispose();
                 return;
             }
-
-            var users = Users.Values;
 
             lock (user)
             {
@@ -599,39 +610,40 @@ namespace Atlasd.Battlenet
             var args = new Dictionary<string, object> {{ "chatEvent", null }};
             var msg = new SID_CHATEVENT();
 
-            var users = Users.Values;
-            foreach (var user in users)
+            lock (Users)
             {
-                // Tell users they re-entered the channel:
-                args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_CHANNELJOIN, ActiveFlags, 0, "", Name);
-                msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
-                user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
-
-                // Show users in channel or display info about no chat:
-                if (!ActiveFlags.HasFlag(Flags.Silent))
+                foreach (var user in Users)
                 {
-                    var subusers = Users.Values;
-                    foreach (var subuser in subusers)
+                    // Tell users they re-entered the channel:
+                    args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_CHANNELJOIN, ActiveFlags, 0, "", Name);
+                    msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
+                    user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
+
+                    // Show users in channel or display info about no chat:
+                    if (!ActiveFlags.HasFlag(Flags.Silent))
                     {
-                        args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, RenderChannelFlags(user, subuser), subuser.Ping, RenderOnlineName(user, subuser), subuser.Statstring);
+                        foreach (var subuser in Users)
+                        {
+                            args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_USERSHOW, RenderChannelFlags(user, subuser), subuser.Ping, RenderOnlineName(user, subuser), subuser.Statstring);
+                            msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
+                            user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
+                        }
+                    }
+                    else
+                    {
+                        args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, Resources.ChannelIsChatRestricted);
                         msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
                         user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
                     }
-                }
-                else
-                {
-                    args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, Resources.ChannelIsChatRestricted);
-                    msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
-                    user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
-                }
 
-                // Channel topic:
-                var topic = RenderTopic(user);
-                foreach (var line in topic.Split("\n"))
-                {
-                    args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line);
-                    msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
-                    user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
+                    // Channel topic:
+                    var topic = RenderTopic(user);
+                    foreach (var line in topic.Split("\n"))
+                    {
+                        args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line);
+                        msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
+                        user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
+                    }
                 }
             }
         }
@@ -675,13 +687,15 @@ namespace Atlasd.Battlenet
 
             WriteChatEvent(new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, Resources.ChannelTopicChanged));
 
-            var users = Users.Values;
-            foreach (var user in users)
+            lock (Users)
             {
-                var lines = RenderTopic(user).Split("\n");
+                foreach (var user in Users)
+                {
+                    var lines = RenderTopic(user).Split("\n");
 
-                foreach (var line in lines)
-                    new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line).WriteTo(user.Client);
+                    foreach (var line in lines)
+                        new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line).WriteTo(user.Client);
+                }
             }
         }
 
@@ -689,10 +703,12 @@ namespace Atlasd.Battlenet
         {
             if (client == null) throw new NullReferenceException("Client parameter must not be null");
 
-            var users = Users.Values;
-            foreach (var user in users)
+            lock (Users)
             {
-                new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, RenderChannelFlags(client, user), user.Ping, RenderOnlineName(client, user), user.Statstring).WriteTo(client.Client);
+                foreach (var user in Users)
+                {
+                    new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, RenderChannelFlags(client, user), user.Ping, RenderOnlineName(client, user), user.Statstring).WriteTo(client.Client);
+                }
             }
         }
         public void UnBanUser(GameState source, string target)
@@ -795,10 +811,12 @@ namespace Atlasd.Battlenet
 
             if (!changed) return; // don't emit ChatEvent for unnecessary calls to UpdateUser() if nothing changed
 
-            var users = Users.Values;
-            foreach (var user in users)
+            lock (Users)
             {
-                new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, RenderChannelFlags(user, client), client.Ping, RenderOnlineName(user, client), client.Statstring).WriteTo(user.Client);
+                foreach (var user in Users)
+                {
+                    new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, RenderChannelFlags(user, client), client.Ping, RenderOnlineName(user, client), client.Statstring).WriteTo(user.Client);
+                }
             }
         }
 
@@ -812,17 +830,19 @@ namespace Atlasd.Battlenet
             var args = new Dictionary<string, object> {{ "chatEvent", chatEvent }};
             var msg = new SID_CHATEVENT();
 
-            var users = Users.Values;
-            foreach (var user in users)
+            lock (Users)
             {
-                if (owner != null && user == owner && chatEvent.EventId == ChatEvent.EventIds.EID_TALK)
+                foreach (var user in Users)
                 {
-                    // Dropping EID_TALK from being echoed back to sender
-                    continue;
-                }
+                    if (owner != null && user == owner && chatEvent.EventId == ChatEvent.EventIds.EID_TALK)
+                    {
+                        // Dropping EID_TALK from being echoed back to sender
+                        continue;
+                    }
 
-                msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
-                user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
+                    msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
+                    user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
+                }
             }
         }
 
@@ -836,19 +856,21 @@ namespace Atlasd.Battlenet
         {
             var msg = new SID_CHATEVENT();
 
-            var users = Users.Values;
-            foreach (var user in users)
+            lock (Users)
             {
-                if (owner != null && user == owner && !emote)
+                foreach (var user in Users)
                 {
-                    // Dropping EID_TALK from being echoed back to sender
-                    continue;
+                    if (owner != null && user == owner && !emote)
+                    {
+                        // Dropping EID_TALK from being echoed back to sender
+                        continue;
+                    }
+
+                    var e = new ChatEvent(emote ? ChatEvent.EventIds.EID_EMOTE : ChatEvent.EventIds.EID_TALK, RenderChannelFlags(user, owner), owner.Ping, RenderOnlineName(user, owner), message);
+
+                    msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, dynamic>() {{ "chatEvent", e }}));
+                    user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
                 }
-
-                var e = new ChatEvent(emote ? ChatEvent.EventIds.EID_EMOTE : ChatEvent.EventIds.EID_TALK, RenderChannelFlags(user, owner), owner.Ping, RenderOnlineName(user, owner), message);
-
-                msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, dynamic>() {{ "chatEvent", e }}));
-                user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
             }
         }
     }

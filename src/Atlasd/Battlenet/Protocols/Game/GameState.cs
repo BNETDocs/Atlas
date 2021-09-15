@@ -25,7 +25,6 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public Account ActiveAccount;
         public Channel ActiveChannel;
-        public DateTime ActiveChannelTSKey;
         public Account.Flags ChannelFlags;
         public DateTime ConnectedTimestamp;
         public GameAd GameAd;
@@ -71,7 +70,6 @@ namespace Atlasd.Battlenet.Protocols.Game
 
             ActiveAccount = null;
             ActiveChannel = null;
-            ActiveChannelTSKey = DateTime.MinValue;
             ChannelFlags = Account.Flags.None;
             ConnectedTimestamp = DateTime.Now;
             GameAd = null;
