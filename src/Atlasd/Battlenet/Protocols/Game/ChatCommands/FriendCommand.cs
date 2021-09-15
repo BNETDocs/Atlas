@@ -71,6 +71,55 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                         }
                         break;
                     }
+                case "demote":
+                case "d":
+                    {
+                        var targetString = Arguments.Count > 0 ? Arguments[0] : string.Empty;
+                        if (string.IsNullOrEmpty(targetString))
+                        {
+                            reply = Resources.DemoteFriendEmptyTarget;
+                        }
+                        else
+                        {
+                            byte[] exists = null;
+                            byte counter1 = 0;
+                            byte counter2 = 0;
+                            foreach (var friendByteString in friends)
+                            {
+                                string friendString = Encoding.UTF8.GetString(friendByteString);
+                                if (string.Equals(targetString, friendString, StringComparison.CurrentCultureIgnoreCase))
+                                {
+                                    exists = friendByteString;
+                                    break;
+                                }
+                                counter1++;
+                            }
+                            if (exists == null || exists.Length == 0)
+                            {
+                                reply = Resources.DemoteFriendEmptyTarget;
+                            }
+                            else
+                            {
+                                if (counter1 == friends.Count - 1)
+                                {
+                                    counter2 = counter1;
+                                }
+                                else
+                                {
+                                    counter2 = (byte)(counter1 + 1);
+                                    friends.RemoveAt(counter1);
+                                    friends.Insert(counter2, exists);
+                                }
+
+                                replyEventId = ChatEvent.EventIds.EID_INFO;
+                                reply = Resources.DemotedFriend.Replace("{friend}", Encoding.UTF8.GetString(exists));
+
+                                if (counter1 != counter2)
+                                    new SID_FRIENDSPOSITION().Invoke(new MessageContext(context.GameState.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>() {{ "old", counter1 }, { "new", counter2 }}));
+                            }
+                        }
+                        break;
+                    }
                 case "list":
                 case "l":
                     {
@@ -86,6 +135,55 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                         }
                         if (friendCount > 0) reply = reply[0..(reply.Length - Battlenet.Common.NewLine.Length)]; // strip last newline
 
+                        break;
+                    }
+                case "promote":
+                case "p":
+                    {
+                        var targetString = Arguments.Count > 0 ? Arguments[0] : string.Empty;
+                        if (string.IsNullOrEmpty(targetString))
+                        {
+                            reply = Resources.PromoteFriendEmptyTarget;
+                        }
+                        else
+                        {
+                            byte[] exists = null;
+                            byte counter1 = 0;
+                            byte counter2 = 0;
+                            foreach (var friendByteString in friends)
+                            {
+                                string friendString = Encoding.UTF8.GetString(friendByteString);
+                                if (string.Equals(targetString, friendString, StringComparison.CurrentCultureIgnoreCase))
+                                {
+                                    exists = friendByteString;
+                                    break;
+                                }
+                                counter1++;
+                            }
+                            if (exists == null || exists.Length == 0)
+                            {
+                                reply = Resources.PromoteFriendEmptyTarget;
+                            }
+                            else
+                            {
+                                if (counter1 == 0)
+                                {
+                                    counter2 = counter1;
+                                }
+                                else
+                                {
+                                    counter2 = (byte)(counter1 - 1);
+                                    friends.RemoveAt(counter1);
+                                    friends.Insert(counter2, exists);
+                                }
+
+                                replyEventId = ChatEvent.EventIds.EID_INFO;
+                                reply = Resources.PromotedFriend.Replace("{friend}", Encoding.UTF8.GetString(exists));
+
+                                if (counter1 != counter2)
+                                    new SID_FRIENDSPOSITION().Invoke(new MessageContext(context.GameState.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>() {{ "old", counter1 }, { "new", counter2 }}));
+                            }
+                        }
                         break;
                     }
                 case "remove":

@@ -464,6 +464,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Demoted {friend} down one level in your friends list..
+        /// </summary>
+        public static string DemotedFriend {
+            get {
+                return ResourceManager.GetString("DemotedFriend", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Who do you want to demote?.
+        /// </summary>
+        public static string DemoteFriendEmptyTarget {
+            get {
+                return ResourceManager.GetString("DemoteFriendEmptyTarget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {user} is your new designated heir..
         /// </summary>
         public static string DesignateCommand {
@@ -677,6 +695,24 @@ namespace Atlasd.Localization {
         public static string NoOneHearsYou {
             get {
                 return ResourceManager.GetString("NoOneHearsYou", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Promoted {friend} up one level in your friends list..
+        /// </summary>
+        public static string PromotedFriend {
+            get {
+                return ResourceManager.GetString("PromotedFriend", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Who do you want to promote?.
+        /// </summary>
+        public static string PromoteFriendEmptyTarget {
+            get {
+                return ResourceManager.GetString("PromoteFriendEmptyTarget", resourceCulture);
             }
         }
         

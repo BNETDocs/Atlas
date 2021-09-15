@@ -262,6 +262,12 @@ This server is hosted by {host}.
   <data name="ChatCommandUnavailable" xml:space="preserve">
     <value>That command is not available at the moment.</value>
   </data>
+  <data name="DemotedFriend" xml:space="preserve">
+    <value>Demoted {friend} down one level in your friends list.</value>
+  </data>
+  <data name="DemoteFriendEmptyTarget" xml:space="preserve">
+    <value>Who do you want to demote?</value>
+  </data>
   <data name="DesignateCommand" xml:space="preserve">
     <value>{user} is your new designated heir.</value>
   </data>
@@ -352,6 +358,12 @@ Displays the current {realm} Time ({realmTimezone}).</value>
   </data>
   <data name="NoOneHearsYou" xml:space="preserve">
     <value>No one hears you.</value>
+  </data>
+  <data name="PromotedFriend" xml:space="preserve">
+    <value>Promoted {friend} up one level in your friends list.</value>
+  </data>
+  <data name="PromoteFriendEmptyTarget" xml:space="preserve">
+    <value>Who do you want to promote?</value>
   </data>
   <data name="RemovedFriend" xml:space="preserve">
     <value>Removed {friend} from your friends list.</value>
