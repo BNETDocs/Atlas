@@ -77,6 +77,8 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_AUTH_INFO => new Messages.SID_AUTH_INFO(buffer),
                 MessageIds.SID_AUTH_CHECK => new Messages.SID_AUTH_CHECK(buffer),
                 MessageIds.SID_FRIENDSLIST => new Messages.SID_FRIENDSLIST(buffer),
+                MessageIds.SID_FRIENDSADD => new Messages.SID_FRIENDSADD(buffer),
+                MessageIds.SID_FRIENDSREMOVE => new Messages.SID_FRIENDSREMOVE(buffer),
                 MessageIds.SID_CLANMEMBERLIST => new Messages.SID_CLANMEMBERLIST(buffer),
                 /*
                 MessageIds.SID_ => new Messages.SID_(buffer),
@@ -139,6 +141,10 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_AUTH_INFO => "SID_AUTH_INFO",
                 MessageIds.SID_AUTH_CHECK => "SID_AUTH_CHECK",
                 MessageIds.SID_FRIENDSLIST => "SID_FRIENDSLIST",
+                MessageIds.SID_FRIENDSUPDATE => "SID_FRIENDSUPDATE",
+                MessageIds.SID_FRIENDSADD => "SID_FRIENDSADD",
+                MessageIds.SID_FRIENDSREMOVE => "SID_FRIENDSREMOVE",
+                MessageIds.SID_FRIENDSPOSITION => "SID_FRIENDSPOSITION",
                 MessageIds.SID_CLANMEMBERLIST => "SID_CLANMEMBERLIST",
                 _ => null,
             };

@@ -1,4 +1,5 @@
-﻿using Atlasd.Daemon;
+﻿using Atlasd.Battlenet.Protocols.Game.Messages;
+using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
@@ -59,9 +60,14 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                             }
                             else
                             {
+                                var friendByteString = Encoding.UTF8.GetBytes(targetString);
+                                var friend = new Friend(context.GameState, friendByteString);
+                                friends.Add(friend.Username);
+
                                 replyEventId = ChatEvent.EventIds.EID_INFO;
-                                reply = Resources.AddedFriend.Replace("{friend}", targetString);
-                                friends.Add(Encoding.UTF8.GetBytes(targetString));
+                                reply = Resources.AddedFriend.Replace("{friend}", Encoding.UTF8.GetString(friend.Username));
+
+                                new SID_FRIENDSADD().Invoke(new MessageContext(context.GameState.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>() {{ "friend", friend }}));
                             }
                         }
                         break;
@@ -95,6 +101,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                         else
                         {
                             byte[] exists = null;
+                            byte counter = 0;
                             foreach (var friendByteString in friends)
                             {
                                 string friendString = Encoding.UTF8.GetString(friendByteString);
@@ -103,6 +110,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                                     exists = friendByteString;
                                     break;
                                 }
+                                counter++;
                             }
                             if (exists == null || exists.Length == 0)
                             {
@@ -112,7 +120,10 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                             {
                                 replyEventId = ChatEvent.EventIds.EID_INFO;
                                 reply = Resources.RemovedFriend.Replace("{friend}", targetString);
+
                                 friends.Remove(exists);
+
+                                new SID_FRIENDSREMOVE().Invoke(new MessageContext(context.GameState.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>() {{ "friend", counter }}));
                             }
                         }
                         break;
