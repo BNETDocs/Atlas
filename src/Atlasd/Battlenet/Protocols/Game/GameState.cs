@@ -25,6 +25,7 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public Account ActiveAccount;
         public Channel ActiveChannel;
+        public Clan ActiveClan;
         public Account.Flags ChannelFlags;
         public DateTime ConnectedTimestamp;
         public GameAd GameAd;
@@ -70,6 +71,7 @@ namespace Atlasd.Battlenet.Protocols.Game
 
             ActiveAccount = null;
             ActiveChannel = null;
+            ActiveClan = null;
             ChannelFlags = Account.Flags.None;
             ConnectedTimestamp = DateTime.Now;
             GameAd = null;
@@ -122,6 +124,12 @@ namespace Atlasd.Battlenet.Protocols.Game
             if (ActiveChannel != null)
             {
                 ActiveChannel.RemoveUser(this); // will change this.ActiveChannel to null.
+            }
+
+            // Notify clan members
+            if (ActiveClan != null)
+            {
+                ActiveClan.WriteStatusChange(this, false); // offline
             }
 
             // Remove this GameState from ActiveGameStates

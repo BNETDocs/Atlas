@@ -20,6 +20,7 @@ namespace Atlasd.Daemon
             Account,
             BNFTP,
             Channel,
+            Clan,
             Config,
             Client,
             Client_BNFTP,
