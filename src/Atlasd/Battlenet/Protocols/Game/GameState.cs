@@ -79,7 +79,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             GameKeys = new List<GameKey>();
             LastLogon = DateTime.Now;
             LastNull = DateTime.Now;
-            LastPing = DateTime.Parse("1970-01-01T00:00:00+00:00");
+            LastPing = DateTime.MinValue;
             LocalIPAddress = null;
             Locale = new LocaleInfo();
             LogonType = LogonTypes.OLS;
