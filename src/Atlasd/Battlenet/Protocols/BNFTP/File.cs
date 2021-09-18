@@ -72,7 +72,7 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
             }
             catch (Exception ex)
             {
-                if (!(ex is UnauthorizedAccessException || ex is PathTooLongException || ex is NotSupportedException)) throw ex;
+                if (!(ex is UnauthorizedAccessException || ex is PathTooLongException || ex is NotSupportedException)) throw;
                 return null;
             }
 

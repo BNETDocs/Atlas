@@ -101,7 +101,7 @@ namespace Atlasd.Daemon
                 }
                 else
                 {
-                    throw ex;
+                    throw;
                 }
             }
 
@@ -143,7 +143,7 @@ namespace Atlasd.Daemon
                 }
                 else
                 {
-                    throw ex;
+                    throw;
                 }
             }
 
