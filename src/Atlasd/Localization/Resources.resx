@@ -444,6 +444,14 @@ Your local time: {localTime}</value>
   <data name="UserUnBannedFromChannel" xml:space="preserve">
     <value>{target} was unbanned by {source}</value>
   </data>
+  <data name="VersionCommand" xml:space="preserve">
+    <value>This server is running {version}.</value>
+  </data>
+  <data name="VersionCommandWithAdmin" xml:space="preserve">
+    <value>This server is running {version}.
+Node uptime: {systemUptime}
+Process uptime: {processUptime}</value>
+  </data>
   <data name="WhisperCommandEmptyMessage" xml:space="preserve">
     <value>What do you want to say?</value>
   </data>

@@ -952,6 +952,26 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This server is running {version}..
+        /// </summary>
+        public static string VersionCommand {
+            get {
+                return ResourceManager.GetString("VersionCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This server is running {version}.
+        ///Node uptime: {systemUptime}
+        ///Process uptime: {processUptime}.
+        /// </summary>
+        public static string VersionCommandWithAdmin {
+            get {
+                return ResourceManager.GetString("VersionCommandWithAdmin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to What do you want to say?.
         /// </summary>
         public static string WhisperCommandEmptyMessage {

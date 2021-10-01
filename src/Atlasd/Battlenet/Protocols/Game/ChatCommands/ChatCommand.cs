@@ -95,6 +95,9 @@ namespace Atlasd.Battlenet.Protocols.Game
                     return new UnsquelchCommand(_raw, args);
                 case "users":
                     return new UsersCommand(_raw, args);
+                case "version":
+                case "ver":
+                    return new VersionCommand(_raw, args);
                 case "whereis":
                 case "where":
                 case "whois":
