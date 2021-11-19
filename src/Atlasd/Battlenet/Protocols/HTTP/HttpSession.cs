@@ -13,6 +13,7 @@ namespace Atlasd.Battlenet.Protocols.Http
 
         public HttpSession(Socket client)
         {
+            if (client == null) { return; } //Yes this is possible.
             if (!client.Connected)
             {
                 return;
@@ -23,6 +24,7 @@ namespace Atlasd.Battlenet.Protocols.Http
 
         public void ConnectedEvent()
         {
+            if (Client == null) { return; } //Yes this is possible.
             var assembly = typeof(Program).Assembly;
             var server = $"{assembly.GetName().Name}/{assembly.GetName().Version} ({Program.DistributionMode})";
 
