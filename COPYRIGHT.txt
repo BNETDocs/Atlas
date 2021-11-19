@@ -2,6 +2,7 @@ Atlas
 
 Copyright (c) 2020 Carl Bennett <https://github.com/carlbennett>
 Copyright (c) 2020 William LaFrance <https://keybase.io/wjlafrance>
+Copyright (c) 2021 James [l)ragon] <admin@botdev-united.com>
 
 Special thanks to: BNETDocs <https://bnetdocs.org/>
 Honorable mention to: Valhalla Legends (a.k.a. vL)
