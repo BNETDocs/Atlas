@@ -1,0 +1,671 @@
+﻿{
+  "account": {
+    "auto_admin": [
+      "Admin",
+      "BNETDocs",
+      "BNRBot",
+      "Carl",
+      "islanti",
+      "Ribose",
+      "DragonKing"
+    ],
+    "disallow_words": [
+      "ass",
+      "battle.net",
+      "blizzard",
+      "chink",
+      "cracker",
+      "cunt",
+      "fag",
+      "fuck",
+      "idiot",
+      "nigga",
+      "nigger",
+      "niglet",
+      "twat",
+      "wetback"
+    ],
+    "max_adjacent_punctuation": 0,
+    "max_length": 15,
+    "max_punctuation": 7,
+    "min_alphanumeric": 1,
+    "min_length": 3
+  },
+  "ads": [
+    {
+      "enabled": true,
+      "filename": "ad-20201030-3days.smk",
+      "url": "http://bnetdocs.org",
+      "products": null,
+      "locales": null
+    },
+    {
+      "enabled": true,
+      "filename": "ad-20201030-discord.smk",
+      "url": "http://bnetdocs.org/discord",
+      "products": null,
+      "locales": null
+    },
+    {
+      "enabled": true,
+      "filename": "ad-20201030-ghacv.smk",
+      "url": "http://bnetdocs.org",
+      "products": null,
+      "locales": null
+    },
+    {
+      "enabled": true,
+      "filename": "ad-20201030-ktbpa.smk",
+      "url": "http://bnetdocs.org",
+      "products": null,
+      "locales": null
+    },
+    {
+      "enabled": true,
+      "filename": "ad-20201030-nobtry.smk",
+      "url": "http://bnetdocs.org",
+      "products": null,
+      "locales": null
+    },
+    {
+      "enabled": true,
+      "filename": "ad-20201031-vl.smk",
+      "url": "http://davnit.net/bnet/vL/index.php",
+      "products": null,
+      "locales": null
+    }
+  ],
+  "battlenet": {
+    "emulation": {
+      "auto_refresh_pings": false,
+      "grant_sudo_to_spoofed_admins": true,
+      "mask_admins_in_ban_message": true,
+      "mask_admins_in_kick_message": true,
+      "required_game_key_count": {
+        "D2DV": 1,
+        "D2XP": 2,
+        "W2BN": 1,
+        "WAR3": 1,
+        "W3XP": 2
+      }
+    },
+    "listener": {
+      "interface": "0.0.0.0",
+      "port": 6112,
+      "tcp_nodelay": true
+    }
+  },
+  "bnftp": {
+    "root": "..\\..\\..\\..\\..\\var\\bnftp"
+  },
+  "channel": {
+    "auto_op": true,
+    "max_length": 31,
+    "max_users": 40,
+    "static": [
+      {
+        "name": "The Void",
+        "flags": 9
+      },
+      {
+        "name": "warez",
+        "flags": 12
+      },
+      {
+        "name": "Backstage",
+        "flags": 16,
+        "topic": "Abandon hope, all ye who enter here..."
+      },
+      {
+        "name": "Blizzard Tech Support",
+        "flags": 69635,
+        "topic": "This channel is provided for nostalgic purposes. No support is given here."
+      },
+      {
+        "name": "Open Tech Support",
+        "flags": 69633,
+        "topic": "This is an open channel where you can get help on technical problems from other users.\nIf you need to contact Blizzard Technical Support for any legacy game issue, please visit their Technical Support forum located at: http://forums.battle.net/board.html?forumId=12014&sid=3000"
+      },
+      {
+        "name": "Town Square",
+        "flags": 1,
+        "max_users": 40,
+        "topic": "Atlas is alpha server software, no warranty is given, use at your own risk. Developing your bot around this server is ill-advised.\nGeneral discussion. Join our Discord at: https://bnetdocs.org/discord"
+      },
+      {
+        "name": "ktbpa",
+        "flags": 1,
+        "topic": "Keeping the Battle.net pride alive."
+      },
+      {
+        "name": "Blizzard Chat",
+        "flags": 4097
+      },
+      {
+        "name": "Clan Recruitment",
+        "flags": 1,
+        "topic": "Looking for a clan? Looking for members? Clan Recruitment allows you to find both."
+      },
+      {
+        "name": "Public Chat",
+        "flags": 33,
+        "products": [
+          "CHAT"
+        ]
+      },
+      {
+        "name": "Diablo II",
+        "flags": 33,
+        "products": [
+          "D2DV"
+        ],
+        "product_restricted": true
+      },
+      {
+        "name": "Lord of Destruction",
+        "flags": 33,
+        "products": [
+          "D2XP"
+        ],
+        "product_restricted": true
+      },
+      {
+        "name": "Diablo",
+        "flags": 33,
+        "products": [
+          "DRTL"
+        ]
+      },
+      {
+        "name": "Diablo Shareware",
+        "flags": 33,
+        "products": [
+          "DSHR"
+        ]
+      },
+      {
+        "name": "Brood War",
+        "flags": 33,
+        "products": [
+          "SEXP"
+        ]
+      },
+      {
+        "name": "StarCraft",
+        "flags": 33,
+        "products": [
+          "STAR"
+        ]
+      },
+      {
+        "name": "StarCraft Japan",
+        "flags": 33,
+        "products": [
+          "JSTR"
+        ]
+      },
+      {
+        "name": "StarCraft Shareware",
+        "flags": 33,
+        "products": [
+          "SSHR"
+        ]
+      },
+      {
+        "name": "WarCraft II",
+        "flags": 33,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "WarCraft III",
+        "flags": 33,
+        "products": [
+          "WAR3"
+        ],
+        "product_restricted": true
+      },
+      {
+        "name": "Frozen Throne",
+        "flags": 33,
+        "products": [
+          "W3XP"
+        ],
+        "product_restricted": true
+      },
+      {
+        "name": "24423lkn",
+        "flags": 3
+      },
+      {
+        "name": "StarCraft Newbies",
+        "flags": 1,
+        "products": [
+          "STAR"
+        ]
+      },
+      {
+        "name": "Opponents Wanted",
+        "flags": 1,
+        "products": [
+          "STAR"
+        ]
+      },
+      {
+        "name": "Ladder Challenges",
+        "flags": 1,
+        "products": [
+          "STAR"
+        ]
+      },
+      {
+        "name": "Brood War Games",
+        "flags": 1,
+        "products": [
+          "SEXP"
+        ]
+      },
+      {
+        "name": "Brood War Ladder",
+        "flags": 1,
+        "products": [
+          "SEXP"
+        ]
+      },
+      {
+        "name": "Terran Strategy",
+        "flags": 1,
+        "products": [
+          "SEXP",
+          "STAR"
+        ]
+      },
+      {
+        "name": "Zerg Strategy",
+        "flags": 1,
+        "products": [
+          "SEXP",
+          "STAR"
+        ]
+      },
+      {
+        "name": "Protoss Strategy",
+        "flags": 1,
+        "products": [
+          "SEXP",
+          "STAR"
+        ]
+      },
+      {
+        "name": "Custom Maps",
+        "flags": 1,
+        "products": [
+          "SEXP",
+          "STAR"
+        ]
+      },
+      {
+        "name": "Human Strategy",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "Orc Strategy",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "Scenario Games",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "Classic Games",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "War2 Ladder Challenges",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "Iron Man Challenges",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "Free For All",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "One vs One",
+        "flags": 1,
+        "products": [
+          "W2BN"
+        ]
+      },
+      {
+        "name": "Trading",
+        "flags": 1,
+        "products": [
+          "D2DV"
+        ]
+      },
+      {
+        "name": "Trading Sets",
+        "flags": 1,
+        "products": [
+          "D2DV"
+        ]
+      },
+      {
+        "name": "Trading Hardcore",
+        "flags": 1,
+        "products": [
+          "D2DV"
+        ]
+      },
+      {
+        "name": "Trading Gems",
+        "flags": 1,
+        "products": [
+          "D2DV"
+        ]
+      },
+      {
+        "name": "LoD",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Amazon Camp",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Amazon Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Assassin Den",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Assassin Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Barbarian Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Barbarian Village",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Druid Grove",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Druid Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Hardcore",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Hardcore Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Ladder",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Ladder Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Necro Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Necromancer Crypt",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Paladin Temple",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Paladin Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD PvP",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Sorceress Tower",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Sorceress Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "LoD Trading",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Starting Strategies",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Barbarian Village",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Amazon Camp",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Necromancer Crypt",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Paladin Temple",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Sorceress Tower",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Assassin Den",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Druidic Grove",
+        "flags": 1,
+        "products": [
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Hardcore Players",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Cooperative Players",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Diablo II PvP",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Cow Normal",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Cow Nightmare",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      },
+      {
+        "name": "Cow Hell",
+        "flags": 1,
+        "products": [
+          "D2DV",
+          "D2XP"
+        ]
+      }
+    ]
+  },
+  "document_version": 0,
+  "http": {
+    "enable": true,
+    "listener": {
+      "interface": "0.0.0.0",
+      "port": 6115,
+      "tcp_nodelay": true
+    }
+  },
+  "logging": {
+    "level": "Debug"
+  },
+  "mysql": {
+    "charset": "utf8mb4",
+    "connect_timeout": 3,
+    "database": "atlasd",
+    "hostname": "mariadb.localdomain",
+    "password": "atlasdev",
+    "username": "atlasd"
+  }
+}
