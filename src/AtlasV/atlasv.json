@@ -31,6 +31,104 @@
     "min_alphanumeric": 1,
     "min_length": 3
   },
+  "profanity_filter": [
+    {
+      "key": "faggot",
+      "value": "!@!@!%"
+    },
+    {
+      "key": "nigga",
+      "value": "!@!@#"
+    },
+    {
+      "key": "nigger",
+      "value": "!@!@&#"
+    },
+    {
+      "key": "kkk",
+      "value": "$%$"
+    },
+    {
+      "key": "klux",
+      "value": "$%&!"
+    },
+    {
+      "key": "cock",
+      "value": "$!$%"
+    },
+    {
+      "key": "dick",
+      "value": "%@$%"
+    },
+    {
+      "key": "penis",
+      "value": "!&!@$"
+    },
+    {
+      "key": "asshole",
+      "value": "@$%!@%&"
+    },
+    {
+      "key": "nipple",
+      "value": "!@!@%&"
+    },
+    {
+      "key": "slut",
+      "value": "$%&%"
+    },
+    {
+      "key": "whore",
+      "value": "!@!#&"
+    },
+    {
+      "key": "lesbian",
+      "value": "%&$#@#!"
+    },
+    {
+      "key": "bitch",
+      "value": "#@%$!"
+    },
+    {
+      "key": "shit",
+      "value": "$!@%"
+    },
+    {
+      "key": "pussy",
+      "value": "!&$%@"
+    },
+    {
+      "key": "fuck",
+      "value": "!&$%"
+    },
+    {
+      "key": "dildo",
+      "value": "%@%&!"
+    },
+    {
+      "key": "cunt",
+      "value": "$&!%"
+    },
+    {
+      "key": "clit",
+      "value": "$%@%"
+    },
+    {
+      "key": "asswipe",
+      "value": "@$%!@!&"
+    },
+    {
+      "key": "orgasm",
+      "value": "!#!@$&"
+    },
+    {
+      "key": "vagina",
+      "value": "!@!@!@"
+    },
+    {
+      "key": "kike",
+      "value": "$@$&"
+    }
+  ],
   "ads": [
     {
       "enabled": true,
@@ -82,6 +180,8 @@
       "mask_admins_in_ban_message": true,
       "mask_admins_in_kick_message": true,
       "required_game_key_count": {
+        "STAR": 1,
+        "SEXP": 1,
         "D2DV": 1,
         "D2XP": 2,
         "W2BN": 1,
