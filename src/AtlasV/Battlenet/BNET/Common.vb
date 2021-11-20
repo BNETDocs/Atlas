@@ -40,9 +40,6 @@ Namespace AtlasV.Battlenet
         Public Shared ActiveGameAds As ConcurrentDictionary(Of Byte(), GameAd)
         Public Shared ActiveGameStates As Dictionary(Of String, GameState)
 
-        'ChatFilter
-        Public Shared ActiveChatFilter As ConcurrentDictionary(Of Byte(), GameAd)
-
         Public Shared Property DefaultAddress As IPAddress
         Public Shared Property DefaultPort As Integer
         Public Shared Property Listener As ServerSocket
