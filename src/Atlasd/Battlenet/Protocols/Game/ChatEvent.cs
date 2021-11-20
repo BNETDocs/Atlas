@@ -109,12 +109,12 @@ namespace Atlasd.Battlenet.Protocols.Game
             Flags = flags;
             Ping = ping;
             Username = username;
-            Text = text;
+            Text = ProfanityFilter.FilterMessage(text);
         }
 
         protected void Initialize(EventIds eventId, UInt32 flags, Int32 ping, string username, string text)
         {
-            Initialize(eventId, flags, ping, username, Encoding.UTF8.GetBytes(text));
+            Initialize(eventId, flags, ping, username, ProfanityFilter.FilterMessage(text));// Encoding.UTF8.GetBytes(text));
         }
 
         public byte[] ToByteArray(ProtocolType.Types protocolType)
