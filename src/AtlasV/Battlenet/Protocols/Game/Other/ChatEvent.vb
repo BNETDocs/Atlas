@@ -103,7 +103,7 @@ Namespace AtlasV.Battlenet.Protocols.Game
             Flags = varFlags
             Ping = varPing
             Username = varUsername
-            Text = varText
+            Text = ProfanityFilter.FilterMessage(varText)
         End Sub
 
         Protected Sub Initialize(ByVal varEventId As EventIds,
@@ -111,7 +111,7 @@ Namespace AtlasV.Battlenet.Protocols.Game
                                  ByVal varPing As Int32,
                                  ByVal varUsername As String,
                                  ByVal varText As String)
-            Initialize(varEventId, varFlags, varPing, varUsername, Encoding.UTF8.GetBytes(varText))
+            Initialize(varEventId, varFlags, varPing, varUsername, ProfanityFilter.FilterMessage(varText)) 'Encoding.UTF8.GetBytes(varText))
         End Sub
 
         Public Function ToByteArray(ByVal varProtocolType As ProtocolType.Types) As Byte()
