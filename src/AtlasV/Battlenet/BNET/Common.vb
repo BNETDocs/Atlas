@@ -39,6 +39,10 @@ Namespace AtlasV.Battlenet
         Public Shared ActiveClientStates As List(Of ClientState)
         Public Shared ActiveGameAds As ConcurrentDictionary(Of Byte(), GameAd)
         Public Shared ActiveGameStates As Dictionary(Of String, GameState)
+
+        'ChatFilter
+        Public Shared ActiveChatFilter As ConcurrentDictionary(Of Byte(), GameAd)
+
         Public Shared Property DefaultAddress As IPAddress
         Public Shared Property DefaultPort As Integer
         Public Shared Property Listener As ServerSocket
@@ -92,6 +96,7 @@ Namespace AtlasV.Battlenet
             ActiveGameAds = New ConcurrentDictionary(Of Byte(), GameAd)()
             ActiveGameStates = New Dictionary(Of String, GameState)(StringComparer.OrdinalIgnoreCase)
             InitializeAds()
+            ProfanityFilter.Initialize()
             DefaultAddress = IPAddress.Any
             DefaultPort = 6112
             InitializeListener()
