@@ -113,7 +113,7 @@ namespace Atlasd.Battlenet.Protocols.Game
 
                 return finalArray;
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
                 throw new ArgumentException(KEY_VALUE_LENGTH_ARGUMENTEXCEPTION);
             }
