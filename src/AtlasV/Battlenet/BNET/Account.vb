@@ -1,4 +1,4 @@
-﻿Imports AtlasV.Daemon
+Imports AtlasV.Daemon
 Imports System
 Imports System.Collections.Generic
 Imports System.Net
@@ -101,12 +101,10 @@ Namespace AtlasV.Battlenet
                         Exit For
                     End If
                 Next
+                If value Is Nothing Then Return False
+                Return True
             End SyncLock
 
-            If value Is Nothing Then
-                Return False
-            End If
-            Return True
         End Function
 
         'VB VooDoo
@@ -143,7 +141,7 @@ Namespace AtlasV.Battlenet
 
         Public Shared Function TryCreate(ByVal varUsername As String, ByVal varPasswordHash As Byte(), <Out> ByRef varAccount As Account) As CreateStatus
             varAccount = Nothing
-            Dim accountJson = Nothing
+            Dim accountJson As JsonElement = Nothing
             Settings.State.RootElement.TryGetProperty("account", accountJson)
             Dim autoAdminJson = Nothing
             accountJson.TryGetProperty("auto_admin", autoAdminJson)
@@ -241,8 +239,16 @@ Namespace AtlasV.Battlenet
                 Return CreateStatus.UsernameShortAlphanumeric
             End If
 
-            For Each word In bannedWords.EnumerateArray()
+            'This is not here to destroy your current "BannedWords" there is an actual banned word list for
+            'accounts, also titles but that one was characters only. So pulled out the curse words that
+            'exist in the profanity listing, since this takes care of those words as well as the main missing 
+            'profane words.
+            If AtlasV.Battlenet.Protocols.Game.ProfanityFilter.ContainsProfane(varUsername) Then
+                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{varUsername}] contains Profanity.")
+                Return CreateStatus.UsernameBannedWord
+            End If
 
+            For Each word In bannedWords.EnumerateArray()
                 If varUsername.ToLower().Contains(word.GetString().ToLower()) Then
                     Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{varUsername}] contains a banned word or phrase")
                     Return CreateStatus.UsernameBannedWord
