@@ -1,4 +1,4 @@
-﻿Imports AtlasV.Daemon
+Imports AtlasV.Daemon
 Imports System
 Imports System.Collections.Generic
 Imports System.IO
@@ -67,8 +67,6 @@ Namespace AtlasV.Battlenet.Protocols.Game
 
                     If (Not String.IsNullOrEmpty(locKey)) AndAlso
                             (Not String.IsNullOrEmpty(locValue)) AndAlso
-                            locKey.Length > 0 AndAlso
-                            locValue.Length > 0 AndAlso
                             locKey.Length = locValue.Length Then
 
                         Dim locProfane = New ProfanityFilterKeySet(locKey, Encoding.UTF8.GetBytes(locValue))
