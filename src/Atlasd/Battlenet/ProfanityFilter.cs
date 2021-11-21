@@ -108,6 +108,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                     int locIndex = -1;
                     foreach (var SetOfKeys in ChatFilterListing)
                     {
+                        locIndex = lowerString.IndexOf(SetOfKeys.Key);
                         if (locIndex >= 0)
                             return true;
                     }
