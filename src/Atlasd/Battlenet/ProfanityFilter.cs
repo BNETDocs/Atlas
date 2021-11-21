@@ -89,6 +89,37 @@ namespace Atlasd.Battlenet.Protocols.Game
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Config, $"Initialized {ChatFilterListing.Count} Profanity Filter Keys.");
         }
 
+        public static bool ContainsProfane(byte[] varString)
+        {
+            return ContainsProfane(Encoding.UTF8.GetString(varString));
+        }
+
+        public static bool ContainsProfane(string varString)
+        {
+            try
+            {
+                // If the profanity isnt set up just return false
+                if (!ActiveFilterList || ChatFilterListing == null)
+                    return false;
+                string lowerString = varString.ToLower();
+
+                lock (LockObject)
+                {
+                    int locIndex = -1;
+                    foreach (var SetOfKeys in ChatFilterListing)
+                    {
+                        if (locIndex >= 0)
+                            return true;
+                    }
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex.InnerException);
+            }
+        }
+
         public static byte[] FilterMessage(byte[] varByteArray)
         {
             try
@@ -124,8 +155,8 @@ namespace Atlasd.Battlenet.Protocols.Game
         }
 
         /// <summary>
-        ///         ''' Just a manual disposal of our static list nothing big.
-        ///         ''' </summary>
+        /// Just a manual disposal of our static list nothing big.
+        /// </summary>
         public static void Dispose()
         {
             if (ChatFilterListing != null)
