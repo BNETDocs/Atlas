@@ -83,6 +83,32 @@ Namespace AtlasV.Battlenet.Protocols.Game
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Config, $"Initialized {ChatFilterListing.Count} Profanity Filter Keys.")
         End Sub
 
+        Public Shared Function ContainsProfane(varString() As Byte) As Boolean
+            Return ContainsProfane(Encoding.UTF8.GetString(varString))
+        End Function
+
+        Public Shared Function ContainsProfane(varString As String) As Boolean
+            Try
+                'If the profanity isnt set up just return false
+                If Not ActiveFilterList OrElse ChatFilterListing Is Nothing Then Return False
+                Dim lowerString As String = varString.ToLower()
+
+                SyncLock LockObject
+                    Dim locIndex As Integer = -1
+                    For Each SetOfKeys In ChatFilterListing
+                        locIndex = lowerString.IndexOf(SetOfKeys.Key)
+                        If locIndex >= 0 Then
+                            Return True
+                        End If
+                    Next
+                    Return False
+                End SyncLock
+
+            Catch ex As Exception
+                Throw New Exception(ex.Message, ex.InnerException)
+            End Try
+        End Function
+
         Public Shared Function FilterMessage(varByteArray() As Byte) As Byte()
             Try
                 If Not ActiveFilterList Then Return varByteArray
@@ -98,9 +124,9 @@ Namespace AtlasV.Battlenet.Protocols.Game
                             Array.Copy(SetOfKeys.Value, 0, finalArray, locIndex, SetOfKeys.Value.Length)
                         End If
                     Next
+                    Return finalArray
                 End SyncLock
 
-                Return finalArray
             Catch ex As ArgumentException
                 Throw New ArgumentException(KEY_VALUE_LENGTH_ARGUMENTEXCEPTION)
             End Try
