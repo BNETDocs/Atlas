@@ -76,7 +76,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                     locKey = locKeyJson.GetString().ToLower();
                     locValue = locValueJson.GetString().ToLower();
 
-                    if ((!string.IsNullOrEmpty(locKey)) && (!string.IsNullOrEmpty(locValue)) && locKey.Length > 0 && locValue.Length > 0 && locKey.Length == locValue.Length)
+                    if ((!string.IsNullOrEmpty(locKey)) && (!string.IsNullOrEmpty(locValue)) && locKey.Length == locValue.Length)
                     {
                         var locProfane = new ProfanityFilterKeySet(locKey, Encoding.UTF8.GetBytes(locValue));
                         lock (LockObject)
