@@ -129,9 +129,7 @@ Namespace AtlasV.Battlenet.Protocols.Game
             End If
 
             If OnlineName IsNot Nothing Then
-
                 SyncLock Battlenet.Common.ActiveGameStates
-
                     If Battlenet.Common.ActiveGameStates.ContainsKey(OnlineName) Then
                         Battlenet.Common.ActiveGameStates.Remove(OnlineName)
                     End If
@@ -147,7 +145,9 @@ Namespace AtlasV.Battlenet.Protocols.Game
                     timeLogged += CUInt(Math.Round(diff.TotalSeconds))
                     ActiveAccount.[Set](Account.TimeLoggedKey, timeLogged)
                     Dim username = CStr(ActiveAccount.[Get](Account.UsernameKey))
-                    If Battlenet.Common.ActiveAccounts.ContainsKey(username) Then Battlenet.Common.ActiveAccounts.Remove(username)
+                    If Battlenet.Common.ActiveAccounts.ContainsKey(OnlineName.ToLower()) Then
+                        Battlenet.Common.ActiveAccounts.Remove(OnlineName.ToLower())
+                    End If
                 End SyncLock
             End If
 

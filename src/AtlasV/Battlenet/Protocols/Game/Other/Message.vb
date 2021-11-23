@@ -95,7 +95,17 @@ Namespace AtlasV.Battlenet.Protocols.Game
                 System.Buffer.BlockCopy(Buffer, 0, rereBuffer, 4, Buffer.Length)
                 Return rereBuffer
             ElseIf varProtocolType.IsChat() Then
-                Return Encoding.UTF8.GetBytes($"{2000 + Id} {MessageName(Id).Replace("SID_", "")}{Battlenet.Common.NewLine}")
+                Select Case Id
+                    Case MessageIds.SID_NULL, MessageIds.SID_PING
+                        'NULL was used on both ends until closer to the end it was left optional to
+                        'the client, PING was never a thing but you have an oportunity to add this
+                        'for newer bots I would suggest as such:
+                        '   $"{2000 + Id} {MessageName(Id).Replace("SID_", "")} {((int)PingValue).ToString()}{Battlenet.Common.NewLine}"
+                        '       also would suggest not making it manditory to reply to for old compatability since they'll ignore the message.
+                        Return Encoding.UTF8.GetBytes($"{2000 + Id} {MessageName(Id).Replace("SID_", "")}{Battlenet.Common.NewLine}")
+                    Case Else
+                        Return Buffer 'Encoding.UTF8.GetBytes($"{1000 + Id} {MessageName(Id).Replace("SID_", "")}{Battlenet.Common.NewLine}")
+                End Select
             Else
                 Throw New NotSupportedException()
             End If
