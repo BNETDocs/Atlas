@@ -88,7 +88,7 @@ Namespace AtlasV.Battlenet.Protocols.Game.ChatCommands
 
             SyncLock Battlenet.Common.ActiveGameStates
                 Battlenet.Common.ActiveGameStates.Remove(oldOnlineName.ToLower())
-                Battlenet.Common.ActiveGameStates.Add(target.OnlineName, target)
+                Battlenet.Common.ActiveGameStates.Add(target.OnlineName.ToLower(), target)
             End SyncLock
 
             '// send a New SID_ENTERCHAT to target
