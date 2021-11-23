@@ -130,8 +130,8 @@ Namespace AtlasV.Battlenet.Protocols.Game
 
             If OnlineName IsNot Nothing Then
                 SyncLock Battlenet.Common.ActiveGameStates
-                    If Battlenet.Common.ActiveGameStates.ContainsKey(OnlineName) Then
-                        Battlenet.Common.ActiveGameStates.Remove(OnlineName)
+                    If Battlenet.Common.ActiveGameStates.ContainsKey(OnlineName.ToLower()) Then
+                        Battlenet.Common.ActiveGameStates.Remove(OnlineName.ToLower())
                     End If
                 End SyncLock
             End If
