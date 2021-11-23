@@ -86,9 +86,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
                 lock (target.ActiveAccount)
                 {
-                    Battlenet.Common.ActiveAccounts.Remove(oldOnlineName);
+                    Battlenet.Common.ActiveAccounts.Remove(oldOnlineName.ToLower());
                     target.OnlineName = onlineName;
-                    Battlenet.Common.ActiveAccounts.Add(onlineName, target.ActiveAccount);
+                    Battlenet.Common.ActiveAccounts.Add(onlineName.ToLower(), target.ActiveAccount);
                 }
             }
 
