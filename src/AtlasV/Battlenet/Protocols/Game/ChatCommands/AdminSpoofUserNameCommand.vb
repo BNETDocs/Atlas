@@ -75,19 +75,19 @@ Namespace AtlasV.Battlenet.Protocols.Game.ChatCommands
 
                 Dim onlineName = If(serial = 1, searchName, $"{searchName}#{serial}")
 
-                While Battlenet.Common.ActiveAccounts.ContainsKey(onlineName)
+                While Battlenet.Common.ActiveAccounts.ContainsKey(onlineName.ToLower())
                     onlineName = $"{searchName}#{System.Threading.Interlocked.Increment(serial)}"
                 End While
 
                 SyncLock target.ActiveAccount
-                    Battlenet.Common.ActiveAccounts.Remove(oldOnlineName)
+                    Battlenet.Common.ActiveAccounts.Remove(oldOnlineName.ToLower())
                     target.OnlineName = onlineName
-                    Battlenet.Common.ActiveAccounts.Add(onlineName, target.ActiveAccount)
+                    Battlenet.Common.ActiveAccounts.Add(onlineName.ToLower(), target.ActiveAccount)
                 End SyncLock
             End SyncLock
 
             SyncLock Battlenet.Common.ActiveGameStates
-                Battlenet.Common.ActiveGameStates.Remove(oldOnlineName)
+                Battlenet.Common.ActiveGameStates.Remove(oldOnlineName.ToLower())
                 Battlenet.Common.ActiveGameStates.Add(target.OnlineName, target)
             End SyncLock
 
