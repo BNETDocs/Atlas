@@ -137,9 +137,9 @@ namespace Atlasd.Battlenet.Protocols.Game
             {
                 lock (Battlenet.Common.ActiveGameStates)
                 {
-                    if (Battlenet.Common.ActiveGameStates.ContainsKey(OnlineName))
+                    if (Battlenet.Common.ActiveGameStates.ContainsKey(OnlineName.ToLower()))
                     {
-                        Battlenet.Common.ActiveGameStates.Remove(OnlineName);
+                        Battlenet.Common.ActiveGameStates.Remove(OnlineName.ToLower());
                     }
                 }
             }
