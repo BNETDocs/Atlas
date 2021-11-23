@@ -87,12 +87,12 @@ Namespace AtlasV.Battlenet.Protocols.Game.Messages
                         Dim serial = 1
                         Dim onlineName = varContext.Client.GameState.Username
 
-                        While Battlenet.Common.ActiveAccounts.ContainsKey(onlineName)
+                        While Battlenet.Common.ActiveAccounts.ContainsKey(onlineName.ToLower())
                             onlineName = $"{varContext.Client.GameState.Username}#{System.Threading.Interlocked.Increment(serial)}"
                         End While
 
                         varContext.Client.GameState.OnlineName = onlineName
-                        Battlenet.Common.ActiveAccounts.Add(onlineName, rereAccount)
+                        Battlenet.Common.ActiveAccounts.Add(onlineName.ToLower(), rereAccount)
                     End SyncLock
 
                     varContext.Client.GameState.Username = CStr(rereAccount.[Get](Account.UsernameKey, varContext.Client.GameState.Username))
