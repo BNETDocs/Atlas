@@ -1,4 +1,4 @@
-using Atlasd.Battlenet.Exceptions;
+﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Battlenet.Protocols.BNFTP;
 using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Battlenet.Protocols.Game.Messages;
@@ -437,7 +437,7 @@ namespace Atlasd.Battlenet
                     GameState.Username = System.Convert.ToString(varAccount.Get(Account.UsernameKey, GameState.Username));
 
                     lock (Common.ActiveGameStates)
-                        Common.ActiveGameStates.Add(GameState.OnlineName, GameState);
+                        Common.ActiveGameStates.Add(GameState.OnlineName.ToLower(), GameState);
 
                     Send(Encoding.UTF8.GetBytes($"Connection from [{RemoteEndPoint}]{Common.NewLine}"));
                     GameState.GenerateStatstring();
