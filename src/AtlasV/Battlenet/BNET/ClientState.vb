@@ -388,7 +388,7 @@ Namespace AtlasV.Battlenet
                     GameState.Username = CStr(varAccount.[Get](Account.UsernameKey, GameState.Username))
 
                     SyncLock Common.ActiveGameStates
-                        Common.ActiveGameStates.Add(GameState.OnlineName, GameState)
+                        Common.ActiveGameStates.Add(GameState.OnlineName.ToLower(), GameState)
                     End SyncLock
 
                     Send(Encoding.UTF8.GetBytes($"Connection from [{RemoteEndPoint}]{Common.NewLine}"))
