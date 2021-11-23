@@ -1,4 +1,4 @@
-﻿using Atlasd.Battlenet.Exceptions;
+using Atlasd.Battlenet.Exceptions;
 using Atlasd.Battlenet.Protocols.BNFTP;
 using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Battlenet.Protocols.Game.Messages;
