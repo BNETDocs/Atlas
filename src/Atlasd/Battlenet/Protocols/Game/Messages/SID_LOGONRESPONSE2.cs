@@ -100,7 +100,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             }
 
                             context.Client.GameState.OnlineName = onlineName;
-                            Battlenet.Common.ActiveAccounts.Add(onlineName, account);
+                            Battlenet.Common.ActiveAccounts.Add(onlineName.ToLower(), account);
                         }
 
                         context.Client.GameState.Username = (string)account.Get(Account.UsernameKey, context.Client.GameState.Username);
