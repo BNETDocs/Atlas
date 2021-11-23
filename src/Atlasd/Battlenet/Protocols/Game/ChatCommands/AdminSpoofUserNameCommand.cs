@@ -95,8 +95,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             // re-key target in active states
             lock (Battlenet.Common.ActiveGameStates)
             {
-                Battlenet.Common.ActiveGameStates.Remove(oldOnlineName);
-                Battlenet.Common.ActiveGameStates.Add(target.OnlineName, target);
+                Battlenet.Common.ActiveGameStates.Remove(oldOnlineName.ToLower());
+                Battlenet.Common.ActiveGameStates.Add(target.OnlineName.ToLower(), target);
             }
 
             // send a new SID_ENTERCHAT to target
