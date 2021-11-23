@@ -96,7 +96,7 @@ Namespace AtlasV.Battlenet.Protocols.Game.Messages
                     context.Client.GameState.Username = CStr(rereAccount.[Get](Account.UsernameKey, context.Client.GameState.Username))
 
                     SyncLock Battlenet.Common.ActiveGameStates
-                        Battlenet.Common.ActiveGameStates.Add(context.Client.GameState.OnlineName, context.Client.GameState)
+                        Battlenet.Common.ActiveGameStates.Add(context.Client.GameState.OnlineName.ToLower(), context.Client.GameState)
                     End SyncLock
 
                     Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Account [{context.Client.GameState.Username}] logon success as [{context.Client.GameState.OnlineName}]")
