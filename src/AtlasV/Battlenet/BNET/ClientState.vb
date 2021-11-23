@@ -240,118 +240,200 @@ Namespace AtlasV.Battlenet
                 Return
             End Try
 
-            If Not text.Contains(Common.NewLine) Then
-                Return
-            End If
+            'Fill the lineBuffer
+            Dim indexCr, indexLf, indexCount, currentPos As Integer
+            Dim CurrentLine As String
+            While text.Contains(Convert.ToChar(13)) OrElse text.Contains(Convert.ToChar(10))
+                'Topaz uses carriagereturn's (cr x3 x4 name cr pass cr [data cr])
+                'UltimateBot (crlf, x3 x4 crlf name crlf pass crlf [data crlf])
+                'MiniChat (x3 x4 crlf name crlf pass crlf [data crlf])
+                '
+                '   there was a few that used a similar data set to topaz where it wasent cr's but was lf's
+                '   and there is likely one's that used a mix of both.
+                '   pretty sure there was a login in the form of (x3 name crlf x4 pass crlf) aswell
+                '
 
-            Dim pos = text.IndexOf(Common.NewLine)
-            'ReceiveBuffer = ReceiveBuffer((pos + 2)..)
-            ReceiveBuffer = ReceiveBuffer.Skip((pos + 2)).ToArray()
+#Region " Gather the index location and the length of the delimiter "
+                'need to check for mixing
+                indexCr = text.IndexOf(Convert.ToChar(13)) 'since vbLf is busted vbCr probably isnt far behind that.
+                indexLf = text.IndexOf(Convert.ToChar(10)) 'apparently vbLf is busted, but thats ok
 
-            Dim line = text.Substring(0, pos)
-
-            If GameState.ActiveAccount Is Nothing AndAlso String.IsNullOrEmpty(GameState.Username) AndAlso String.IsNullOrEmpty(line) Then
-                Send(Encoding.UTF8.GetBytes($"Enter your login name and password.{Common.NewLine}"))
-                GameState.Username = line
-                Send(Encoding.UTF8.GetBytes($"Username: "))
-                Return
-            End If
-
-            If GameState.ActiveAccount Is Nothing AndAlso String.IsNullOrEmpty(GameState.Username) Then
-                GameState.Username = line
-                Send(Encoding.UTF8.GetBytes($"Password: \x01"))
-                Return
-            End If
-
-            Dim account As Account = Nothing
-
-            If GameState.ActiveAccount Is Nothing Then
-                Dim inPasswordHash = MBNCSUtil.XSha1.CalculateHash(Encoding.UTF8.GetBytes(line))
-                Common.AccountsDb.TryGetValue(GameState.Username, account)
-
-                If account Is Nothing Then
-                    GameState.Username = Nothing
-                    Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"))
-                    Return
-                End If
-
-                Dim dbPasswordHash = CType(account.[Get](Account.PasswordKey, New Byte(19) {},), Byte())
-
-                If Not inPasswordHash.SequenceEqual(dbPasswordHash) Then
-                    GameState.Username = Nothing
-                    Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"))
-                    Return
-                End If
-
-                Dim flags = CType(account.[Get](Account.FlagsKey, Account.Flags.None,), Account.Flags)
-
-                If (flags And Account.Flags.Closed) <> 0 Then
-                    GameState.Username = Nothing
-                    Send(Encoding.UTF8.GetBytes($"Account closed.{Common.NewLine}"))
-                    Return
-                End If
-
-                GameState.ActiveAccount = account
-                GameState.LastLogon = CDate(account.[Get](Account.LastLogonKey, DateTime.Now,))
-                account.[Set](Account.IPAddressKey, RemoteEndPoint.ToString().Split(":")(0))
-                account.[Set](Account.LastLogonKey, DateTime.Now)
-                account.[Set](Account.PortKey, RemoteEndPoint.ToString().Split(":")(1))
-
-                SyncLock Common.ActiveAccounts
-                    Dim serial = 1
-                    Dim onlineName = GameState.Username
-
-                    While Common.ActiveAccounts.ContainsKey(onlineName)
-                        onlineName = $"{GameState.Username}#{System.Threading.Interlocked.Increment(serial)}"
-                    End While
-
-                    GameState.OnlineName = onlineName
-                    Common.ActiveAccounts.Add(onlineName, account)
-                End SyncLock
-
-                GameState.Username = CStr(account.[Get](Account.UsernameKey, GameState.Username))
-
-                SyncLock Common.ActiveGameStates
-                    Common.ActiveGameStates.Add(GameState.OnlineName, GameState)
-                End SyncLock
-
-                Send(Encoding.UTF8.GetBytes($"Connection from [{RemoteEndPoint}]{Common.NewLine}"))
-
-                Using m1 = New MemoryStream(128)
-                    Using w1 = New BinaryWriter(m1)
-                        If True Then
-                            w1.Write(GameState.OnlineName)
-                            w1.Write(GameState.Statstring)
-                            Call New SID_ENTERCHAT(m1.ToArray()).Invoke(New MessageContext(Me, Protocols.MessageDirection.ClientToServer))
+                If indexCr > -1 AndAlso indexLf > -1 Then
+                    'Are they side by side
+                    If indexCr < indexLf Then
+                        If (indexLf - indexCr) = 1 Then
+                            'theyre side by side
+                            indexCount = 2
+                        Else
+                            'theyre not side by side
+                            indexCount = 1
                         End If
-                    End Using
-                End Using
-
-                Using m2 = New MemoryStream(128)
-                    Using w2 = New BinaryWriter(m2)
-                        If True Then
-                            w2.Write(CUInt(SID_JOINCHANNEL.Flags.First))
-                            w2.Write(Product.ProductChannelName(GameState.Product))
-                            Call New SID_JOINCHANNEL(m2.ToArray()).Invoke(New MessageContext(Me, Protocols.MessageDirection.ClientToServer))
+                        currentPos = indexCr
+                    Else 'indexCr > indexLf
+                        If (indexCr - indexLf) = 1 Then
+                            'theyre side by side
+                            indexCount = 2
+                        Else
+                            'theyre not side by side
+                            indexCount = 1
                         End If
-                    End Using
-                End Using
-            End If
-
-            If Not text.Contains(Common.NewLine) Then
-                Return
-            End If
-
-            If String.IsNullOrEmpty(line) Then Return
-
-            Using m3 = New MemoryStream(1 + Encoding.UTF8.GetByteCount(line))
-                Using w3 = New BinaryWriter(m3)
-                    If True Then
-                        w3.Write(line)
-                        Call New SID_CHATCOMMAND(m3.ToArray()).Invoke(New MessageContext(Me, Protocols.MessageDirection.ClientToServer))
+                        currentPos = indexLf
                     End If
-                End Using
-            End Using
+                Else
+                    'There was only 1 instance of either carriagereturn or linefeed
+                    If indexCr > -1 Then
+                        currentPos = indexCr
+                    Else 'If indexLf > -1 Then [no need to test again, 1 or the other is here]
+                        currentPos = indexLf
+                    End If
+                    indexCount = 1
+                End If
+
+                ' currentPos = location of either the cr or the lf or both if side by side
+                ' indexCount = length of the delimiter if the cr and the lf are side by side then its 2 otherwise its 1
+#End Region
+                ' Text holds the pre-processed UTF8 ReceiveBuffer
+                ' ReceiveBuffer is moved to the next line
+                ReceiveBuffer = ReceiveBuffer.Skip(currentPos + indexCount).ToArray()
+                ' CurrentLine is the first line 
+                CurrentLine = text.Substring(0, currentPos)
+
+                ' was the line empty, and is there still data in the text buf
+                If CurrentLine = "" Then
+                    'move the text forward and push us back to the top of the while loop
+                    text = text.Substring(currentPos + indexCount)
+                    If text = "" Then
+                        'This was required for UB 4.13
+                        Send(Encoding.UTF8.GetBytes($"Enter your Account name: {Common.NewLine}"))
+                    End If
+                    Continue While
+                End If
+
+                ' if GameState.ActiveAccount is nothing then the login process hasent completed yet
+                If GameState.ActiveAccount Is Nothing Then
+#Region " Telnet Chat Initial Data Flow "
+                    ' text holds the current line of data first order of buisness we are looking for
+                    ' 0x3 and 0x4, since the login could have come from Topaz or UltimateBot
+                    If CurrentLine(0) = Convert.ToChar(&H3) Then
+                        CurrentLine = CurrentLine.Substring(1)
+                    End If
+                    ' Because the line may actually be empty check the length aswell, we will get this
+                    ' on the next pass. the above we know for sure is not empty.
+                    If CurrentLine.Length >= 1 AndAlso CurrentLine(0) = Convert.ToChar(&H4) Then
+                        CurrentLine = CurrentLine.Substring(1)
+                        ' 
+                        Send(Encoding.UTF8.GetBytes($"Enter your Account name: {Common.NewLine}"))
+                    End If
+                    ' At this point the CurrentLine could be empty again, if it is push the text forward again
+                    If CurrentLine = "" Then 'we had x3 crlf or we had x4 crlf
+                        'move the text forward and push us back to the top of the while loop
+                        text = text.Substring(currentPos + indexCount)
+                        Continue While
+                    End If
+
+                    ' Second order of work we're looking for the UserName
+                    If String.IsNullOrEmpty(GameState.Username) Then
+                        Send(Encoding.UTF8.GetBytes($"Username: {CurrentLine}{Common.NewLine}"))
+                        GameState.Username = CurrentLine
+                        Send(Encoding.UTF8.GetBytes($"Enter your Account pass: {Common.NewLine}"))
+                        text = text.Substring(currentPos + indexCount)
+                        Continue While
+                    End If
+
+                    ' Third we are looking for the Password to process the account forward
+                    Dim varAccount As Account = Nothing
+                    Dim inPasswordHash = MBNCSUtil.XSha1.CalculateHash(Encoding.UTF8.GetBytes(CurrentLine))
+                    Common.AccountsDb.TryGetValue(GameState.Username, varAccount)
+
+                    If varAccount Is Nothing Then
+                        GameState.Username = Nothing
+                        Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"))
+                        Return
+                    End If
+
+                    Dim dbPasswordHash = CType(varAccount.[Get](Account.PasswordKey, New Byte(19) {},), Byte())
+
+                    If Not inPasswordHash.SequenceEqual(dbPasswordHash) Then
+                        GameState.Username = Nothing
+                        Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"))
+                        Return
+                    End If
+
+                    Dim flags = CType(varAccount.[Get](Account.FlagsKey, Account.Flags.None,), Account.Flags)
+
+                    If (flags And Account.Flags.Closed) <> 0 Then
+                        GameState.Username = Nothing
+                        Send(Encoding.UTF8.GetBytes($"Account closed.{Common.NewLine}"))
+                        Return
+                    End If
+
+                    GameState.ActiveAccount = varAccount
+                    GameState.LastLogon = CDate(varAccount.[Get](Account.LastLogonKey, DateTime.Now,))
+                    varAccount.[Set](Account.IPAddressKey, RemoteEndPoint.ToString().Split(":")(0))
+                    varAccount.[Set](Account.LastLogonKey, DateTime.Now)
+                    varAccount.[Set](Account.PortKey, RemoteEndPoint.ToString().Split(":")(1))
+
+                    SyncLock Common.ActiveAccounts
+                        Dim locSerial = 1
+                        Dim locOnlineName = GameState.Username
+
+                        While Common.ActiveAccounts.ContainsKey(locOnlineName.ToLower())
+                            locOnlineName = $"{GameState.Username}#{System.Threading.Interlocked.Increment(locSerial)}"
+                        End While
+
+                        GameState.OnlineName = locOnlineName
+                        Common.ActiveAccounts.Add(locOnlineName.ToLower(), varAccount)
+                    End SyncLock
+
+                    GameState.Username = CStr(varAccount.[Get](Account.UsernameKey, GameState.Username))
+
+                    SyncLock Common.ActiveGameStates
+                        Common.ActiveGameStates.Add(GameState.OnlineName, GameState)
+                    End SyncLock
+
+                    Send(Encoding.UTF8.GetBytes($"Connection from [{RemoteEndPoint}]{Common.NewLine}"))
+                    GameState.GenerateStatstring()
+
+                    ' [Telnet SID_ENTERCHAT] = "2010 NAME {GameState.OnlineName}{Common.NewLine}"
+                    Send(Encoding.UTF8.GetBytes($"2010 NAME {GameState.OnlineName}{Common.NewLine}"))
+
+                    Using m2 = New MemoryStream(128)
+                        Using w2 = New BinaryWriter(m2)
+                            If True Then
+                                w2.Write(CUInt(SID_JOINCHANNEL.Flags.First))
+                                w2.Write(Product.ProductChannelName(GameState.Product))
+                                Call New SID_JOINCHANNEL(m2.ToArray()).Invoke(New MessageContext(Me, Protocols.MessageDirection.ClientToServer))
+                            End If
+                        End Using
+                    End Using
+
+
+                    ' At this point the CurrentLine could be empty again, if it is push the text forward again
+                    text = text.Substring(currentPos + indexCount)
+                    Continue While
+
+#End Region
+                Else 'login has completed they now have the ability to send regular data
+#Region " Telnet Live Messaging "
+                    If Not String.IsNullOrEmpty(CurrentLine) Then
+                        Using m3 = New MemoryStream(1 + Encoding.UTF8.GetByteCount(CurrentLine))
+                            Using w3 = New BinaryWriter(m3)
+                                If True Then
+                                    w3.Write(CurrentLine)
+                                    Call New SID_CHATCOMMAND(m3.ToArray()).Invoke(New MessageContext(Me, Protocols.MessageDirection.ClientToServer))
+                                End If
+                            End Using
+                        End Using
+                    End If
+
+
+                    ' At this point the CurrentLine could be empty again, if it is push the text forward again
+                    text = text.Substring(currentPos + indexCount)
+                    Continue While
+#End Region
+                End If
+
+            End While
         End Sub
 
         Protected Sub ReceiveProtocolGame(ByVal e As SocketAsyncEventArgs)
