@@ -107,7 +107,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         lock (Battlenet.Common.ActiveGameStates)
                         {
-                            Battlenet.Common.ActiveGameStates.Add(context.Client.GameState.OnlineName, context.Client.GameState);
+                            Battlenet.Common.ActiveGameStates.Add(context.Client.GameState.OnlineName.ToLower(), context.Client.GameState);
                         }
 
                         Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Account [{context.Client.GameState.Username}] logon success as [{context.Client.GameState.OnlineName}]");
