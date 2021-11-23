@@ -134,42 +134,48 @@ Namespace AtlasV.Battlenet.Protocols.Game
                     Return buf
                 Case ProtocolType.Types.Chat, ProtocolType.Types.Chat_Alt1, ProtocolType.Types.Chat_Alt2
                     Dim buf = $"{1000 + EventId} "
-                    Dim product = New Byte(3) {}
-                    Buffer.BlockCopy(Text, 0, product, 0, Math.Min(4, Text.Length))
-
+                    Dim varProduct = New Byte(3) {}
+                    Buffer.BlockCopy(Text, 0, varProduct, 0, Math.Min(4, Text.Length))
+                    ' Telnet has these in the opposite direction, good attempt though you get an A for effort.
+                    If varProduct(0) <> &H0 Then
+                        Array.Reverse(varProduct, 0, varProduct.Length)
+                    End If
+                    ' Opportunities to be had here
+                    '      Flags can be set as a straight up integer as that Is how the bots are reading it.
+                    '      Extra data can be applied after the string
                     Select Case EventId
                         Case EventIds.EID_USERSHOW, EventIds.EID_USERUPDATE
-                            buf += $"USER {Username} {Flags} [{product}]"
+                            buf += $"USER {Username} {Flags} [{Encoding.UTF8.GetString(varProduct)}]"
                             Exit Select
                         Case EventIds.EID_USERJOIN
-                            buf += $"JOIN {Username} {Flags} [{product}]"
+                            buf += $"JOIN {Username} {Flags} [{Encoding.UTF8.GetString(varProduct)}]"
                             Exit Select
                         Case EventIds.EID_USERLEAVE
                             buf += $"LEAVE {Username} {Flags}"
                             Exit Select
                         Case EventIds.EID_WHISPERFROM, EventIds.EID_WHISPERTO
-                            buf += $"WHISPER {Username} {Flags} ""{Text}"""
+                            buf += $"WHISPER {Username} {Flags} ""{Encoding.UTF8.GetString(Text)}"""
                             Exit Select
                         Case EventIds.EID_TALK
-                            buf += $"TALK {Username} {Flags} ""{Text}"""
+                            buf += $"TALK {Username} {Flags} ""{Encoding.UTF8.GetString(Text)}"""
                             Exit Select
                         Case EventIds.EID_BROADCAST
-                            buf += $"BROADCAST ""{Text}"""
+                            buf += $"BROADCAST ""{Encoding.UTF8.GetString(Text)}"""
                             Exit Select
                         Case EventIds.EID_CHANNELJOIN
-                            buf += $"CHANNEL ""{Text}"""
+                            buf += $"CHANNEL ""{Encoding.UTF8.GetString(Text)}"""
                             Exit Select
                         Case EventIds.EID_INFO
-                            buf += $"INFO ""{Text}"""
+                            buf += $"INFO ""{Encoding.UTF8.GetString(Text)}"""
                             Exit Select
                         Case EventIds.EID_ERROR
-                            buf += $"ERROR ""{Text}"""
+                            buf += $"ERROR ""{Encoding.UTF8.GetString(Text)}"""
                             Exit Select
                         Case EventIds.EID_EMOTE
-                            buf += $"EMOTE {Username} {Flags} ""{Text}"""
+                            buf += $"EMOTE {Username} {Flags} ""{Encoding.UTF8.GetString(Text)}"""
                             Exit Select
                         Case Else
-                            buf += $"UNKNOWN {Username} {Flags} ""{Text}"""
+                            buf += $"UNKNOWN {Username} {Flags} ""{Encoding.UTF8.GetString(Text)}"""
                             Exit Select
                     End Select
 
