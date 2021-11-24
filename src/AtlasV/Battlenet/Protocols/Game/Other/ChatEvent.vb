@@ -1,4 +1,4 @@
-Imports AtlasV.Battlenet.Exceptions
+﻿Imports AtlasV.Battlenet.Exceptions
 Imports AtlasV.Battlenet.Protocols.Game.Messages
 Imports AtlasV.Localization
 Imports System
@@ -144,19 +144,19 @@ Namespace AtlasV.Battlenet.Protocols.Game
                     '      Extra data can be applied after the string
                     Select Case EventId
                         Case EventIds.EID_USERSHOW, EventIds.EID_USERUPDATE
-                            buf += $"USER {Username} {Flags} [{Encoding.UTF8.GetString(varProduct)}]"
+                            buf += $"USER {Username} {Flags:X4} [{Encoding.UTF8.GetString(varProduct)}]"
                             Exit Select
                         Case EventIds.EID_USERJOIN
-                            buf += $"JOIN {Username} {Flags} [{Encoding.UTF8.GetString(varProduct)}]"
+                            buf += $"JOIN {Username} {Flags:X4} [{Encoding.UTF8.GetString(varProduct)}]"
                             Exit Select
                         Case EventIds.EID_USERLEAVE
-                            buf += $"LEAVE {Username} {Flags}"
+                            buf += $"LEAVE {Username} {Flags:X4}"
                             Exit Select
                         Case EventIds.EID_WHISPERFROM, EventIds.EID_WHISPERTO
-                            buf += $"WHISPER {Username} {Flags} ""{Encoding.UTF8.GetString(Text)}"""
+                            buf += $"WHISPER {Username} {Flags:X4} ""{Encoding.UTF8.GetString(Text)}"""
                             Exit Select
                         Case EventIds.EID_TALK
-                            buf += $"TALK {Username} {Flags} ""{Encoding.UTF8.GetString(Text)}"""
+                            buf += $"TALK {Username} {Flags:X4} ""{Encoding.UTF8.GetString(Text)}"""
                             Exit Select
                         Case EventIds.EID_BROADCAST
                             buf += $"BROADCAST ""{Encoding.UTF8.GetString(Text)}"""
@@ -171,10 +171,10 @@ Namespace AtlasV.Battlenet.Protocols.Game
                             buf += $"ERROR ""{Encoding.UTF8.GetString(Text)}"""
                             Exit Select
                         Case EventIds.EID_EMOTE
-                            buf += $"EMOTE {Username} {Flags} ""{Encoding.UTF8.GetString(Text)}"""
+                            buf += $"EMOTE {Username} {Flags:X4} ""{Encoding.UTF8.GetString(Text)}"""
                             Exit Select
                         Case Else
-                            buf += $"UNKNOWN {Username} {Flags} ""{Encoding.UTF8.GetString(Text)}"""
+                            buf += $"UNKNOWN {Username} {Flags:X4} ""{Encoding.UTF8.GetString(Text)}"""
                             Exit Select
                     End Select
 
