@@ -1,4 +1,4 @@
-﻿using Atlasd.Battlenet.Exceptions;
+using Atlasd.Battlenet.Exceptions;
 using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Localization;
 using System;
@@ -151,7 +151,6 @@ namespace Atlasd.Battlenet.Protocols.Game
                         }
 
                         // Opportunities to be had here
-                        //      Flags can be set as a straight up integer as that is how the bots are reading it.
                         //      Extra data can be applied after the string
                         switch (EventId)
                         {
