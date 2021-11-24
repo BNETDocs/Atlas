@@ -1,4 +1,4 @@
-﻿Imports AtlasV.Battlenet.Exceptions
+Imports AtlasV.Battlenet.Exceptions
 Imports AtlasV.Battlenet.Protocols.Game.Messages
 Imports AtlasV.Localization
 Imports System
@@ -141,7 +141,6 @@ Namespace AtlasV.Battlenet.Protocols.Game
                         Array.Reverse(varProduct, 0, varProduct.Length)
                     End If
                     ' Opportunities to be had here
-                    '      Flags can be set as a straight up integer as that Is how the bots are reading it.
                     '      Extra data can be applied after the string
                     Select Case EventId
                         Case EventIds.EID_USERSHOW, EventIds.EID_USERUPDATE
