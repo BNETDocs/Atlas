@@ -1,4 +1,4 @@
-﻿using Atlasd.Battlenet.Exceptions;
+using Atlasd.Battlenet.Exceptions;
 using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Localization;
 using System;
@@ -109,12 +109,12 @@ namespace Atlasd.Battlenet.Protocols.Game
             Flags = flags;
             Ping = ping;
             Username = username;
-            Text = text;
+            Text = ProfanityFilter.FilterMessage(text);
         }
 
         protected void Initialize(EventIds eventId, UInt32 flags, Int32 ping, string username, string text)
         {
-            Initialize(eventId, flags, ping, username, Encoding.UTF8.GetBytes(text));
+            Initialize(eventId, flags, ping, username, ProfanityFilter.FilterMessage(text));// Encoding.UTF8.GetBytes(text));
         }
 
         public byte[] ToByteArray(ProtocolType.Types protocolType)
@@ -145,18 +145,24 @@ namespace Atlasd.Battlenet.Protocols.Game
                         var product = new byte[4];
 
                         Buffer.BlockCopy(Text, 0, product, 0, Math.Min(4, Text.Length));
+                        // Telnet has these in the opposite direction, good attempt though you get an A for effort as well as on the return strings.
+                        if (product[0] != 0x0) {
+                            Array.Reverse(product, 0, product.Length);
+                        }
 
+                        // Opportunities to be had here
+                        //      Extra data can be applied after the string
                         switch (EventId)
                         {
                             case EventIds.EID_USERSHOW:
                             case EventIds.EID_USERUPDATE:
                                 {
-                                    buf += $"USER {Username} {Flags:X4} [{product}]";
+                                    buf += $"USER {Username} {Flags:X4} [{Encoding.UTF8.GetString(product)}]";
                                     break;
                                 }
                             case EventIds.EID_USERJOIN:
                                 {
-                                    buf += $"JOIN {Username} {Flags:X4} [{product}]";
+                                    buf += $"JOIN {Username} {Flags:X4} [{Encoding.UTF8.GetString(product)}]";
                                     break;
                                 }
                             case EventIds.EID_USERLEAVE:
@@ -167,42 +173,42 @@ namespace Atlasd.Battlenet.Protocols.Game
                             case EventIds.EID_WHISPERFROM:
                             case EventIds.EID_WHISPERTO:
                                 {
-                                    buf += $"WHISPER {Username} {Flags:X4} \"{Text}\"";
+                                    buf += $"WHISPER {Username} {Flags:X4} \"{Encoding.UTF8.GetString(Text)}\"";
                                     break;
                                 }
                             case EventIds.EID_TALK:
                                 {
-                                    buf += $"TALK {Username} {Flags:X4} \"{Text}\"";
+                                    buf += $"TALK {Username} {Flags:X4} \"{Encoding.UTF8.GetString(Text)}\"";
                                     break;
                                 }
                             case EventIds.EID_BROADCAST:
                                 {
-                                    buf += $"BROADCAST \"{Text}\"";
+                                    buf += $"BROADCAST \"{Encoding.UTF8.GetString(Text)}\"";
                                     break;
                                 }
                             case EventIds.EID_CHANNELJOIN:
                                 {
-                                    buf += $"CHANNEL \"{Text}\"";
+                                    buf += $"CHANNEL \"{Encoding.UTF8.GetString(Text)}\"";
                                     break;
                                 }
                             case EventIds.EID_INFO:
                                 {
-                                    buf += $"INFO \"{Text}\"";
+                                    buf += $"INFO \"{Encoding.UTF8.GetString(Text)}\"";
                                     break;
                                 }
                             case EventIds.EID_ERROR:
                                 {
-                                    buf += $"ERROR \"{Text}\"";
+                                    buf += $"ERROR \"{Encoding.UTF8.GetString(Text)}\"";
                                     break;
                                 }
                             case EventIds.EID_EMOTE:
                                 {
-                                    buf += $"EMOTE {Username} {Flags:X4} \"{Text}\"";
+                                    buf += $"EMOTE {Username} {Flags:X4} \"{Encoding.UTF8.GetString(Text)}\"";
                                     break;
                                 }
                             default:
                                 {
-                                    buf += $"UNKNOWN {Username} {Flags:X4} \"{Text}\"";
+                                    buf += $"UNKNOWN {Username} {Flags:X4} \"{Encoding.UTF8.GetString(Text)}\"";
                                     break;
                                 }
                         }

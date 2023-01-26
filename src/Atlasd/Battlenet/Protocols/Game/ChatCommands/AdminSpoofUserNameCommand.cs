@@ -86,17 +86,17 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
                 lock (target.ActiveAccount)
                 {
-                    Battlenet.Common.ActiveAccounts.Remove(oldOnlineName);
+                    Battlenet.Common.ActiveAccounts.Remove(oldOnlineName.ToLower());
                     target.OnlineName = onlineName;
-                    Battlenet.Common.ActiveAccounts.Add(onlineName, target.ActiveAccount);
+                    Battlenet.Common.ActiveAccounts.Add(onlineName.ToLower(), target.ActiveAccount);
                 }
             }
 
             // re-key target in active states
             lock (Battlenet.Common.ActiveGameStates)
             {
-                Battlenet.Common.ActiveGameStates.Remove(oldOnlineName);
-                Battlenet.Common.ActiveGameStates.Add(target.OnlineName, target);
+                Battlenet.Common.ActiveGameStates.Remove(oldOnlineName.ToLower());
+                Battlenet.Common.ActiveGameStates.Add(target.OnlineName.ToLower(), target);
             }
 
             // send a new SID_ENTERCHAT to target

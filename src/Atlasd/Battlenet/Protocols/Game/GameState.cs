@@ -137,9 +137,9 @@ namespace Atlasd.Battlenet.Protocols.Game
             {
                 lock (Battlenet.Common.ActiveGameStates)
                 {
-                    if (Battlenet.Common.ActiveGameStates.ContainsKey(OnlineName))
+                    if (Battlenet.Common.ActiveGameStates.ContainsKey(OnlineName.ToLower()))
                     {
-                        Battlenet.Common.ActiveGameStates.Remove(OnlineName);
+                        Battlenet.Common.ActiveGameStates.Remove(OnlineName.ToLower());
                     }
                 }
             }
@@ -157,8 +157,8 @@ namespace Atlasd.Battlenet.Protocols.Game
                     ActiveAccount.Set(Account.TimeLoggedKey, timeLogged);
 
                     var username = (string)ActiveAccount.Get(Account.UsernameKey);
-                    if (Battlenet.Common.ActiveAccounts.ContainsKey(username))
-                        Battlenet.Common.ActiveAccounts.Remove(username);
+                    if (Battlenet.Common.ActiveAccounts.ContainsKey(OnlineName.ToLower()))  //this was causing duped names on the server
+                        Battlenet.Common.ActiveAccounts.Remove(OnlineName.ToLower());       //was [username], remove note later on
                 }
             }
 

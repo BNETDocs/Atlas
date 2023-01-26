@@ -1,4 +1,4 @@
-﻿using Atlasd.Daemon;
+using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -263,6 +263,16 @@ namespace Atlasd.Battlenet
             {
                 Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{username}] is too short or contains too few alphanumeric characters");
                 return CreateStatus.UsernameShortAlphanumeric;
+            }
+
+            // This is not here to destroy your current "BannedWords" there is an actual banned word list for
+            // accounts, also titles but that one was characters only. So pulled out the curse words that
+            // exist in the profanity listing, since this takes care of those words as well as the main missing 
+            // profane words.
+            if (Atlasd.Battlenet.Protocols.Game.ProfanityFilter.ContainsProfane(username))
+            {
+                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{username}] contains Profanity.");
+                return CreateStatus.UsernameBannedWord;
             }
 
             foreach (var word in bannedWords.EnumerateArray())

@@ -1,0 +1,510 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccountIsAlreadyLoggedOn" xml:space="preserve">
+    <value>That account is already logged on.</value>
+  </data>
+  <data name="AddedFriend" xml:space="preserve">
+    <value>Added {friend} to your friends list.</value>
+  </data>
+  <data name="AddFriendEmptyTarget" xml:space="preserve">
+    <value>Who do you want to add?</value>
+  </data>
+  <data name="AdminDisconnectCommand" xml:space="preserve">
+    <value>{user} was disconnected.</value>
+  </data>
+  <data name="AdminHelpCommand" xml:space="preserve">
+    <value>Admin Command List:</value>
+  </data>
+  <data name="AdminMoveUserCommand" xml:space="preserve">
+    <value>Forcefully moved {user} to the channel {channel}.</value>
+  </data>
+  <data name="AdminReloadCommandFailure" xml:space="preserve">
+    <value>An {exception} occurred while reloading the server configuration. Server stability is now at risk, notify a system administrator immediately.</value>
+  </data>
+  <data name="AdminReloadCommandSuccess" xml:space="preserve">
+    <value>The server configuration has been reloaded.</value>
+  </data>
+  <data name="AdminShutdownCommandCancelled" xml:space="preserve">
+    <value>The server shutdown was cancelled.</value>
+  </data>
+  <data name="AdminShutdownCommandNotScheduled" xml:space="preserve">
+    <value>There is no shutdown event scheduled for the server.</value>
+  </data>
+  <data name="AdminShutdownCommandParseError" xml:space="preserve">
+    <value>Unable to parse your grace period in seconds, please see https://bit.ly/34Sgl2w</value>
+  </data>
+  <data name="AdminShutdownCommandScheduled" xml:space="preserve">
+    <value>The server shutdown was scheduled.</value>
+  </data>
+  <data name="AdminSpoofUserFlagsCommand" xml:space="preserve">
+    <value>Set {user}'s active channel flags to {flags}.</value>
+  </data>
+  <data name="AdminSpoofUserFlagsCommandBadValue" xml:space="preserve">
+    <value>Unable to parse the flags into an unsigned 32-bit integer.
+Supported number prefixes:
+- Binary: 0b, 0B, &amp;b, &amp;B
+- Hex: 0x, 0X, &amp;h, &amp;H
+- Octal: 0
+- Decimal: Any whole number, not prefixed with zero (octal indication)
+Example: 0x10 = 16 decimal</value>
+  </data>
+  <data name="AdminSpoofUserGameCommand" xml:space="preserve">
+    <value>Set {user}'s game to {game}.</value>
+  </data>
+  <data name="AdminSpoofUserGameCommandBadValue" xml:space="preserve">
+    <value>Unable to parse the game value into a product.
+Examples: SEXP, pxes</value>
+  </data>
+  <data name="AdminSpoofUserNameCommand" xml:space="preserve">
+    <value>Set {name1}'s name to {name2}.</value>
+  </data>
+  <data name="AdminSpoofUserNameCommandBadValue" xml:space="preserve">
+    <value>Unacceptable new name for target.</value>
+  </data>
+  <data name="AdminSpoofUserPingCommand" xml:space="preserve">
+    <value>Set {user}'s ping to {ping}ms.</value>
+  </data>
+  <data name="AdminSpoofUserPingCommandBadValue" xml:space="preserve">
+    <value>Unable to parse the ping into an unsigned 32-bit integer.
+Supported number prefixes:
+- Binary: 0b, 0B, &amp;b, &amp;B
+- Hex: 0x, 0X, &amp;h, &amp;H
+- Octal: 0
+- Decimal: Any whole number, not prefixed with zero (octal indication)
+Example: 0x10 = 16 decimal</value>
+  </data>
+  <data name="AlreadyAddedFriend" xml:space="preserve">
+    <value>{friend} is already in your friends list.</value>
+  </data>
+  <data name="AlreadyRemovedFriend" xml:space="preserve">
+    <value>{friend} is not in your friends list.</value>
+  </data>
+  <data name="AwayCommandOff" xml:space="preserve">
+    <value>You are no longer marked as away.</value>
+  </data>
+  <data name="AwayCommandOn" xml:space="preserve">
+    <value>You are now marked as being away.</value>
+  </data>
+  <data name="AwayCommandStatus" xml:space="preserve">
+    <value>{user} is away ({awayMessage})</value>
+  </data>
+  <data name="AwayCommandStatusSelf" xml:space="preserve">
+    <value>You are away ({awayMessage})</value>
+  </data>
+  <data name="Backstage" xml:space="preserve">
+    <value>Backstage</value>
+  </data>
+  <data name="BattlenetAdministrator" xml:space="preserve">
+    <value>Battle.net administrator</value>
+  </data>
+  <data name="BattlenetRepresentative" xml:space="preserve">
+    <value>Battle.net representative</value>
+  </data>
+  <data name="BlizzardAdministrator" xml:space="preserve">
+    <value>Blizzard administrator</value>
+  </data>
+  <data name="BlizzardRepresentative" xml:space="preserve">
+    <value>Blizzard representative</value>
+  </data>
+  <data name="ChannelFirstJoinGreeting" xml:space="preserve">
+    <value>Welcome to {realm}!
+This server is hosted by {host}.
+{serverStats}</value>
+  </data>
+  <data name="ChannelIsChatRestricted" xml:space="preserve">
+    <value>This channel does not have chat privileges.</value>
+  </data>
+  <data name="ChannelIsFull" xml:space="preserve">
+    <value>That channel is full.</value>
+  </data>
+  <data name="ChannelIsNowPrivate" xml:space="preserve">
+    <value>This channel is now private, new users are rejected.</value>
+  </data>
+  <data name="ChannelIsNowPublic" xml:space="preserve">
+    <value>This channel is now public, new users are allowed.</value>
+  </data>
+  <data name="ChannelIsRestricted" xml:space="preserve">
+    <value>That channel is restricted.</value>
+  </data>
+  <data name="ChannelMaxUsersChanged" xml:space="preserve">
+    <value>The upper user limit for this channel was changed to {maxUsers}.</value>
+  </data>
+  <data name="ChannelNotFound" xml:space="preserve">
+    <value>That channel does not exist.
+(If you are trying to search for a user, use the /whois command.)</value>
+  </data>
+  <data name="ChannelTopicChanged" xml:space="preserve">
+    <value>The channel topic was changed to:</value>
+  </data>
+  <data name="ChannelWasRenamed" xml:space="preserve">
+    <value>The channel {oldName} was renamed to {newName}.</value>
+  </data>
+  <data name="CharacterNotLoggedOn" xml:space="preserve">
+    <value>That character is not logged on.  Try using *username to message a user or character@realm to message a character in a different realm.</value>
+  </data>
+  <data name="ChatCommandUnavailable" xml:space="preserve">
+    <value>That command is not available at the moment.</value>
+  </data>
+  <data name="DemotedFriend" xml:space="preserve">
+    <value>Demoted {friend} down one level in your friends list.</value>
+  </data>
+  <data name="DemoteFriendEmptyTarget" xml:space="preserve">
+    <value>Who do you want to demote?</value>
+  </data>
+  <data name="DesignateCommand" xml:space="preserve">
+    <value>{user} is your new designated heir.</value>
+  </data>
+  <data name="DisconnectedByAdmin" xml:space="preserve">
+    <value>You have been disconnected by a system administrator.</value>
+  </data>
+  <data name="DisconnectedByAdminCaption" xml:space="preserve">
+    <value>Disconnected by Admin</value>
+  </data>
+  <data name="DisconnectedByAdminWithReason" xml:space="preserve">
+    <value>You have been disconnected by a system administrator ({reason}).</value>
+  </data>
+  <data name="ErrorCaption" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="FailedLogonAttempts" xml:space="preserve">
+    <value>Failed logon attempts since then: {count}</value>
+  </data>
+  <data name="GameProductIsChatRestricted" xml:space="preserve">
+    <value>Chatting with this game is restricted to the channels listed in the channel menu.</value>
+  </data>
+  <data name="HelpCommandAdvancedRemarks" xml:space="preserve">
+    <value>Advanced chat commands:
+/ban /beep /clan /designate /friends /kick /mail
+/nobeep /options /rejoin /stats /time /unban /users
+Type  /help COMMAND  for information about a specific command.</value>
+  </data>
+  <data name="HelpCommandAliasesRemarks" xml:space="preserve">
+    <value>Command aliases:
+  /?         -- /help
+  /channel   -- /join
+  /squelch   -- /ignore
+  /whisper   -- /w /m /msg
+  /emote     -- /me
+  /rejoin    -- /resign
+  /unsquelch -- /unignore
+  /whois     -- /where /whereis
+  /friends   -- /f
+  /clan      -- /c
+Type  /help COMMAND  for information about a specific command.</value>
+  </data>
+  <data name="HelpCommandBanRemarks" xml:space="preserve">
+    <value>/ban USERNAME  (see also: /unban)
+(For channel Operators only) Bans a USERNAME from the channel, and prevents him from returning.
+Example: /ban JoeUser</value>
+  </data>
+  <data name="HelpCommandCommandsRemarks" xml:space="preserve">
+    <value>Basic chat commands:
+/away /dnd /channel /emote 
+/friends /options /squelch /unsquelch 
+/whisper /who /whoami /whois
+Type /help COMMAND for information about a specific command.</value>
+  </data>
+  <data name="HelpCommandJoinRemarks" xml:space="preserve">
+    <value>/channel CHANNEL  (alias: /join)
+Moves you to a different CHANNEL.
+Example: /channel Blizzard Tech Support</value>
+  </data>
+  <data name="HelpCommandRemarks" xml:space="preserve">
+    <value>Battle.net help topics:
+commands  aliases  advanced
+Type /help TOPIC for information about a specific topic.</value>
+  </data>
+  <data name="HelpCommandRemarksWithAdmin" xml:space="preserve">
+    <value>Battle.net help topics:
+commands  aliases  advanced
+Type /help TOPIC for information about a specific topic.
+Type /admin help for the administrator command list.</value>
+  </data>
+  <data name="HelpCommandTimeRemarks" xml:space="preserve">
+    <value>/time
+Displays the current {realm} Time ({realmTimezone}).</value>
+  </data>
+  <data name="InvalidAdminCommand" xml:space="preserve">
+    <value>That is not a valid admin command. Type /admin help or /admin ? for more info.</value>
+  </data>
+  <data name="InvalidChannelName" xml:space="preserve">
+    <value>Invalid channel name.</value>
+  </data>
+  <data name="InvalidChatCommand" xml:space="preserve">
+    <value>That is not a valid command. Type /help or /? for more info.</value>
+  </data>
+  <data name="InvalidUser" xml:space="preserve">
+    <value>Invalid user.</value>
+  </data>
+  <data name="LastLogonInfo" xml:space="preserve">
+    <value>Last logon: {timestamp}</value>
+  </data>
+  <data name="NoOneHearsYou" xml:space="preserve">
+    <value>No one hears you.</value>
+  </data>
+  <data name="PromotedFriend" xml:space="preserve">
+    <value>Promoted {friend} up one level in your friends list.</value>
+  </data>
+  <data name="PromoteFriendEmptyTarget" xml:space="preserve">
+    <value>Who do you want to promote?</value>
+  </data>
+  <data name="RemovedFriend" xml:space="preserve">
+    <value>Removed {friend} from your friends list.</value>
+  </data>
+  <data name="RemoveFriendEmptyTarget" xml:space="preserve">
+    <value>Who do you want to remove?</value>
+  </data>
+  <data name="ServerShutdownCancelled" xml:space="preserve">
+    <value>The server shutdown has been cancelled.</value>
+  </data>
+  <data name="ServerShutdownCancelledWithMessage" xml:space="preserve">
+    <value>The server shutdown has been cancelled ({message}).</value>
+  </data>
+  <data name="ServerShutdownRescheduled" xml:space="preserve">
+    <value>The server has been rescheduled for shutdown in {period}.</value>
+  </data>
+  <data name="ServerShutdownRescheduledWithMessage" xml:space="preserve">
+    <value>The server has been rescheduled for shutdown in {period} ({message}).</value>
+  </data>
+  <data name="ServerShutdownScheduled" xml:space="preserve">
+    <value>The server has been scheduled for shutdown in {period}.</value>
+  </data>
+  <data name="ServerShutdownScheduledWithMessage" xml:space="preserve">
+    <value>The server has been scheduled for shutdown in {period} ({message}).</value>
+  </data>
+  <data name="ServerStatistics" xml:space="preserve">
+    <value>There are currently {gameUsers} users playing {gameAds} games of {game}, and {totalUsers} users playing {totalGameAds} games on {realm}.</value>
+  </data>
+  <data name="TheVoid" xml:space="preserve">
+    <value>The Void</value>
+  </data>
+  <data name="TimeCommand" xml:space="preserve">
+    <value>{realm} time: {realmTime}
+Your local time: {localTime}</value>
+  </data>
+  <data name="UserBannedFromChannel" xml:space="preserve">
+    <value>{target} was banned by {source}</value>
+  </data>
+  <data name="UserBannedFromChannelWithReason" xml:space="preserve">
+    <value>{target} was banned by {source} ({reason}).</value>
+  </data>
+  <data name="UserIsAlreadyBanned" xml:space="preserve">
+    <value>{target} is already banned from the channel!</value>
+  </data>
+  <data name="UserIsNotBanned" xml:space="preserve">
+    <value>{target} is not banned from the channel</value>
+  </data>
+  <data name="UserIsUsingDiablo2InAPrivateGame" xml:space="preserve">
+    <value>{character}#{characterRealm} (*{username}) is using {game} in a private game.</value>
+  </data>
+  <data name="UserIsUsingGameInAPrivateGame" xml:space="preserve">
+    <value>{username} is using {game} in a private game.</value>
+  </data>
+  <data name="UserIsUsingGameInRealm" xml:space="preserve">
+    <value>{user} is using {game} in {realm}</value>
+  </data>
+  <data name="UserIsUsingGameInTheChannel" xml:space="preserve">
+    <value>{user} is using {game} in the channel {channel}.</value>
+  </data>
+  <data name="UserIsUsingGameInTheGame" xml:space="preserve">
+    <value>{username} is using {game} in game {gameAd}.</value>
+  </data>
+  <data name="UserIsUsingGameInThePasswordedGame" xml:space="preserve">
+    <value>{username} is using {game} in the password-protected game {gameAd}.</value>
+  </data>
+  <data name="UserKickedFromChannel" xml:space="preserve">
+    <value>{target} was kicked out of the channel by {source}.</value>
+  </data>
+  <data name="UserKickedFromChannelWithReason" xml:space="preserve">
+    <value>{target} was kicked out of the channel by {source} ({reason}).</value>
+  </data>
+  <data name="UserNotInChannel" xml:space="preserve">
+    <value>That user is not in a channel.</value>
+  </data>
+  <data name="UserNotLoggedOn" xml:space="preserve">
+    <value>That user is not logged on.</value>
+  </data>
+  <data name="UserUnBannedFromChannel" xml:space="preserve">
+    <value>{target} was unbanned by {source}</value>
+  </data>
+  <data name="VersionCommand" xml:space="preserve">
+    <value>This server is running {version}.</value>
+  </data>
+  <data name="VersionCommandWithAdmin" xml:space="preserve">
+    <value>This server is running {version}.
+Node uptime: {systemUptime}
+Process uptime: {processUptime}</value>
+  </data>
+  <data name="WhisperCommandEmptyMessage" xml:space="preserve">
+    <value>What do you want to say?</value>
+  </data>
+  <data name="WhisperCommandUserIsAway" xml:space="preserve">
+    <value>{user} is away ({message})</value>
+  </data>
+  <data name="WhisperCommandUserIsDoNotDisturb" xml:space="preserve">
+    <value>{user} is unavailable ({message})</value>
+  </data>
+  <data name="WhoCommand" xml:space="preserve">
+    <value>Users in channel {channel}:
+{users}</value>
+  </data>
+  <data name="YouAreBannedFromThatChannel" xml:space="preserve">
+    <value>You are banned from that channel.</value>
+  </data>
+  <data name="YouAreNotAChannelOperator" xml:space="preserve">
+    <value>You are not a channel operator.</value>
+  </data>
+  <data name="YouAreUsingGameInGame" xml:space="preserve">
+    <value>You are {name}, using {game} in game {gameAd}.</value>
+  </data>
+  <data name="YouAreUsingGameInRealm" xml:space="preserve">
+    <value>You are {name}, using {game} in {realm}</value>
+  </data>
+  <data name="YouAreUsingGameInTheChannel" xml:space="preserve">
+    <value>You are {name}, using {game} in the channel {channel}.</value>
+  </data>
+  <data name="YouCannotBanAChannelOperator" xml:space="preserve">
+    <value>You can't ban a channel operator.</value>
+  </data>
+  <data name="YouCannotKickAChannelOperator" xml:space="preserve">
+    <value>You can't kick a channel operator.</value>
+  </data>
+  <data name="YourFriendEnteredGame" xml:space="preserve">
+    <value>Your friend {friend} has entered a {game} game called {gameAd}.</value>
+  </data>
+  <data name="YourFriendEnteredPasswordedGame" xml:space="preserve">
+    <value>Your friend {friend} has entered a password-protected {game} game called {gameAd}.</value>
+  </data>
+  <data name="YourFriendLoggedOff" xml:space="preserve">
+    <value>Your friend {friend} has exited {realm}.</value>
+  </data>
+  <data name="YourFriendLoggedOn" xml:space="preserve">
+    <value>Your friend {friend} has entered {realm}.</value>
+  </data>
+  <data name="YourFriendsList" xml:space="preserve">
+    <value>Your friends list:</value>
+  </data>
+  <data name="YouWereBannedFromChannel" xml:space="preserve">
+    <value>{source} banned you from the channel!</value>
+  </data>
+  <data name="YouWereKickedFromChannel" xml:space="preserve">
+    <value>{source} kicked you out of the channel!</value>
+  </data>
+</root>

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atlasd", "Atlasd\Atlasd.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MBNCSUtil", "..\vendor\MBNCSUtil\src\MBNCSUtil.csproj", "{C1DC2666-B308-4B01-A037-7C9F7ECFBD1E}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "AtlasV", "AtlasV\AtlasV.vbproj", "{3163E7F5-0EE8-484C-ADEC-DBD6AE79DB2C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C1DC2666-B308-4B01-A037-7C9F7ECFBD1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1DC2666-B308-4B01-A037-7C9F7ECFBD1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1DC2666-B308-4B01-A037-7C9F7ECFBD1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3163E7F5-0EE8-484C-ADEC-DBD6AE79DB2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3163E7F5-0EE8-484C-ADEC-DBD6AE79DB2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3163E7F5-0EE8-484C-ADEC-DBD6AE79DB2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3163E7F5-0EE8-484C-ADEC-DBD6AE79DB2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

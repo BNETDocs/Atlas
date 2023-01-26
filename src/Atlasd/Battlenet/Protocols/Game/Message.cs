@@ -115,7 +115,20 @@ namespace Atlasd.Battlenet.Protocols.Game
             }
             else if (protocolType.IsChat())
             {
-                return Encoding.UTF8.GetBytes($"{2000 + Id} {MessageName(Id).Replace("SID_", "")}{Battlenet.Common.NewLine}");
+                switch (Id)
+                {
+                    // NULL was used on both ends until closer to the end it was left optional to
+                    // the client, PING was never a thing but you have an oportunity to add this
+                    // for newer bots I would suggest as such:
+                    // $"{2000 + Id} {MessageName(Id).Replace("SID_", "")} {((int)PingValue).ToString()}{Battlenet.Common.NewLine}"
+                    // also would suggest not making it manditory to reply to for old compatability since they'll ignore the message.
+                    case (byte)MessageIds.SID_NULL:
+                        return Encoding.UTF8.GetBytes($"{2000 + Id} {MessageName(Id).Replace("SID_", "")}{Battlenet.Common.NewLine}");
+                    case (byte)MessageIds.SID_PING:
+                        return Encoding.UTF8.GetBytes($"{2000 + Id} {MessageName(Id).Replace("SID_", "")}{Battlenet.Common.NewLine}");
+                    default:
+                        return Buffer; // Encoding.UTF8.GetBytes($"{1000 + Id} {MessageName(Id).Replace("SID_", "")}{Battlenet.Common.NewLine}");
+                }
             }
             else
             {

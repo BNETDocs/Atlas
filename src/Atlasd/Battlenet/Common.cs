@@ -106,6 +106,7 @@ namespace Atlasd.Battlenet
             ActiveGameStates = new Dictionary<string, GameState>(StringComparer.OrdinalIgnoreCase);
 
             InitializeAds();
+            ProfanityFilter.Initialize();
 
             DefaultAddress = IPAddress.Any;
             DefaultPort = 6112;

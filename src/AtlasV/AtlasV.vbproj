@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace></RootNamespace>
+    <TargetFramework>net5.0</TargetFramework>
+    <StartupObject></StartupObject>
+    <Authors>l)ragon &lt;admin@botdev-united.com&gt;</Authors>
+    <PackageProjectUrl>https://github.com/BNETDocs/Atlas</PackageProjectUrl>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <Company>BNETDocs</Company>
+    <Description>Atlas is cross-platform software that emulates Classic Battle.net in a compatible model for Diablo, StarCraft, and WarCraft. 
+(VisualBasic.Net .NETCore 5.0 Build)</Description>
+    <Copyright>NA</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="atlasv.json" />
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="atlasv.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\vendor\MBNCSUtil\src\MBNCSUtil.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Localization\Resources.Designer.vb">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Localization\Resources.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
