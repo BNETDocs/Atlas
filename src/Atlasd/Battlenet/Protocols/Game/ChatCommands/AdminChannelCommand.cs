@@ -29,6 +29,16 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             {
                 switch (subcommand.ToLower())
                 {
+                    case "disband":
+                        {
+                            var destinationName = string.Join(" ", Arguments);
+                            if (string.IsNullOrEmpty(destinationName)) destinationName = Resources.TheVoid;
+                            var destination = Channel.GetChannelByName(destinationName, true);
+                            channel.DisbandInto(destination);
+                            eventId = ChatEvent.EventIds.EID_INFO;
+                            reply = Resources.ChannelWasDisbanded.Replace("{oldName}", channel.Name).Replace("{newName}", destination.Name);
+                            break;
+                        }
                     case "flags":
                     case "flag":
                         {

@@ -20,6 +20,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 { "/admin ? (alias: /admin help)" },
                 { "/admin announce (alias: /admin broadcast)" },
                 { "/admin broadcast <message>" },
+                { "/admin channel disband [destination]" },
                 { "/admin channel flags <integer>" },
                 { "/admin channel maxusers <max|-1>" },
                 { "/admin channel rename <new name...>" },

@@ -244,6 +244,14 @@ namespace Atlasd.Battlenet
             DesignatedHeirs[designator] = heir;
         }
 
+        public void DisbandInto(Channel destination)
+        {
+            foreach (var user in Users)
+            {
+                destination.AcceptUser(user, true, true);
+            }
+        }
+
         public void Dispose()
         {
             BannedUsers = null;

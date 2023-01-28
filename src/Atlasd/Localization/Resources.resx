@@ -253,6 +253,9 @@ This server is hosted by {host}.
   <data name="ChannelTopicChanged" xml:space="preserve">
     <value>The channel topic was changed to:</value>
   </data>
+  <data name="ChannelWasDisbanded" xml:space="preserve">
+    <value>The channel {oldName} was disbanded into {newName}.</value>
+  </data>
   <data name="ChannelWasRenamed" xml:space="preserve">
     <value>The channel {oldName} was renamed to {newName}.</value>
   </data>

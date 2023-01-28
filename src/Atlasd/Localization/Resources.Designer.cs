@@ -437,6 +437,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The channel {oldName} was disbanded into {newName}..
+        /// </summary>
+        public static string ChannelWasDisbanded {
+            get {
+                return ResourceManager.GetString("ChannelWasDisbanded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The channel {oldName} was renamed to {newName}..
         /// </summary>
         public static string ChannelWasRenamed {
