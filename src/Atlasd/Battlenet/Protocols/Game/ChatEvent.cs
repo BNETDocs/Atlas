@@ -4,7 +4,7 @@ using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
+using System.Net;
 using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game
@@ -32,38 +32,69 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public EventIds EventId { get; protected set; }
         public UInt32 Flags { get; protected set; }
+        public IPAddress IPAddress { get; protected set; }
         public Int32 Ping { get; protected set; }
         public string Username { get; protected set; }
         public byte[] Text { get; protected set; }
 
         public ChatEvent(EventIds eventId, UInt32 flags, Int32 ping, string username, byte[] text)
         {
-            Initialize(eventId, flags, ping, username, text);
+            Initialize(eventId, flags, null, ping, username, text);
         }
 
         public ChatEvent(EventIds eventId, UInt32 flags, Int32 ping, string username, string text)
         {
-            Initialize(eventId, flags, ping, username, text);
+            Initialize(eventId, flags, null, ping, username, text);
+        }
+
+        public ChatEvent(EventIds eventId, UInt32 flags, IPAddress ipAddress, Int32 ping, string username, byte[] text)
+        {
+            Initialize(eventId, flags, ipAddress, ping, username, text);
+        }
+
+        public ChatEvent(EventIds eventId, UInt32 flags, IPAddress ipAddress, Int32 ping, string username, string text)
+        {
+            Initialize(eventId, flags, ipAddress, ping, username, text);
         }
 
         public ChatEvent(EventIds eventId, Account.Flags flags, Int32 ping, string username, byte[] text)
         {
-            Initialize(eventId, (UInt32)flags, ping, username, text);
+            Initialize(eventId, (UInt32)flags, null, ping, username, text);
         }
 
         public ChatEvent(EventIds eventId, Account.Flags flags, Int32 ping, string username, string text)
         {
-            Initialize(eventId, (UInt32)flags, ping, username, text);
+            Initialize(eventId, (UInt32)flags, null, ping, username, text);
+        }
+
+        public ChatEvent(EventIds eventId, Account.Flags flags, IPAddress ipAddress, Int32 ping, string username, byte[] text)
+        {
+            Initialize(eventId, (UInt32)flags, ipAddress, ping, username, text);
+        }
+
+        public ChatEvent(EventIds eventId, Account.Flags flags, IPAddress ipAddress, Int32 ping, string username, string text)
+        {
+            Initialize(eventId, (UInt32)flags, ipAddress, ping, username, text);
         }
 
         public ChatEvent(EventIds eventId, Channel.Flags flags, Int32 ping, string username, byte[] text)
         {
-            Initialize(eventId, (UInt32)flags, ping, username, text);
+            Initialize(eventId, (UInt32)flags, null, ping, username, text);
         }
 
         public ChatEvent(EventIds eventId, Channel.Flags flags, Int32 ping, string username, string text)
         {
-            Initialize(eventId, (UInt32)flags, ping, username, text);
+            Initialize(eventId, (UInt32)flags, null, ping, username, text);
+        }
+
+        public ChatEvent(EventIds eventId, Channel.Flags flags, IPAddress ipAddress, Int32 ping, string username, byte[] text)
+        {
+            Initialize(eventId, (UInt32)flags, ipAddress, ping, username, text);
+        }
+
+        public ChatEvent(EventIds eventId, Channel.Flags flags, IPAddress ipAddress, Int32 ping, string username, string text)
+        {
+            Initialize(eventId, (UInt32)flags, ipAddress, ping, username, text);
         }
 
         public static bool EventIdIsChatMessage(EventIds eventId)
@@ -103,18 +134,19 @@ namespace Atlasd.Battlenet.Protocols.Game
             };
         }
 
-        protected void Initialize(EventIds eventId, UInt32 flags, Int32 ping, string username, byte[] text)
+        protected void Initialize(EventIds eventId, UInt32 flags, IPAddress ipAddress, Int32 ping, string username, byte[] text)
         {
             EventId = eventId;
             Flags = flags;
+            IPAddress = ipAddress;
             Ping = ping;
             Username = username;
             Text = text;
         }
 
-        protected void Initialize(EventIds eventId, UInt32 flags, Int32 ping, string username, string text)
+        protected void Initialize(EventIds eventId, UInt32 flags, IPAddress ipAddress, Int32 ping, string username, string text)
         {
-            Initialize(eventId, flags, ping, username, Encoding.UTF8.GetBytes(text));
+            Initialize(eventId, flags, ipAddress, ping, username, Encoding.UTF8.GetBytes(text));
         }
 
         public byte[] ToByteArray(ProtocolType.Types protocolType)
@@ -129,7 +161,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                         w.Write((UInt32)EventId);
                         w.Write((UInt32)Flags);
                         w.Write((Int32)Ping);
-                        w.Write((UInt32)0); // IP address (Defunct)
+                        if (IPAddress == null) w.Write((UInt32)0); else w.Write(IPAddress.MapToIPv4().GetAddressBytes());
                         w.Write((UInt32)0xBAADF00D); // Account number (Defunct)
                         w.Write((UInt32)0xBAADF00D); // Registration authority (Defunct)
                         w.Write((string)Username);

@@ -7,6 +7,7 @@ using Atlasd.Localization;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,8 @@ namespace Atlasd.Battlenet
 
         public GameState GameState { get; private set; }
         public ProtocolType ProtocolType { get; private set; }
-        public System.Net.EndPoint RemoteEndPoint { get; private set; }
+        public EndPoint RemoteEndPoint { get; private set; }
+        public IPAddress RemoteIPAddress { get; private set; }
         public Socket Socket { get; set; }
 
         protected byte[] ReceiveBuffer = new byte[0];
@@ -107,6 +109,7 @@ namespace Atlasd.Battlenet
             GameState = null;
             ProtocolType = null;
             RemoteEndPoint = client.RemoteEndPoint;
+            RemoteIPAddress = (client.RemoteEndPoint as IPEndPoint).Address;
             Socket = client;
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, "TCP connection established");
