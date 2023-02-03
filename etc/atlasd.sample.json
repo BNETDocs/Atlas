@@ -77,6 +77,7 @@
   "battlenet": {
     "emulation": {
       "auto_refresh_pings": false,
+      "enable_ip_address_in_chatevents": false,
       "grant_sudo_to_spoofed_admins": true,
       "mask_admins_in_ban_message": true,
       "mask_admins_in_kick_message": true,

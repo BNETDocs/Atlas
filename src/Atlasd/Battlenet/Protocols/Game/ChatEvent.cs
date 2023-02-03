@@ -1,5 +1,6 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Battlenet.Protocols.Game.Messages;
+using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
@@ -151,6 +152,8 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public byte[] ToByteArray(ProtocolType.Types protocolType)
         {
+            var enableIPAddressInChatEvents = Settings.GetBoolean(new string[] { "battlenet", "emulation", "enable_ip_address_in_chatevents" }, false);
+
             switch (protocolType) {
                 case ProtocolType.Types.Game:
                     {
@@ -161,7 +164,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                         w.Write((UInt32)EventId);
                         w.Write((UInt32)Flags);
                         w.Write((Int32)Ping);
-                        if (IPAddress == null) w.Write((UInt32)0); else w.Write(IPAddress.MapToIPv4().GetAddressBytes());
+                        if (!enableIPAddressInChatEvents || IPAddress == null) w.Write((UInt32)0); else w.Write(IPAddress.MapToIPv4().GetAddressBytes());
                         w.Write((UInt32)0xBAADF00D); // Account number (Defunct)
                         w.Write((UInt32)0xBAADF00D); // Registration authority (Defunct)
                         w.Write((string)Username);
