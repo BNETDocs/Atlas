@@ -18,7 +18,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
         {
             if (Arguments.Count < 1)
             {
-                new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, Resources.UserNotLoggedOn).WriteTo(context.GameState.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, Resources.UserNotLoggedOn).WriteTo(context.GameState.Client);
                 return;
             }
 
@@ -30,14 +30,14 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             // Check for empty message
             if (RawBuffer.Length == 0)
             {
-                new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, Resources.WhisperCommandEmptyMessage).WriteTo(context.GameState.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, Resources.WhisperCommandEmptyMessage).WriteTo(context.GameState.Client);
                 return;
             }
 
             // Get the target state, or return not logged on
             if (!Battlenet.Common.GetClientByOnlineName(target, out var targetState) || targetState == null)
             {
-                new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, Resources.UserNotLoggedOn).WriteTo(context.GameState.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, Resources.UserNotLoggedOn).WriteTo(context.GameState.Client);
                 return;
             }
 
@@ -49,7 +49,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 r = r.Replace("{user}", targetState.OnlineName);
                 r = r.Replace("{message}", targetState.Away);
 
-                new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, r).WriteTo(context.GameState.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, r).WriteTo(context.GameState.Client);
 
                 return; // Target has asked to not be disturbed, discontinue
             }
@@ -65,7 +65,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 r = r.Replace("{user}", targetState.OnlineName);
                 r = r.Replace("{message}", targetState.Away);
 
-                new ChatEvent(ChatEvent.EventIds.EID_INFO, Channel.RenderChannelFlags(context.GameState, targetState), context.GameState.Ping, Channel.RenderOnlineName(context.GameState, targetState), r).WriteTo(context.GameState.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, Channel.RenderChannelFlags(context.GameState, targetState), context.GameState.Client.RemoteIPAddress, context.GameState.Ping, Channel.RenderOnlineName(context.GameState, targetState), r).WriteTo(context.GameState.Client);
             }
 
             // Check for squelched status

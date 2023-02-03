@@ -42,7 +42,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             foreach (var line in r.Split(Battlenet.Common.NewLine))
             {
-                new ChatEvent(eid, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
+                new ChatEvent(eid, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
             }
 
             if (e != null)

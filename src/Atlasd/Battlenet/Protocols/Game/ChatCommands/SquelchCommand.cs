@@ -25,7 +25,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             {
                 r = Resources.UserNotLoggedOn;
                 foreach (var line in r.Split(Environment.NewLine))
-                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
+                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
                 return;
             }
 

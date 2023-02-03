@@ -111,7 +111,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
 
             foreach (var line in reply.Split(Battlenet.Common.NewLine))
-                new ChatEvent(eventId, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
+                new ChatEvent(eventId, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
         }
     }
 }

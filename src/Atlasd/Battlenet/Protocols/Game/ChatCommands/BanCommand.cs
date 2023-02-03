@@ -25,7 +25,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 || context.GameState.ChannelFlags.HasFlag(Account.Flags.ChannelOp)
                 || context.GameState.ChannelFlags.HasFlag(Account.Flags.Admin)))
             {
-                new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, Resources.YouAreNotAChannelOperator).WriteTo(context.GameState.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, Resources.YouAreNotAChannelOperator).WriteTo(context.GameState.Client);
                 return;
             }
 
@@ -41,7 +41,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 || !Battlenet.Common.ActiveGameStates.TryGetValue(target, out var targetState)
                 || targetState == null)
             {
-                new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, Resources.UserNotLoggedOn).WriteTo(context.GameState.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, Resources.UserNotLoggedOn).WriteTo(context.GameState.Client);
                 return;
             }
 

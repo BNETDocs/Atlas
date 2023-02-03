@@ -16,7 +16,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
         {
             if (context.GameState.ActiveChannel == null)
             {
-                new ChatEvent(ChatEvent.EventIds.EID_ERROR, (uint)0, context.GameState.Ping, context.GameState.OnlineName, Resources.InvalidChatCommand).WriteTo(context.GameState.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, Resources.InvalidChatCommand).WriteTo(context.GameState.Client);
                 return;
             }
 
