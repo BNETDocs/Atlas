@@ -107,15 +107,6 @@ namespace Atlasd.Battlenet.Protocols.Game
             UDPSupported = false;
             UDPToken = (uint)r.Next(0, 0x7FFFFFFF);
             Username = null;
-
-            Task.Run(() =>
-            {
-                lock (Battlenet.Common.NullTimerState) Battlenet.Common.NullTimerState.Add(this);
-            });
-            Task.Run(() =>
-            {
-                lock (Battlenet.Common.PingTimerState) Battlenet.Common.PingTimerState.Add(this);
-            });
         }
 
         public void Close()
@@ -152,10 +143,6 @@ namespace Atlasd.Battlenet.Protocols.Game
 
             // Remove this GameAd
             StopGameAd();
-
-            // Remove this GameState from the NullTimer and PingTimer
-            lock (Battlenet.Common.NullTimerState) Battlenet.Common.NullTimerState.Remove(this);
-            lock (Battlenet.Common.PingTimerState) Battlenet.Common.PingTimerState.Remove(this);
         }
 
         public void Dispose() /* part of IDisposable */
