@@ -39,7 +39,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             if (context.Client == null || !context.Client.Connected) return false;
 
-            var delta = DateTime.Now - context.Client.GameState.PingDelta;
+            var now = DateTime.Now;
+            var delta = now - context.Client.GameState.LastPing;
 
             var autoRefreshPings = Settings.GetBoolean(new string[] { "battlenet", "emulation", "auto_refresh_pings" }, false);
 
@@ -51,6 +52,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             if (!(context.Direction == MessageDirection.ClientToServer && token == context.Client.GameState.PingToken)) return true;
 
+            context.Client.GameState.LastPong = now;
             context.Client.GameState.Ping = (int)Math.Round(delta.TotalMilliseconds);
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Ping: {context.Client.GameState.Ping}ms");

@@ -34,12 +34,12 @@ namespace Atlasd.Battlenet.Protocols.Game
         public DateTime LastLogon;
         public DateTime LastNull;
         public DateTime LastPing;
+        public DateTime LastPong;
         public IPAddress LocalIPAddress;
         public DateTime LocalTime { get => DateTime.UtcNow.AddMinutes(0 - TimezoneBias); }
         public LocaleInfo Locale;
         public LogonTypes LogonType;
         public List<IPAddress> SquelchedIPs;
-        public DateTime PingDelta;
         public Platform.PlatformCode Platform;
         public Product.ProductCode Product;
         public VersionInfo Version;
@@ -80,11 +80,11 @@ namespace Atlasd.Battlenet.Protocols.Game
             LastLogon = DateTime.Now;
             LastNull = DateTime.Now;
             LastPing = DateTime.MinValue;
+            LastPong = DateTime.Now;
             LocalIPAddress = null;
             Locale = new LocaleInfo();
             LogonType = LogonTypes.OLS;
             SquelchedIPs = new List<IPAddress>();
-            PingDelta = LastPing;
             Platform = Battlenet.Platform.PlatformCode.None;
             Product = Battlenet.Product.ProductCode.None;
             Version = new VersionInfo();

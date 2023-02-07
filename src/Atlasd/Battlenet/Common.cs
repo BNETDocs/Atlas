@@ -243,13 +243,13 @@ namespace Atlasd.Battlenet
             foreach (var gameState in gameStates.Values)
             {
                 if (gameState == null) continue;
-                lock (gameState)
-                {
-                    if (gameState.LastNull == null || gameState.LastNull + interval > now) continue;
-                    gameState.LastNull = now;
-                    msg.Invoke(new MessageContext(gameState.Client, Protocols.MessageDirection.ServerToClient));
-                    gameState.Client.Send(msg.ToByteArray(gameState.Client.ProtocolType));
-                }
+                if (gameState.Client == null) continue;
+                if (!gameState.Client.Connected) continue;
+                if (gameState.LastNull == null || gameState.LastNull + interval > now) continue;
+
+                gameState.LastNull = now;
+                msg.Invoke(new MessageContext(gameState.Client, Protocols.MessageDirection.ServerToClient));
+                gameState.Client.Send(msg.ToByteArray(gameState.Client.ProtocolType));
             }
         }
 
@@ -257,24 +257,31 @@ namespace Atlasd.Battlenet
         {
             var gameStates = state as ConcurrentDictionary<string, GameState>;
             var msg = new SID_PING();
-            var interval = TimeSpan.FromSeconds(180);
-            var now = DateTime.Now;
             var r = new Random();
+            var interval = TimeSpan.FromSeconds(180);
+            var unresponsiveInterval = interval.Multiply(2);
+            var unresponsiveIntervalMS = (int)Math.Round(unresponsiveInterval.TotalMilliseconds);
+            var now = DateTime.Now;
 
             foreach (var gameState in gameStates.Values)
             {
                 if (gameState == null) continue;
-                lock (gameState)
-                {
-                    if (gameState.LastPing == null || gameState.LastPing + interval > now) continue;
+                if (gameState.Client == null) continue;
+                if (!gameState.Client.Connected) continue;
+                if (gameState.LastPing == null) continue;
 
-                    now = DateTime.Now;
+                if (gameState.LastPing + interval <= now)
+                {
                     gameState.LastPing = now;
-                    gameState.PingDelta = now;
                     gameState.PingToken = (uint)r.Next(0, 0x7FFFFFFF);
 
                     msg.Invoke(new MessageContext(gameState.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){{ "token", gameState.PingToken }}));
                     gameState.Client.Send(msg.ToByteArray(gameState.Client.ProtocolType));
+                }
+
+                if (gameState.LastPong + unresponsiveInterval <= now && gameState.ActiveChannel != null && gameState.Ping != unresponsiveIntervalMS)
+                {
+                    gameState.ActiveChannel.UpdateUser(gameState, unresponsiveIntervalMS);
                 }
             }
         }

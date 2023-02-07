@@ -443,6 +443,7 @@ namespace Atlasd.Battlenet
         public void Send(byte[] buffer)
         {
             if (Socket == null) return;
+            if (!Socket.Connected) return;
 
             var e = new SocketAsyncEventArgs();
             e.Completed += new EventHandler<SocketAsyncEventArgs>(SocketIOCompleted);
