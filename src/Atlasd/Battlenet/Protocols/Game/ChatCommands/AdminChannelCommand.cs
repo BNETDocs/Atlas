@@ -1,4 +1,5 @@
-﻿using Atlasd.Localization;
+﻿using Atlasd.Daemon;
+using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
 
@@ -62,12 +63,16 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                             if (!string.IsNullOrEmpty(newName))
                             {
                                 reply = string.Empty;
-                                lock (Battlenet.Common.ActiveChannels)
+                                var oldName = channel.Name;
+                                if (!(Battlenet.Common.ActiveChannels.TryAdd(newName, channel)
+                                    && Battlenet.Common.ActiveChannels.TryRemove(oldName, out _)))
                                 {
-                                    Battlenet.Common.ActiveChannels.Remove(channel.Name);
-                                    Battlenet.Common.ActiveChannels.Add(newName, channel);
+                                    Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, $"Failed to rename channel from [{oldName}] to [{newName}]");
                                 }
-                                channel.SetName(newName);
+                                else
+                                {
+                                    channel.SetName(newName);
+                                }
                             }
                             break;
                         }

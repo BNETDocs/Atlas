@@ -264,11 +264,7 @@ namespace Atlasd.Battlenet
                 foreach (var user in Users) MoveUser(user, theVoid, true);
             }
 
-            lock (Common.ActiveChannels)
-            {
-                if (Common.ActiveChannels.ContainsKey(Name))
-                    Common.ActiveChannels.Remove(Name);
-            }
+            Common.ActiveChannels.TryRemove(Name, out _);
         }
 
         public static Channel GetChannelByName(string name, bool autoCreate)
@@ -278,12 +274,8 @@ namespace Atlasd.Battlenet
             if (string.IsNullOrEmpty(name)) return channel;
             if (name[0] == '#') name = name[1..];
 
-            lock (Common.ActiveChannels)
-            {
-                Common.ActiveChannels.TryGetValue(name, out channel);
-            }
-
-            if (channel != null || !autoCreate) return channel;
+            if (!Common.ActiveChannels.TryGetValue(name, out channel)
+                && (!autoCreate || channel != null)) return channel;
 
             var isStatic = GetStaticChannel(name, out var staticName, out var staticFlags, out var staticMaxUsers, out var staticTopic, out var staticProducts);
 
@@ -296,9 +288,13 @@ namespace Atlasd.Battlenet
                 channel = new Channel(staticName, staticFlags, staticMaxUsers, staticTopic);
             }
 
-            lock (Common.ActiveChannels)
+            if (!Common.ActiveChannels.TryAdd(channel.Name, channel))
             {
-                Common.ActiveChannels.Add(channel.Name, channel);
+                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Channel, $"Failed to add channel [{channel.Name}] to active channel cache; using already existing channel");
+                if (!Common.ActiveChannels.TryGetValue(channel.Name, out channel))
+                {
+                    Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Channel, $"Failed to find existing channel [{channel.Name}]");
+                }
             }
 
             return channel;

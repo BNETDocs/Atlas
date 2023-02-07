@@ -38,10 +38,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         var channels = new List<string>();
 
-                        foreach (var pair in Battlenet.Common.ActiveChannels)
+                        foreach (var channel in Battlenet.Common.ActiveChannels.Values)
                         {
                             //if ((channel.ActiveFlags & Channel.Flags.Public) > 0)
-                            channels.Add(pair.Value.Name);
+                            channels.Add(channel.Name);
                         }
 
                         return new SID_GETCHANNELLIST().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {
