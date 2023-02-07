@@ -274,8 +274,8 @@ namespace Atlasd.Battlenet
             if (string.IsNullOrEmpty(name)) return channel;
             if (name[0] == '#') name = name[1..];
 
-            if (!Common.ActiveChannels.TryGetValue(name, out channel)
-                && (!autoCreate || channel != null)) return channel;
+            if (Common.ActiveChannels.TryGetValue(name, out channel)
+                || !autoCreate || channel != null) return channel;
 
             var isStatic = GetStaticChannel(name, out var staticName, out var staticFlags, out var staticMaxUsers, out var staticTopic, out var staticProducts);
 
