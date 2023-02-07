@@ -20,12 +20,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             {
                 var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, RawBuffer);
 
-                lock (Battlenet.Common.ActiveGameStates)
+                foreach (var gameState in Battlenet.Common.ActiveGameStates.Values)
                 {
-                    foreach (var pair in Battlenet.Common.ActiveGameStates)
-                    {
-                        chatEvent.WriteTo(pair.Value.Client);
-                    }
+                    chatEvent.WriteTo(gameState.Client);
                 }
             });
         }

@@ -354,9 +354,13 @@ namespace Atlasd.Battlenet
 
                 GameState.Username = (string)account.Get(Account.UsernameKey, GameState.Username);
 
-                lock (Common.ActiveGameStates)
+                if (!Battlenet.Common.ActiveGameStates.TryAdd(GameState.OnlineName, GameState))
                 {
-                    Common.ActiveGameStates.Add(GameState.OnlineName, GameState);
+                    Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Client_Chat, RemoteEndPoint, $"Failed to add game state to active game state cache");
+                    account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
+                    Battlenet.Common.ActiveAccounts.TryRemove(onlineName, out _);
+                    Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
+                    return;
                 }
 
                 Send(Encoding.UTF8.GetBytes($"Connection from [{RemoteEndPoint}]{Common.NewLine}"));

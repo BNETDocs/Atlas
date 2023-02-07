@@ -92,9 +92,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         context.Client.GameState.Username = (string)account.Get(Account.UsernameKey, context.Client.GameState.Username);
 
-                        lock (Battlenet.Common.ActiveGameStates)
+                        if (!Battlenet.Common.ActiveGameStates.TryAdd(context.Client.GameState.OnlineName, context.Client.GameState))
                         {
-                            Battlenet.Common.ActiveGameStates.Add(context.Client.GameState.OnlineName, context.Client.GameState);
+                            Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Failed to add game state to active game state cache");
+                            account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
+                            Battlenet.Common.ActiveAccounts.TryRemove(onlineName, out _);
+                            return new SID_LOGONRESPONSE().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.Failure }}));
                         }
 
                         Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Account [{context.Client.GameState.Username}] logon success as [{context.Client.GameState.OnlineName}]");

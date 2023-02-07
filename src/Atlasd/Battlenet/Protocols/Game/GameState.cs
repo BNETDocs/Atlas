@@ -132,19 +132,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                 ActiveClan.WriteStatusChange(this, false); // offline
             }
 
-            // Remove this GameState from ActiveGameStates
-            if (OnlineName != null)
-            {
-                lock (Battlenet.Common.ActiveGameStates)
-                {
-                    if (Battlenet.Common.ActiveGameStates.ContainsKey(OnlineName))
-                    {
-                        Battlenet.Common.ActiveGameStates.Remove(OnlineName);
-                    }
-                }
-            }
-
-            // Remove this ActiveAccount from ActiveAccounts
+            // Update keys of ActiveAccount
             if (ActiveAccount != null)
             {
                 ActiveAccount.Set(Account.LastLogoffKey, DateTime.Now);
@@ -153,8 +141,13 @@ namespace Atlasd.Battlenet.Protocols.Game
                 var diff = DateTime.Now - ConnectedTimestamp;
                 timeLogged += (UInt32)Math.Round(diff.TotalSeconds);
                 ActiveAccount.Set(Account.TimeLoggedKey, timeLogged);
+            }
 
+            // Remove this OnlineName from ActiveAccounts and ActiveGameStates
+            if (!string.IsNullOrEmpty(OnlineName))
+            {
                 Battlenet.Common.ActiveAccounts.TryRemove(OnlineName, out _);
+                Battlenet.Common.ActiveGameStates.TryRemove(OnlineName, out _);
             }
 
             // Remove this GameAd

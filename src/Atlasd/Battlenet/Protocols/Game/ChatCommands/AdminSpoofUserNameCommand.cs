@@ -1,4 +1,5 @@
 ﻿using Atlasd.Battlenet.Protocols.Game.Messages;
+using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
@@ -82,10 +83,10 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             target.OnlineName = onlineName;
 
             // re-key target in active states
-            lock (Battlenet.Common.ActiveGameStates)
+            if (!(Battlenet.Common.ActiveGameStates.TryAdd(target.OnlineName, target)) &&
+                Battlenet.Common.ActiveGameStates.TryRemove(oldOnlineName, out _))
             {
-                Battlenet.Common.ActiveGameStates.Remove(oldOnlineName);
-                Battlenet.Common.ActiveGameStates.Add(target.OnlineName, target);
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Client, $"Failed to re-key game state from [{oldOnlineName}] to [{target.OnlineName}]");
             }
 
             // send a new SID_ENTERCHAT to target

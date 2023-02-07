@@ -41,7 +41,7 @@ namespace Atlasd.Battlenet
         public static Dictionary<string, Channel> ActiveChannels;
         public static List<ClientState> ActiveClientStates;
         public static ConcurrentDictionary<byte[], GameAd> ActiveGameAds;
-        public static Dictionary<string, GameState> ActiveGameStates;
+        public static ConcurrentDictionary<string, GameState> ActiveGameStates;
         public static IPAddress DefaultAddress { get; private set; }
         public static int DefaultPort { get; private set; }
         public static ServerSocket Listener { get; private set; }
@@ -103,7 +103,7 @@ namespace Atlasd.Battlenet
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClientStates = new List<ClientState>();
             ActiveGameAds = new ConcurrentDictionary<byte[], GameAd>();
-            ActiveGameStates = new Dictionary<string, GameState>(StringComparer.OrdinalIgnoreCase);
+            ActiveGameStates = new ConcurrentDictionary<string, GameState>(StringComparer.OrdinalIgnoreCase);
 
             InitializeAds();
 
@@ -238,10 +238,7 @@ namespace Atlasd.Battlenet
                 }
             }
 
-            lock (ActiveGameStates)
-            {
-                return ActiveGameStates.TryGetValue(t, out client);
-            }
+            return ActiveGameStates.TryGetValue(t, out client);
         }
 
         static void ProcessNullTimer(object state)
@@ -377,14 +374,7 @@ namespace Atlasd.Battlenet
             Task.Run(() =>
             {
                 var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, Account.Flags.Admin, -1, "Battle.net", m);
-
-                lock (ActiveGameStates)
-                {
-                    foreach (var pair in ActiveGameStates)
-                    {
-                        chatEvent.WriteTo(pair.Value.Client);
-                    }
-                }
+                foreach (var gameState in ActiveGameStates.Values) chatEvent.WriteTo(gameState.Client);
 
                 if (command != null)
                 {
@@ -441,14 +431,7 @@ namespace Atlasd.Battlenet
                 Task.Run(() =>
                 {
                     var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, Account.Flags.Admin, -1, "Battle.net", m);
-
-                    lock (ActiveGameStates)
-                    {
-                        foreach (var pair in ActiveGameStates)
-                        {
-                            chatEvent.WriteTo(pair.Value.Client);
-                        }
-                    }
+                    foreach (var gameState in ActiveGameStates.Values) chatEvent.WriteTo(gameState.Client);
 
                     if (command != null)
                     {
