@@ -34,8 +34,8 @@ namespace Atlasd.Battlenet
             }
         };
 
-        public static Dictionary<string, Account> AccountsDb;
-        public static List<string> AccountsProcessing;
+        public static ConcurrentDictionary<string, Account> AccountsDb;
+        public static ConcurrentDictionary<string, Account> AccountsProcessing;
         public static Dictionary<string, Account> ActiveAccounts;
         public static List<Advertisement> ActiveAds;
         public static Dictionary<string, Channel> ActiveChannels;
@@ -97,8 +97,8 @@ namespace Atlasd.Battlenet
         {
             Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, "Initializing Battle.net common state");
 
-            AccountsDb = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
-            AccountsProcessing = new List<string>();
+            AccountsDb = new ConcurrentDictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
+            AccountsProcessing = new ConcurrentDictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveAccounts = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClientStates = new List<ClientState>();

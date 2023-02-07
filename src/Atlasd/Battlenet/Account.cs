@@ -157,6 +157,7 @@ namespace Atlasd.Battlenet
 
             Settings.State.RootElement.TryGetProperty("account", out var accountJson);
             accountJson.TryGetProperty("auto_admin", out var autoAdminJson);
+            accountJson.TryGetProperty("auto_admin_flags", out var autoAdminFlagsJson);
             accountJson.TryGetProperty("disallow_words", out var disallowWordsJson);
             accountJson.TryGetProperty("max_adjacent_punctuation", out var maxAdjacentPunctuationJson);
             accountJson.TryGetProperty("max_length", out var maxLengthJson);
@@ -195,6 +196,7 @@ namespace Atlasd.Battlenet
                 throw new NotSupportedException("Setting [account] -> [auto_admin] is not an array, string, or boolean; check value");
             }
 
+            var autoAdminFlags = (Account.Flags)autoAdminFlagsJson.GetUInt32();
             var bannedWords = disallowWordsJson;
             var maximumAdjacentPunctuation = maxAdjacentPunctuationJson.GetUInt32();
             var maximumPunctuation = maxPunctuationJson.GetUInt32();
@@ -202,14 +204,15 @@ namespace Atlasd.Battlenet
             var minimumAlphanumericSize = minAlphanumericJson.GetUInt32();
             var minimumUsernameSize = minLengthJson.GetUInt32();
 
-            lock (Common.AccountsProcessing)
+            if (Common.AccountsProcessing.ContainsKey(username))
             {
-                if (Common.AccountsProcessing.Contains(username))
-                {
-                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, "Still processing new account request...");
-                    return CreateStatus.LastCreateInProgress;
-                }
-                Common.AccountsProcessing.Add(username);
+                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, "Still processing new account request...");
+                return CreateStatus.LastCreateInProgress;
+            }
+            else if (!Common.AccountsProcessing.TryAdd(username, account))
+            {
+                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Failed to add username [{username}] to accounts processing cache");
+                return CreateStatus.LastCreateInProgress;
             }
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, "Processing new account request...");
@@ -274,27 +277,28 @@ namespace Atlasd.Battlenet
                 }
             }
 
-            lock (Common.AccountsDb)
+            if (Common.AccountsDb.ContainsKey(username))
             {
-                if (Common.AccountsDb.ContainsKey(username))
-                {
-                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{username}] already exists");
-                    return CreateStatus.AccountExists;
-                }
-
-                account = new Account();
-
-                account.Set(Account.UsernameKey, username);
-                account.Set(Account.PasswordKey, passwordHash);
-
-                account.Set(Account.FlagsKey, autoAdmin ? (Account.Flags.Employee | Account.Flags.Admin) : Account.Flags.None);
-
-                Common.AccountsDb.Add(username, account);
+                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Requested username [{username}] already exists");
+                return CreateStatus.AccountExists;
             }
 
-            lock (Common.AccountsProcessing)
+            account = new Account();
+
+            account.Set(Account.UsernameKey, username);
+            account.Set(Account.PasswordKey, passwordHash);
+            account.Set(Account.FlagsKey, autoAdmin ? autoAdminFlags : Account.Flags.None);
+
+            if (!Common.AccountsDb.TryAdd(username, account))
             {
-                Common.AccountsProcessing.Remove(username);
+                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Failed to add username [{username}] to accounts database; username already exists");
+                return CreateStatus.AccountExists;
+            }
+
+            if (!Common.AccountsProcessing.TryRemove(username, out _))
+            {
+                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Failed to remove username [{username}] from accounts processing cache");
+                return CreateStatus.LastCreateInProgress;
             }
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Account, $"Created new account [{username}]");
