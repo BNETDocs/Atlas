@@ -29,10 +29,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             for (var i = 0; i < accounts.Count; i++)
             {
                 var accountName = accounts[i];
-                Account account = null;
-                lock (Battlenet.Common.AccountsDb) Battlenet.Common.AccountsDb.TryGetValue(accountName, out account);
-
-                if (account == null)
+                if (!Battlenet.Common.AccountsDb.TryGetValue(accountName, out Account account) || account == null)
                 {
                     for (var j = 0; j < keys.Count; j++)
                     {

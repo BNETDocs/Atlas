@@ -53,9 +53,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var passwordHash = r.ReadBytes(20);
                         context.Client.GameState.Username = r.ReadString();
 
-                        Battlenet.Common.AccountsDb.TryGetValue(context.Client.GameState.Username, out Account account);
-
-                        if (account == null)
+                        if (!Battlenet.Common.AccountsDb.TryGetValue(context.Client.GameState.Username, out Account account) || account == null)
                         {
                             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Account [{context.Client.GameState.Username}] does not exist");
                             return new SID_LOGONRESPONSE().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.Failure }}));

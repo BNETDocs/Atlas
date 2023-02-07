@@ -61,9 +61,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             foreach (var accountNameBytes in accounts)
             {
                 var accountNameStr = Encoding.UTF8.GetString(accountNameBytes);
-                Battlenet.Common.AccountsDb.TryGetValue(accountNameStr, out var account);
-
-                if (account == null)
+                if (!Battlenet.Common.AccountsDb.TryGetValue(accountNameStr, out Account account) || account == null)
                 {
                     Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "Client attempted to write userdata for an account that does not exist");
                     return false;
