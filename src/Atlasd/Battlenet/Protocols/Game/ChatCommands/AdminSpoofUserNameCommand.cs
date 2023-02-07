@@ -66,31 +66,20 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
 
             // get a new unique name from n2 (instead of target.Username)
-            lock (Battlenet.Common.ActiveAccounts)
+            var searchName = n2.Contains("#") ? n2[0..n2.IndexOf("#")] : n2;
+            int serial = 1;
+
+            if (n2.Contains("#"))
             {
-                var searchName = n2.Contains("#") ? n2[0..n2.IndexOf("#")] : n2;
-                int serial = 1;
-
-                if (n2.Contains("#"))
-                {
-                    var fields = n2.Split("#");
-                    int.TryParse(fields[1], out serial);
-                    if (serial < 1) serial = 1;
-                }
-
-                var onlineName = serial == 1 ? searchName : $"{searchName}#{serial}";
-                while (Battlenet.Common.ActiveAccounts.ContainsKey(onlineName))
-                {
-                    onlineName = $"{searchName}#{++serial}";
-                }
-
-                lock (target.ActiveAccount)
-                {
-                    Battlenet.Common.ActiveAccounts.Remove(oldOnlineName);
-                    target.OnlineName = onlineName;
-                    Battlenet.Common.ActiveAccounts.Add(onlineName, target.ActiveAccount);
-                }
+                var fields = n2.Split("#");
+                int.TryParse(fields[1], out serial);
+                if (serial < 1) serial = 1;
             }
+
+            var onlineName = serial == 1 ? searchName : $"{searchName}#{serial}";
+            while (!Battlenet.Common.ActiveAccounts.TryAdd(onlineName, target.ActiveAccount)) onlineName = $"{searchName}#{++serial}";
+            Battlenet.Common.ActiveAccounts.TryRemove(oldOnlineName, out _);
+            target.OnlineName = onlineName;
 
             // re-key target in active states
             lock (Battlenet.Common.ActiveGameStates)

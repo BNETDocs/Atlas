@@ -347,19 +347,10 @@ namespace Atlasd.Battlenet
                 account.Set(Account.LastLogonKey, DateTime.Now);
                 account.Set(Account.PortKey, RemoteEndPoint.ToString().Split(":")[1]);
 
-                lock (Common.ActiveAccounts)
-                {
-                    var serial = 1;
-                    var onlineName = GameState.Username;
-
-                    while (Common.ActiveAccounts.ContainsKey(onlineName))
-                    {
-                        onlineName = $"{GameState.Username}#{++serial}";
-                    }
-
-                    GameState.OnlineName = onlineName;
-                    Common.ActiveAccounts.Add(onlineName, account);
-                }
+                var serial = 1;
+                var onlineName = GameState.Username;
+                while (!Common.ActiveAccounts.TryAdd(onlineName, account)) onlineName = $"{GameState.Username}#{++serial}";
+                GameState.OnlineName = onlineName;
 
                 GameState.Username = (string)account.Get(Account.UsernameKey, GameState.Username);
 

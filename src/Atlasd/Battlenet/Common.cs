@@ -36,7 +36,7 @@ namespace Atlasd.Battlenet
 
         public static ConcurrentDictionary<string, Account> AccountsDb;
         public static ConcurrentDictionary<string, Account> AccountsProcessing;
-        public static Dictionary<string, Account> ActiveAccounts;
+        public static ConcurrentDictionary<string, Account> ActiveAccounts;
         public static List<Advertisement> ActiveAds;
         public static Dictionary<string, Channel> ActiveChannels;
         public static List<ClientState> ActiveClientStates;
@@ -99,7 +99,7 @@ namespace Atlasd.Battlenet
 
             AccountsDb = new ConcurrentDictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             AccountsProcessing = new ConcurrentDictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
-            ActiveAccounts = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
+            ActiveAccounts = new ConcurrentDictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveChannels = new Dictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClientStates = new List<ClientState>();
             ActiveGameAds = new ConcurrentDictionary<byte[], GameAd>();

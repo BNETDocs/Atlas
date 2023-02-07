@@ -87,19 +87,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         account.Set(Account.LastLogonKey, DateTime.Now);
                         account.Set(Account.PortKey, context.Client.RemoteEndPoint.ToString().Split(":")[1]);
 
-                        lock (Battlenet.Common.ActiveAccounts)
-                        {
-                            var serial = 1;
-                            var onlineName = context.Client.GameState.Username;
-
-                            while (Battlenet.Common.ActiveAccounts.ContainsKey(onlineName))
-                            {
-                                onlineName = $"{context.Client.GameState.Username}#{++serial}";
-                            }
-
-                            context.Client.GameState.OnlineName = onlineName;
-                            Battlenet.Common.ActiveAccounts.Add(onlineName, account);
-                        }
+                        var serial = 1;
+                        var onlineName = context.Client.GameState.Username;
+                        while (!Battlenet.Common.ActiveAccounts.TryAdd(onlineName, account)) onlineName = $"{context.Client.GameState.Username}#{++serial}";
+                        context.Client.GameState.OnlineName = onlineName;
 
                         context.Client.GameState.Username = (string)account.Get(Account.UsernameKey, context.Client.GameState.Username);
 

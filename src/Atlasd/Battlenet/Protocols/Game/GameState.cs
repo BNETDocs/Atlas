@@ -147,19 +147,14 @@ namespace Atlasd.Battlenet.Protocols.Game
             // Remove this ActiveAccount from ActiveAccounts
             if (ActiveAccount != null)
             {
-                lock (ActiveAccount)
-                {
-                    ActiveAccount.Set(Account.LastLogoffKey, DateTime.Now);
+                ActiveAccount.Set(Account.LastLogoffKey, DateTime.Now);
 
-                    var timeLogged = (UInt32)ActiveAccount.Get(Account.TimeLoggedKey);
-                    var diff = DateTime.Now - ConnectedTimestamp;
-                    timeLogged += (UInt32)Math.Round(diff.TotalSeconds);
-                    ActiveAccount.Set(Account.TimeLoggedKey, timeLogged);
+                var timeLogged = (UInt32)ActiveAccount.Get(Account.TimeLoggedKey);
+                var diff = DateTime.Now - ConnectedTimestamp;
+                timeLogged += (UInt32)Math.Round(diff.TotalSeconds);
+                ActiveAccount.Set(Account.TimeLoggedKey, timeLogged);
 
-                    var username = (string)ActiveAccount.Get(Account.UsernameKey);
-                    if (Battlenet.Common.ActiveAccounts.ContainsKey(username))
-                        Battlenet.Common.ActiveAccounts.Remove(username);
-                }
+                Battlenet.Common.ActiveAccounts.TryRemove(OnlineName, out _);
             }
 
             // Remove this GameAd
