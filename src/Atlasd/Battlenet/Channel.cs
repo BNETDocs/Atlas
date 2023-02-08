@@ -7,8 +7,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet
 {
@@ -240,20 +238,7 @@ namespace Atlasd.Battlenet
             }
         }
 
-        public void Designate(GameState designator, GameState heir)
-        {
-            DesignatedHeirs[designator] = heir;
-        }
-
-        public void DisbandInto(Channel destination)
-        {
-            foreach (var user in Users)
-            {
-                destination.AcceptUser(user, true, true);
-            }
-        }
-
-        public void Dispose()
+        public void Close()
         {
             BannedUsers = null;
             DesignatedHeirs = null;
@@ -265,6 +250,19 @@ namespace Atlasd.Battlenet
             }
 
             Common.ActiveChannels.TryRemove(Name, out _);
+        }
+
+        public void Designate(GameState designator, GameState heir)
+        {
+            DesignatedHeirs[designator] = heir;
+        }
+
+        public void DisbandInto(Channel destination)
+        {
+            foreach (var user in Users)
+            {
+                destination.AcceptUser(user, true, true);
+            }
         }
 
         public static Channel GetChannelByName(string name, bool autoCreate)
@@ -503,7 +501,7 @@ namespace Atlasd.Battlenet
             // If the user is not in the Users list, then we give up here
             if (!notify)
             {
-                if (Count == 0 && !ActiveFlags.HasFlag(Flags.Public)) Dispose();
+                if (Count == 0 && !ActiveFlags.HasFlag(Flags.Public)) Close();
                 return;
             }
 
@@ -551,7 +549,7 @@ namespace Atlasd.Battlenet
                 }
             }
 
-            if (Count == 0 && !ActiveFlags.HasFlag(Flags.Public)) Dispose();
+            if (Count == 0 && !ActiveFlags.HasFlag(Flags.Public)) Close();
         }
 
         /**

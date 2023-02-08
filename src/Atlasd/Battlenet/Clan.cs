@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Atlasd.Battlenet
 {
-    class Clan : IDisposable
+    class Clan
     {
         public enum Ranks : byte
         {
@@ -58,14 +58,9 @@ namespace Atlasd.Battlenet
         {
             if (ActiveChannel != null)
             {
-                if (ActiveChannel.Count == 0) ActiveChannel.Dispose();
+                if (ActiveChannel.Count == 0) ActiveChannel.Close();
                 ActiveChannel = null;
             }
-        }
-
-        public void Dispose()
-        {
-            Close();
         }
 
         public bool AddUser(byte[] username, Ranks rank)

@@ -14,11 +14,11 @@ using System.Threading.Tasks;
 
 namespace Atlasd.Battlenet
 {
-    class ClientState : IDisposable
+    class ClientState
     {
         public BNFTPState BNFTPState;
         public bool Connected { get => Socket != null && Socket.Connected; }
-        public bool IsDisposing { get; private set; } = false;
+        public bool IsClosing { get; private set; } = false;
 
         public GameState GameState { get; private set; }
         public ProtocolType ProtocolType { get; private set; }
@@ -38,7 +38,12 @@ namespace Atlasd.Battlenet
 
         public void Close()
         {
+            if (IsClosing) return;
+            IsClosing = true;
+
             Disconnect();
+
+            IsClosing = false;
         }
 
         public void Disconnect(string reason = null)
@@ -89,16 +94,6 @@ namespace Atlasd.Battlenet
                     Socket.Close();
                 }
             }
-        }
-
-        public void Dispose() /* part of IDisposable */
-        {
-            if (IsDisposing) return;
-            IsDisposing = true;
-
-            Disconnect();
-
-            IsDisposing = false;
         }
 
         protected void Initialize(Socket client)
@@ -161,10 +156,10 @@ namespace Atlasd.Battlenet
             // check if the remote host closed the connection
             if (!(e.SocketError == SocketError.Success && e.BytesTransferred > 0))
             {
-                if (!IsDisposing && Socket != null)
+                if (!IsClosing && Socket != null)
                 {
                     Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, $"TCP connection lost");
-                    Dispose();
+                    Close();
                 }
                 return;
             }
@@ -187,10 +182,10 @@ namespace Atlasd.Battlenet
             // check if the remote host closed the connection
             if (e.SocketError != SocketError.Success)
             {
-                if (!IsDisposing && Socket != null)
+                if (!IsClosing && Socket != null)
                 {
                     Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client, RemoteEndPoint, $"TCP connection lost");
-                    Dispose();
+                    Close();
                 }
                 return;
             }
@@ -488,12 +483,12 @@ namespace Atlasd.Battlenet
             catch (GameProtocolViolationException ex)
             {
                 Logging.WriteLine(Logging.LogLevel.Warning, (Logging.LogType)ProtocolType.ProtocolTypeToLogType(ex.ProtocolType), clientState.RemoteEndPoint, "Protocol violation encountered!" + (ex.Message.Length > 0 ? $" {ex.Message}" : ""));
-                clientState.Dispose();
+                clientState.Close();
             }
             catch (Exception ex)
             {
                 Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client, clientState.RemoteEndPoint, $"{ex.GetType().Name} error encountered!" + (ex.Message.Length > 0 ? $" {ex.Message}" : ""));
-                clientState.Dispose();
+                clientState.Close();
             }
             finally
             {
