@@ -76,7 +76,10 @@ namespace Atlasd.Battlenet
             }
 
             // Remove this from ActiveClientStates
-            lock (Common.ActiveClientStates) Common.ActiveClientStates.Remove(this);
+            if (!Common.ActiveClientStates.TryRemove(this.Socket, out _))
+            {
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, $"Failed to remove client state [{this.Socket.RemoteEndPoint}] from active client state cache");
+            }
 
             // Close the connection
             try
@@ -98,7 +101,10 @@ namespace Atlasd.Battlenet
 
         protected void Initialize(Socket client)
         {
-            lock (Common.ActiveClientStates) Common.ActiveClientStates.Add(this);
+            if (!Common.ActiveClientStates.TryAdd(client, this))
+            {
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, $"Failed to add client state [{this.Socket.RemoteEndPoint}] to active client state cache");
+            }
 
             BNFTPState = null;
             GameState = null;

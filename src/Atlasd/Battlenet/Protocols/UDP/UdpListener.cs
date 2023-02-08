@@ -112,17 +112,17 @@ namespace Atlasd.Battlenet.Protocols.Udp
                             var udpToken = r.ReadUInt32();
 
                             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_UDP, remoteEndpoint, $"({serverToken} - {udpToken})");
-                            foreach(ClientState state in Battlenet.Common.ActiveClientStates)
+                            foreach (var clientState in Battlenet.Common.ActiveClientStates.Values)
                             {
-                                if (state.GameState.ServerToken == serverToken)
+                                if (clientState.GameState.ServerToken == serverToken)
                                 {
-                                    if (state.GameState.UDPToken == udpToken)
+                                    if (clientState.GameState.UDPToken == udpToken)
                                     {
                                         var ipEndPoint = remoteEndpoint as IPEndPoint;
                                         if (ipEndPoint != null)
                                         {
-                                            state.GameState.GameDataAddress = ipEndPoint.Address;
-                                            state.GameState.GameDataPort = (ushort)ipEndPoint.Port;
+                                            clientState.GameState.GameDataAddress = ipEndPoint.Address;
+                                            clientState.GameState.GameDataPort = (ushort)ipEndPoint.Port;
                                         }
                                     }
                                     break;

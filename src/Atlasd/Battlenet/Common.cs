@@ -7,6 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -39,7 +40,7 @@ namespace Atlasd.Battlenet
         public static ConcurrentDictionary<string, Account> ActiveAccounts;
         public static ConcurrentDictionary<UInt32, Advertisement> ActiveAds;
         public static ConcurrentDictionary<string, Channel> ActiveChannels;
-        public static List<ClientState> ActiveClientStates;
+        public static ConcurrentDictionary<Socket, ClientState> ActiveClientStates;
         public static ConcurrentDictionary<byte[], GameAd> ActiveGameAds;
         public static ConcurrentDictionary<string, GameState> ActiveGameStates;
         public static IPAddress DefaultAddress { get; private set; }
@@ -97,7 +98,7 @@ namespace Atlasd.Battlenet
             AccountsProcessing = new ConcurrentDictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveAccounts = new ConcurrentDictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             ActiveChannels = new ConcurrentDictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
-            ActiveClientStates = new List<ClientState>();
+            ActiveClientStates = new ConcurrentDictionary<Socket, ClientState>();
             ActiveGameAds = new ConcurrentDictionary<byte[], GameAd>();
             ActiveGameStates = new ConcurrentDictionary<string, GameState>(StringComparer.OrdinalIgnoreCase);
 
@@ -202,13 +203,10 @@ namespace Atlasd.Battlenet
         {
             var count = (uint)0;
 
-            lock (ActiveClientStates)
+            foreach (var client in ActiveClientStates.Values)
             {
-                foreach (var client in ActiveClientStates)
-                {
-                    if (client == null || client.GameState == null || client.GameState.Product == Product.ProductCode.None) continue;
-                    if (client.GameState.Product == productCode) count++;
-                }
+                if (client == null || client.GameState == null || client.GameState.Product == Product.ProductCode.None) continue;
+                if (client.GameState.Product == productCode) count++;
             }
 
             return count;
