@@ -283,10 +283,11 @@ namespace Atlasd.Battlenet
                     gameState.Client.Send(msg.ToByteArray(gameState.Client.ProtocolType));
                 }
 
-                if (gameState.LastPong + unresponsiveInterval <= now && gameState.ActiveChannel != null && gameState.Ping != unresponsiveIntervalMS)
+                // TODO: Fix this commented out code. It seems to have false-positive conditions and abruptly sets unresponsive ping on timely clients.
+                /*if (gameState.LastPong + unresponsiveInterval <= now && gameState.ActiveChannel != null && gameState.Ping != unresponsiveIntervalMS)
                 {
                     gameState.ActiveChannel.UpdateUser(gameState, unresponsiveIntervalMS);
-                }
+                }*/
             }
         }
 
