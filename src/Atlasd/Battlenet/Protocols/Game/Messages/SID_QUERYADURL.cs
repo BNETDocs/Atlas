@@ -41,15 +41,9 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         var adId = r.ReadUInt32();
 
-                        Advertisement ad;
-                        try
+                        if (!Battlenet.Common.ActiveAds.TryGetValue(adId, out var ad) || ad == null)
                         {
-                            lock (Battlenet.Common.ActiveAds) ad = Battlenet.Common.ActiveAds[(int)adId];
-                            if (ad == null) throw new ArgumentOutOfRangeException();
-                        }
-                        catch (ArgumentOutOfRangeException)
-                        {
-                            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Received url query request for out of bounds ad id [0x{adId:X8}]");
+                            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Received url query request for out of bounds ad id [0x{adId:X8}]");
                             return false;
                         }
 

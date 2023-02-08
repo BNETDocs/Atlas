@@ -50,14 +50,14 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 case MessageDirection.ServerToClient:
                     {
                         var rand = new Random();
-                        uint adId;
-                        Advertisement ad;
+                        UInt32 adId;
 
                         // Get random advertisement
-                        lock (Battlenet.Common.ActiveAds)
+                        adId = (UInt32)rand.Next(0, Battlenet.Common.ActiveAds.Count - 1);
+                        if (!Battlenet.Common.ActiveAds.TryGetValue(adId, out var ad) || ad == null)
                         {
-                            adId = (uint)rand.Next(0, Battlenet.Common.ActiveAds.Count - 1);
-                            ad = Battlenet.Common.ActiveAds[(int)adId];
+                            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, $"Failed to get advertisement [0x{adId:X8}] from active advertisement cache");
+                            return true;
                         }
 
                         Buffer = new byte[18 + Encoding.UTF8.GetByteCount(ad.Filename) + Encoding.UTF8.GetByteCount(ad.Url)];

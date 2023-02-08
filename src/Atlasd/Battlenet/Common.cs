@@ -37,7 +37,7 @@ namespace Atlasd.Battlenet
         public static ConcurrentDictionary<string, Account> AccountsDb;
         public static ConcurrentDictionary<string, Account> AccountsProcessing;
         public static ConcurrentDictionary<string, Account> ActiveAccounts;
-        public static List<Advertisement> ActiveAds;
+        public static ConcurrentDictionary<UInt32, Advertisement> ActiveAds;
         public static ConcurrentDictionary<string, Channel> ActiveChannels;
         public static List<ClientState> ActiveClientStates;
         public static ConcurrentDictionary<byte[], GameAd> ActiveGameAds;
@@ -119,13 +119,11 @@ namespace Atlasd.Battlenet
         {
             Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, "Initializing advertisements");
 
-            if (ActiveAds == null || ActiveAds.Count != 0)
-            {
-                ActiveAds = new List<Advertisement>();
-            }
-
             Settings.State.RootElement.TryGetProperty("ads", out var adsJson);
 
+            if (ActiveAds == null || ActiveAds.Count != 0) ActiveAds = new ConcurrentDictionary<UInt32, Advertisement>();
+
+            UInt32 adId = 0;
             foreach (var adJson in adsJson.EnumerateArray())
             {
                 adJson.TryGetProperty("enabled", out var enabledJson);
@@ -158,8 +156,14 @@ namespace Atlasd.Battlenet
                 }
 
                 var ad = new Advertisement(filename, url, products, locales);
-
-                lock (ActiveAds) ActiveAds.Add(ad);
+                if (!ActiveAds.TryAdd(adId, ad))
+                {
+                    Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Failed to add advertisement [{filename}] to active advertisement cache");
+                }
+                else
+                {
+                    adId++; // increment only if TryAdd succeeds, ActiveAds needs to be linear for random ad selection to work in SID_CHECKAD.
+                }
             }
 
             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Config, $"Initialized {ActiveAds.Count} advertisements");
