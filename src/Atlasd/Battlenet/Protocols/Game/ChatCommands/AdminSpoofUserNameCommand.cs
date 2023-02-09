@@ -83,8 +83,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             target.OnlineName = onlineName;
 
             // re-key target in active states
-            if (!(Battlenet.Common.ActiveGameStates.TryAdd(target.OnlineName, target)) &&
-                Battlenet.Common.ActiveGameStates.TryRemove(oldOnlineName, out _))
+            if (!(Battlenet.Common.ActiveGameStates.TryAdd(target.OnlineName, target) &&
+                Battlenet.Common.ActiveGameStates.TryRemove(oldOnlineName, out _)))
             {
                 Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Client, $"Failed to re-key game state from [{oldOnlineName}] to [{target.OnlineName}]");
             }
