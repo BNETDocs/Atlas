@@ -141,7 +141,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 case "msg":
                 case "message":
                     {
-                        var messageString = Arguments.Count > 0 ? Arguments[0] : string.Empty;
+                        var messageString = string.Join(" ", Arguments);
                         if (string.IsNullOrEmpty(messageString))
                         {
                             reply = Resources.WhisperCommandEmptyMessage;
