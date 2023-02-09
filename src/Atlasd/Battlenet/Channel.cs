@@ -504,7 +504,10 @@ namespace Atlasd.Battlenet
 
             if (!string.IsNullOrEmpty(userId))
             {
-                if (!Users.TryRemove(userId, out _)) notify = false;
+                if (Users.TryRemove(userId, out _))
+                    users = Users.ToArray();
+                else
+                    notify = false;
             }
 
             // If the user is not in the Users list, then we give up here
