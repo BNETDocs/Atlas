@@ -138,21 +138,12 @@ namespace Atlasd.Battlenet
 
             var context = new MessageContext(this, Protocols.MessageDirection.ClientToServer);
 
-            lock (BattlenetGameFrame.Messages)
+            while (BattlenetGameFrame.Messages.TryDequeue(out var msg))
             {
-                while (BattlenetGameFrame.Messages.Count > 0)
+                if (!msg.Invoke(context))
                 {
-                    if (!BattlenetGameFrame.Messages.TryDequeue(out var msg))
-                    {
-                        Disconnect();
-                        return;
-                    }
-
-                    if (!msg.Invoke(context))
-                    {
-                        Disconnect();
-                        return;
-                    }
+                    Disconnect();
+                    return;
                 }
             }
         }
