@@ -150,13 +150,12 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                         {
                             new ChatEvent(ChatEvent.EventIds.EID_WHISPERTO, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, Resources.WhisperFromYourFriends, messageString).WriteTo(context.GameState.Client);
 
-                            var whisperFrom = new ChatEvent(ChatEvent.EventIds.EID_WHISPERFROM, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, messageString);
                             foreach (var friend in friends)
                             {
                                 var friendString = Encoding.UTF8.GetString(friend);
                                 if (!Battlenet.Common.GetClientByOnlineName(friendString, out var friendGameState) || friendGameState == null) continue;
                                 if (!string.IsNullOrEmpty(friendGameState.DoNotDisturb)) continue;
-                                whisperFrom.WriteTo(friendGameState.Client);
+                                new ChatEvent(ChatEvent.EventIds.EID_WHISPERFROM, context.GameState.ChannelFlags, context.GameState.Ping, Channel.RenderOnlineName(friendGameState, context.GameState), messageString).WriteTo(friendGameState.Client);
                             }
                         }
 
