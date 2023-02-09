@@ -114,7 +114,7 @@ namespace Atlasd.Battlenet.Protocols.Udp
                             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_UDP, remoteEndpoint, $"({serverToken} - {udpToken})");
                             foreach (var clientState in Battlenet.Common.ActiveClientStates.Values)
                             {
-                                if (clientState.GameState.ServerToken == serverToken)
+                                if (clientState != null && clientState.GameState != null && clientState.GameState.ServerToken == serverToken)
                                 {
                                     if (clientState.GameState.UDPToken == udpToken)
                                     {
