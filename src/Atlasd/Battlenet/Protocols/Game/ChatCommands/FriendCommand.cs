@@ -131,15 +131,32 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                         {
                             if (friendCount++ == 0) reply += Battlenet.Common.NewLine;
                             var friendString = Encoding.UTF8.GetString(friend);
-                            reply += $"{friendCount}: {friendString}{Battlenet.Common.NewLine}";
+
+                            var detailString = "offline";
+                            if (Battlenet.Common.GetClientByOnlineName(friendString, out var friendGameState) && friendGameState != null)
+                            {
+                                detailString = $"using {Battlenet.Product.ProductName(friendGameState.Product, true)}";
+
+                                if (friendGameState.ActiveChannel == null)
+                                    detailString += " in Battle.net"; // emulation note: Blizzard servers use a server-specific realm name here.
+
+                                if (friendGameState.ActiveChannel != null && friendGameState.ActiveChannel.IsPublic())
+                                    detailString += $" in the channel {friendGameState.ActiveChannel.Name}.";
+
+                                if (friendGameState.ActiveChannel != null && !friendGameState.ActiveChannel.IsPublic())
+                                    detailString += $" in a private channel.";
+                            }
+                            if (!string.IsNullOrEmpty(detailString)) detailString = $", {detailString}";
+
+                            reply += $"{friendCount}: {friendString}{detailString}{Battlenet.Common.NewLine}";
                         }
                         if (friendCount > 0) reply = reply[0..(reply.Length - Battlenet.Common.NewLine.Length)]; // strip last newline
 
                         break;
                     }
-                case "m":
-                case "msg":
                 case "message":
+                case "msg":
+                case "m":
                     {
                         var messageString = string.Join(" ", Arguments);
                         if (string.IsNullOrEmpty(messageString))
