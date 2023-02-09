@@ -414,7 +414,7 @@ namespace Atlasd.Battlenet
 
                 if (ReceiveBuffer.Length < messageLen) return; // Partial message
 
-                //byte messagePad = ReceiveBuffer[0];
+                //byte messagePad = ReceiveBuffer[0]; // This is checked in the Message.FromByteArray() call.
                 byte messageId = ReceiveBuffer[1];
                 byte[] messageBuffer = new byte[messageLen - 4];
                 Buffer.BlockCopy(ReceiveBuffer, 4, messageBuffer, 0, messageLen - 4);
