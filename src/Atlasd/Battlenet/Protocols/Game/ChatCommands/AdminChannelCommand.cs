@@ -35,9 +35,15 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                             var destinationName = string.Join(" ", Arguments);
                             if (string.IsNullOrEmpty(destinationName)) destinationName = Resources.TheVoid;
                             var destination = Channel.GetChannelByName(destinationName, true);
-                            channel.DisbandInto(destination);
-                            eventId = ChatEvent.EventIds.EID_INFO;
-                            reply = Resources.ChannelWasDisbanded.Replace("{oldName}", channel.Name).Replace("{newName}", destination.Name);
+                            if (!channel.DisbandInto(destination))
+                            {
+                                reply = Resources.InvalidChannelName;
+                            }
+                            else
+                            {
+                                eventId = ChatEvent.EventIds.EID_INFO;
+                                reply = Resources.ChannelWasDisbanded.Replace("{oldName}", channel.Name).Replace("{newName}", destination.Name);
+                            }
                             break;
                         }
                     case "flags":

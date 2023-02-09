@@ -241,16 +241,20 @@ namespace Atlasd.Battlenet
 
         public void Close()
         {
-            BannedUsers = null;
-            DesignatedHeirs = null;
+            if (!Common.ActiveChannels.TryRemove(Name, out _))
+            {
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Channel, $"Failed to remove channel [{Name}] from active channel cache");
+            }
 
             if (Users != null && Users.Count > 0)
             {
                 var theVoid = GetChannelByName(Resources.TheVoid, true);
-                foreach (var pair in Users) MoveUser(pair.Value, theVoid, true);
+                if (theVoid != null) foreach (var pair in Users) MoveUser(pair.Value, theVoid, true);
             }
 
-            Common.ActiveChannels.TryRemove(Name, out _);
+            BannedUsers = null;
+            DesignatedHeirs = null;
+            Users = null;
         }
 
         public void Designate(GameState designator, GameState heir)
@@ -258,10 +262,17 @@ namespace Atlasd.Battlenet
             DesignatedHeirs[designator] = heir;
         }
 
-        public void DisbandInto(Channel destination)
+        public bool DisbandInto(Channel destination)
         {
+            if (destination == this)
+            {
+                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Channel, $"Cannot disband channel [{Name}] into itself");
+                return false;
+            }
+
             foreach (var pair in Users) destination.AcceptUser(pair.Value, true, true);
             Close();
+            return true;
         }
 
         public static Channel GetChannelByName(string name, bool autoCreate)
