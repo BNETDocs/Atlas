@@ -137,6 +137,31 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
                         break;
                     }
+                case "m":
+                case "msg":
+                case "message":
+                    {
+                        var messageString = Arguments.Count > 0 ? Arguments[0] : string.Empty;
+                        if (string.IsNullOrEmpty(messageString))
+                        {
+                            reply = Resources.WhisperCommandEmptyMessage;
+                        }
+                        else
+                        {
+                            new ChatEvent(ChatEvent.EventIds.EID_WHISPERTO, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, Resources.WhisperFromYourFriends, messageString).WriteTo(context.GameState.Client);
+
+                            var whisperFrom = new ChatEvent(ChatEvent.EventIds.EID_WHISPERFROM, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, messageString);
+                            foreach (var friend in friends)
+                            {
+                                var friendString = Encoding.UTF8.GetString(friend);
+                                if (!Battlenet.Common.GetClientByOnlineName(friendString, out var friendGameState) || friendGameState == null) continue;
+                                if (!string.IsNullOrEmpty(friendGameState.DoNotDisturb)) continue;
+                                whisperFrom.WriteTo(friendGameState.Client);
+                            }
+                        }
+
+                        break;
+                    }
                 case "promote":
                 case "p":
                     {

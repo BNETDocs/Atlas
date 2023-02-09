@@ -464,6 +464,9 @@ Process uptime: {processUptime}</value>
   <data name="WhisperCommandUserIsDoNotDisturb" xml:space="preserve">
     <value>{user} is unavailable ({message})</value>
   </data>
+  <data name="WhisperFromYourFriends" xml:space="preserve">
+    <value>your friends</value>
+  </data>
   <data name="WhoCommand" xml:space="preserve">
     <value>Users in channel {channel}:
 {users}</value>

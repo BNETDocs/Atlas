@@ -1008,6 +1008,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to your friends.
+        /// </summary>
+        public static string WhisperFromYourFriends {
+            get {
+                return ResourceManager.GetString("WhisperFromYourFriends", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Users in channel {channel}:
         ///{users}.
         /// </summary>
