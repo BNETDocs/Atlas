@@ -190,7 +190,7 @@ namespace Atlasd.Battlenet
 
         public void ReceiveAsync()
         {
-            if (Socket == null) return;
+            if (Socket == null || !Socket.Connected) return;
 
             var readEventArgs = new SocketAsyncEventArgs();
             readEventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(SocketIOCompleted);
@@ -201,7 +201,7 @@ namespace Atlasd.Battlenet
             bool willRaiseEvent;
             try
             {
-                willRaiseEvent = Socket.ReceiveAsync(readEventArgs);
+                willRaiseEvent = Socket != null && Socket.Connected && Socket.ReceiveAsync(readEventArgs);
             }
             catch (ObjectDisposedException)
             {
