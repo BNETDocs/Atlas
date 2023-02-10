@@ -267,6 +267,7 @@ namespace Atlasd.Battlenet
         protected void ReceiveProtocolChat(SocketAsyncEventArgs e)
         {
             string text;
+
             try
             {
                 text = Encoding.UTF8.GetString(ReceiveBuffer);
@@ -280,115 +281,119 @@ namespace Atlasd.Battlenet
 
             // Mix alternate platform's new lines into our easily parsable NewLine constant:
             text = text.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Common.NewLine);
-            if (!text.Contains(Common.NewLine)) return; // Need more data from client
 
-            var pos = text.IndexOf(Common.NewLine);
-            ReceiveBuffer = ReceiveBuffer[(pos + Common.NewLine.Length)..];
-            var line = text.Substring(0, pos);
-
-            if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username) && string.IsNullOrEmpty(line))
+            while (text.Length > 0)
             {
-                if (line[0] == 0x04) line = line[1..];
-                Send(Encoding.UTF8.GetBytes($"Enter your login name and password.{Common.NewLine}"));
-                GameState.Username = line;
-                Send(Encoding.UTF8.GetBytes($"Username: "));
-                return;
-            }
+                if (!text.Contains(Common.NewLine)) break; // Need more data from client
 
-            if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username))
-            {
-                GameState.Username = line;
-                Send(Encoding.UTF8.GetBytes($"Password: \x01"));
-                return;
-            }
+                var pos = text.IndexOf(Common.NewLine);
+                ReceiveBuffer = ReceiveBuffer[(pos + Common.NewLine.Length)..];
+                var line = text.Substring(0, pos);
+                text = text[(line.Length + Common.NewLine.Length)..];
 
-            if (GameState.ActiveAccount == null)
-            {
-                var inPasswordHash = MBNCSUtil.XSha1.CalculateHash(Encoding.UTF8.GetBytes(line));
-
-                Common.AccountsDb.TryGetValue(GameState.Username, out Account account);
-
-                if (account == null)
+                if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username) && !string.IsNullOrEmpty(line) && line[0] == 0x04)
                 {
-                    GameState.Username = null;
-                    Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, "Client sent login byte [0x04]");
+                    line = line[1..];
+                }
+
+                if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username) && !string.IsNullOrEmpty(line))
+                {
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, "Asking client for login credentials");
+                    //Send(Encoding.UTF8.GetBytes($"Enter your login name and password.{Common.NewLine}Username: "));
+                    GameState.Username = line;
+                    //if (!string.IsNullOrEmpty(GameState.Username)) Send(Encoding.UTF8.GetBytes($"Password: \x01"));
+                    continue;
+                }
+
+                /*if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username))
+                {
+                    GameState.Username = line;
+                    Send(Encoding.UTF8.GetBytes($"Password: \x01"));
                     return;
-                }
+                }*/
 
-                var dbPasswordHash = (byte[])account.Get(Account.PasswordKey, new byte[20]);
-                if (!inPasswordHash.SequenceEqual(dbPasswordHash))
+                if (GameState.ActiveAccount == null)
                 {
-                    GameState.Username = null;
-                    Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
-                    return;
+                    var inPasswordHash = MBNCSUtil.XSha1.CalculateHash(Encoding.UTF8.GetBytes(line.ToLower()));
+
+                    if (!Common.AccountsDb.TryGetValue(GameState.Username, out Account account) || account == null)
+                    {
+                        GameState.Username = null;
+                        Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
+                        continue;
+                    }
+
+                    var dbPasswordHash = (byte[])account.Get(Account.PasswordKey, new byte[20]);
+                    if (!inPasswordHash.SequenceEqual(dbPasswordHash))
+                    {
+                        GameState.Username = null;
+                        Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
+                        continue;
+                    }
+
+                    var flags = (Account.Flags)account.Get(Account.FlagsKey, Account.Flags.None);
+                    if ((flags & Account.Flags.Closed) != 0)
+                    {
+                        GameState.Username = null;
+                        Send(Encoding.UTF8.GetBytes($"Account closed.{Common.NewLine}"));
+                        continue;
+                    }
+
+                    GameState.ActiveAccount = account;
+                    GameState.LastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
+
+                    account.Set(Account.IPAddressKey, RemoteEndPoint.ToString().Split(":")[0]);
+                    account.Set(Account.LastLogonKey, DateTime.Now);
+                    account.Set(Account.PortKey, RemoteEndPoint.ToString().Split(":")[1]);
+
+                    var serial = 1;
+                    var onlineName = GameState.Username;
+                    while (!Common.ActiveAccounts.TryAdd(onlineName, account)) onlineName = $"{GameState.Username}#{++serial}";
+                    GameState.OnlineName = onlineName;
+
+                    GameState.Username = (string)account.Get(Account.UsernameKey, GameState.Username);
+                    GameState.Statstring = new byte[1];
+
+                    if (!Battlenet.Common.ActiveGameStates.TryAdd(GameState.OnlineName, GameState))
+                    {
+                        Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Client_Chat, RemoteEndPoint, $"Failed to add game state to active game state cache");
+                        account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
+                        Battlenet.Common.ActiveAccounts.TryRemove(onlineName, out _);
+                        Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
+                        continue;
+                    }
+
+                    Send(Encoding.UTF8.GetBytes($"Connection from [{RemoteEndPoint}]{Common.NewLine}"));
+
+                    using var m1 = new MemoryStream(128);
+                    using var w1 = new BinaryWriter(m1);
+                    {
+                        w1.Write(GameState.OnlineName);
+                        w1.Write(GameState.Statstring);
+
+                        new SID_ENTERCHAT(m1.ToArray()).Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer));
+                    }
+
+                    using var m2 = new MemoryStream(128);
+                    using var w2 = new BinaryWriter(m2);
+                    {
+                        w2.Write((UInt32)SID_JOINCHANNEL.Flags.First);
+                        w2.Write(Product.ProductChannelName(GameState.Product));
+
+                        new SID_JOINCHANNEL(m2.ToArray()).Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer));
+                    }
                 }
 
-                var flags = (Account.Flags)account.Get(Account.FlagsKey, Account.Flags.None);
-                if ((flags & Account.Flags.Closed) != 0)
+                if (string.IsNullOrEmpty(line)) continue;
+
+                using var m3 = new MemoryStream(1 + Encoding.UTF8.GetByteCount(line));
+                using var w3 = new BinaryWriter(m3);
                 {
-                    GameState.Username = null;
-                    Send(Encoding.UTF8.GetBytes($"Account closed.{Common.NewLine}"));
-                    return;
+                    w3.Write(line);
+
+                    new SID_CHATCOMMAND(m3.ToArray()).Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer));
                 }
-
-                GameState.ActiveAccount = account;
-                GameState.LastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
-
-                account.Set(Account.IPAddressKey, RemoteEndPoint.ToString().Split(":")[0]);
-                account.Set(Account.LastLogonKey, DateTime.Now);
-                account.Set(Account.PortKey, RemoteEndPoint.ToString().Split(":")[1]);
-
-                var serial = 1;
-                var onlineName = GameState.Username;
-                while (!Common.ActiveAccounts.TryAdd(onlineName, account)) onlineName = $"{GameState.Username}#{++serial}";
-                GameState.OnlineName = onlineName;
-
-                GameState.Username = (string)account.Get(Account.UsernameKey, GameState.Username);
-
-                if (!Battlenet.Common.ActiveGameStates.TryAdd(GameState.OnlineName, GameState))
-                {
-                    Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Client_Chat, RemoteEndPoint, $"Failed to add game state to active game state cache");
-                    account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
-                    Battlenet.Common.ActiveAccounts.TryRemove(onlineName, out _);
-                    Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
-                    return;
-                }
-
-                Send(Encoding.UTF8.GetBytes($"Connection from [{RemoteEndPoint}]{Common.NewLine}"));
-
-                using var m1 = new MemoryStream(128);
-                using var w1 = new BinaryWriter(m1);
-                {
-                    w1.Write(GameState.OnlineName);
-                    w1.Write(GameState.Statstring);
-
-                    new SID_ENTERCHAT(m1.ToArray()).Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer));
-                }
-
-                using var m2 = new MemoryStream(128);
-                using var w2 = new BinaryWriter(m2);
-                {
-                    w2.Write((UInt32)SID_JOINCHANNEL.Flags.First);
-                    w2.Write(Product.ProductChannelName(GameState.Product));
-
-                    new SID_JOINCHANNEL(m2.ToArray()).Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer));
-                }
-            }
-
-            if (!text.Contains(Common.NewLine))
-            {
-                // The caret-return/line-feed character(s) have not yet been received, wait for more data
-                return;
-            }
-
-            if (string.IsNullOrEmpty(line)) return;
-
-            using var m3 = new MemoryStream(1 + Encoding.UTF8.GetByteCount(line));
-            using var w3 = new BinaryWriter(m3);
-            {
-                w3.Write(line);
-
-                new SID_CHATCOMMAND(m3.ToArray()).Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer));
             }
         }
 
