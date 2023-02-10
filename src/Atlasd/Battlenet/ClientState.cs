@@ -78,13 +78,13 @@ namespace Atlasd.Battlenet
             // Remove this from ActiveClientStates
             if (!Common.ActiveClientStates.TryRemove(this.Socket, out _))
             {
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, $"Failed to remove client state [{this.Socket.RemoteEndPoint}] from active client state cache");
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, $"Failed to remove client state [{RemoteEndPoint}] from active client state cache");
             }
 
             // Close the connection
             try
             {
-                Socket.Shutdown(SocketShutdown.Send);
+                if (Socket != null && Socket.Connected) Socket.Shutdown(SocketShutdown.Send);
             }
             catch (Exception ex)
             {
@@ -92,10 +92,7 @@ namespace Atlasd.Battlenet
             }
             finally
             {
-                if (Socket != null)
-                {
-                    Socket.Close();
-                }
+                if (Socket != null) Socket.Close();
             }
         }
 
@@ -237,6 +234,7 @@ namespace Atlasd.Battlenet
                 GameState.Platform = Platform.PlatformCode.Windows;
                 GameState.Product = Product.ProductCode.Chat;
 
+                Send(Encoding.UTF8.GetBytes($"Connection from [{RemoteEndPoint}]{Common.NewLine}"));
                 Send(Encoding.UTF8.GetBytes($"Enter your login name and password.{Common.NewLine}"));
             }
         }
@@ -304,6 +302,8 @@ namespace Atlasd.Battlenet
                 if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username) && !string.IsNullOrEmpty(line))
                 {
                     GameState.Username = line;
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, $"Client set username to [{GameState.Username}]");
+
                     Send(Encoding.UTF8.GetBytes("Password: "));
                     continue;
                 }
@@ -318,6 +318,7 @@ namespace Atlasd.Battlenet
                     {
                         if (!autoAccountCreate)
                         {
+                            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, "Client sent non-existent username");
                             Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
                             continue;
                         }
@@ -325,17 +326,45 @@ namespace Atlasd.Battlenet
 
                     if (autoAccountCreate && account == null)
                     {
+                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, $"Creating account [{GameState.Username}] automatically for chat gateway client");
                         Account.CreateStatus status = Account.TryCreate(GameState.Username, inPasswordHash, out account);
                         if (account == null || status != Account.CreateStatus.Success)
                         {
-                            Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
+                            var message = "Incorrect username/password";
+                            switch(status)
+                            {
+                                case Account.CreateStatus.AccountExists:
+                                    message = "Account already exists"; break;
+                                case Account.CreateStatus.LastCreateInProgress:
+                                    message = "Last create in progress"; break;
+                                case Account.CreateStatus.UsernameAdjacentPunctuation:
+                                    message = "Username has adjacent punctuation"; break;
+                                case Account.CreateStatus.UsernameBannedWord:
+                                    message = "Username contains a banned word"; break;
+                                case Account.CreateStatus.UsernameInvalidChars:
+                                    message = "Username contains an invalid character"; break;
+                                case Account.CreateStatus.UsernameShortAlphanumeric:
+                                    message = "Username contains too few alphanumeric characters"; break;
+                                case Account.CreateStatus.UsernameTooManyPunctuation:
+                                    message = "Username contains too many punctuation characters"; break;
+                                case Account.CreateStatus.UsernameTooShort:
+                                    message = "Username is too short"; break;
+                            }
+
+                            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, $"[{message}]");
+                            Send(Encoding.UTF8.GetBytes($"{message}.{Common.NewLine}"));
                             continue;
+                        }
+                        else
+                        {
+                            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, $"Created account [{account.Get(Account.UsernameKey, GameState.Username)}] automatically for chat gateway client");
                         }
                     }
 
                     var dbPasswordHash = (byte[])account.Get(Account.PasswordKey, new byte[20]);
                     if (!inPasswordHash.SequenceEqual(dbPasswordHash))
                     {
+                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, $"Incorrect password for account [{account.Get(Account.UsernameKey, GameState.Username)}]");
                         Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
                         continue;
                     }
@@ -343,9 +372,12 @@ namespace Atlasd.Battlenet
                     var flags = (Account.Flags)account.Get(Account.FlagsKey, Account.Flags.None);
                     if ((flags & Account.Flags.Closed) != 0)
                     {
+                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, $"Account [{account.Get(Account.UsernameKey, GameState.Username)}] is closed");
                         Send(Encoding.UTF8.GetBytes($"Account closed.{Common.NewLine}"));
                         continue;
                     }
+
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, $"Successfully authenticated into account [{account.Get(Account.UsernameKey, GameState.Username)}]");
 
                     GameState.ActiveAccount = account;
                     GameState.LastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
@@ -370,8 +402,6 @@ namespace Atlasd.Battlenet
                         Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
                         continue;
                     }
-
-                    Send(Encoding.UTF8.GetBytes($"Connection from [{RemoteEndPoint}]{Common.NewLine}"));
 
                     using var m1 = new MemoryStream(128);
                     using var w1 = new BinaryWriter(m1);
