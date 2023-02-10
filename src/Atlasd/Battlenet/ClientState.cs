@@ -379,26 +379,29 @@ namespace Atlasd.Battlenet
 
                     Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, $"Successfully authenticated into account [{account.Get(Account.UsernameKey, GameState.Username)}]");
 
-                    GameState.ActiveAccount = account;
-                    GameState.LastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
+                    lock (GameState)
+                    {
+                        GameState.ActiveAccount = account;
+                        GameState.LastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
 
-                    account.Set(Account.IPAddressKey, RemoteEndPoint.ToString().Split(":")[0]);
-                    account.Set(Account.LastLogonKey, DateTime.Now);
-                    account.Set(Account.PortKey, RemoteEndPoint.ToString().Split(":")[1]);
+                        account.Set(Account.IPAddressKey, RemoteEndPoint.ToString().Split(":")[0]);
+                        account.Set(Account.LastLogonKey, DateTime.Now);
+                        account.Set(Account.PortKey, RemoteEndPoint.ToString().Split(":")[1]);
 
-                    var serial = 1;
-                    var onlineName = GameState.Username;
-                    while (!Common.ActiveAccounts.TryAdd(onlineName, account)) onlineName = $"{GameState.Username}#{++serial}";
-                    GameState.OnlineName = onlineName;
+                        var serial = 1;
+                        var onlineName = GameState.Username;
+                        while (!Common.ActiveAccounts.TryAdd(onlineName, account)) onlineName = $"{GameState.Username}#{++serial}";
+                        GameState.OnlineName = onlineName;
 
-                    GameState.Username = (string)account.Get(Account.UsernameKey, GameState.Username);
-                    GameState.Statstring = new byte[1];
+                        GameState.Username = (string)account.Get(Account.UsernameKey, GameState.Username);
+                        GameState.Statstring = new byte[1];
+                    }
 
                     if (!Battlenet.Common.ActiveGameStates.TryAdd(GameState.OnlineName, GameState))
                     {
                         Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Client_Chat, RemoteEndPoint, $"Failed to add game state to active game state cache");
                         account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
-                        Battlenet.Common.ActiveAccounts.TryRemove(onlineName, out _);
+                        Battlenet.Common.ActiveAccounts.TryRemove(GameState.OnlineName, out _);
                         Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
                         continue;
                     }
