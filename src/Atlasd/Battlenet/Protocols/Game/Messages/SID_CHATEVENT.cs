@@ -1,5 +1,7 @@
 ﻿using Atlasd.Battlenet.Exceptions;
 using Atlasd.Daemon;
+using System;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -28,6 +30,18 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)}: {ChatEvent.EventIdToString(chatEvent.EventId)} ({4 + Buffer.Length:D} bytes)");
 
             return true;
+        }
+
+        public new byte[] ToByteArray(ProtocolType protocolType)
+        {
+            if (protocolType.IsChat())
+            {
+                return Buffer;
+            }
+            else
+            {
+                return base.ToByteArray(protocolType);
+            }
         }
     }
 }

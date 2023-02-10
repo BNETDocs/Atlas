@@ -125,7 +125,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     return false;
                 }
 
-                var serverGreeting = Battlenet.Common.GetServerGreeting(context.Client).Split(Environment.NewLine);
+                var serverGreeting = Battlenet.Common.GetServerGreeting(context.Client).Split(Battlenet.Common.NewLine);
 
                 // Welcome to Battle.net!
                 foreach (var line in serverGreeting)

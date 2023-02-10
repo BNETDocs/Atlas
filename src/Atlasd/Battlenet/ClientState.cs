@@ -240,7 +240,7 @@ namespace Atlasd.Battlenet
                 Send(Encoding.UTF8.GetBytes($"Enter your login name and password.{Common.NewLine}"));
             }
         }
- 
+
         protected void ReceiveProtocol(SocketAsyncEventArgs e)
         {
             if (e.SocketError != SocketError.Success) return;
@@ -254,10 +254,7 @@ namespace Atlasd.Battlenet
                 case ProtocolType.Types.Chat:
                 case ProtocolType.Types.Chat_Alt1:
                 case ProtocolType.Types.Chat_Alt2:
-                {
-                    ReceiveProtocolChat(e);
-                    break;
-                }
+                    ReceiveProtocolChat(e); break;
                 default:
                     throw new ProtocolNotSupportedException(ProtocolType.Type, this, $"Unsupported protocol type [0x{(byte)ProtocolType.Type:X2}]");
             }
@@ -285,7 +282,7 @@ namespace Atlasd.Battlenet
             }
 
             // Mix alternate platform's new lines into our easily parsable NewLine constant:
-            text = text.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Common.NewLine);
+            //text = text.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Common.NewLine);
 
             while (text.Length > 0)
             {
@@ -296,7 +293,7 @@ namespace Atlasd.Battlenet
                 var line = text.Substring(0, pos);
                 text = text[(line.Length + Common.NewLine.Length)..];
 
-                if (GameState.ActiveAccount == null && !string.IsNullOrEmpty(line) && line[0] == 0x04)
+                if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username) && !string.IsNullOrEmpty(line) && line[0] == 0x04)
                 {
                     Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, "Client sent login byte [0x04]");
                     line = line[1..];
