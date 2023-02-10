@@ -37,7 +37,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length != 4)
                 throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be 4 bytes");
 
-            if (context.Client == null || !context.Client.Connected) return false;
+            if (context.Client == null || !context.Client.Connected || context.Client.GameState == null) return false;
 
             var now = DateTime.Now;
             var delta = now - context.Client.GameState.LastPing;
