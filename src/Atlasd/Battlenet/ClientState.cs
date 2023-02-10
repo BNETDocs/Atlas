@@ -314,10 +314,13 @@ namespace Atlasd.Battlenet
                     var inPasswordHash = MBNCSUtil.XSha1.CalculateHash(Encoding.UTF8.GetBytes(line.ToLower()));
                     Account account = null;
 
-                    if (!autoAccountCreate && (!Common.AccountsDb.TryGetValue(GameState.Username, out account) || account == null))
+                    if (!Common.AccountsDb.TryGetValue(GameState.Username, out account) || account == null)
                     {
-                        Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
-                        continue;
+                        if (!autoAccountCreate)
+                        {
+                            Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
+                            continue;
+                        }
                     }
 
                     if (autoAccountCreate && account == null)
