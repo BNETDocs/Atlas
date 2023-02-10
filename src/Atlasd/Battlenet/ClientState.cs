@@ -278,18 +278,17 @@ namespace Atlasd.Battlenet
                 return;
             }
 
-            if (!text.Contains(Common.NewLine))
-            {
-                // need more data
-                return;
-            }
+            // Mix alternate platform's new lines into our easily parsable NewLine constant:
+            text = text.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Common.NewLine);
+            if (!text.Contains(Common.NewLine)) return; // Need more data from client
 
             var pos = text.IndexOf(Common.NewLine);
-            ReceiveBuffer = ReceiveBuffer[(pos + 2)..];
+            ReceiveBuffer = ReceiveBuffer[(pos + Common.NewLine.Length)..];
             var line = text.Substring(0, pos);
 
             if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username) && string.IsNullOrEmpty(line))
             {
+                if (line[0] == 0x04) line = line[1..];
                 Send(Encoding.UTF8.GetBytes($"Enter your login name and password.{Common.NewLine}"));
                 GameState.Username = line;
                 Send(Encoding.UTF8.GetBytes($"Username: "));
