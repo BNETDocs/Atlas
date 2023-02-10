@@ -78,6 +78,10 @@
   "battlenet": {
     "emulation": {
       "auto_refresh_pings": false,
+      "chat_gateway": {
+        "auto_account_create": true,
+        "receive_ping_messages": true
+      },
       "enable_ip_address_in_chatevents": false,
       "grant_sudo_to_spoofed_admins": true,
       "mask_admins_in_ban_message": true,

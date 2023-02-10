@@ -269,7 +269,6 @@ namespace Atlasd.Battlenet
         protected void ReceiveProtocolChat(SocketAsyncEventArgs e)
         {
             string text;
-
             try
             {
                 text = Encoding.UTF8.GetString(ReceiveBuffer);
@@ -311,12 +310,24 @@ namespace Atlasd.Battlenet
 
                 if (GameState.ActiveAccount == null)
                 {
+                    var autoAccountCreate = Settings.GetBoolean(new string[] { "battlenet", "emulation", "chat_gateway", "auto_account_create" }, false);
                     var inPasswordHash = MBNCSUtil.XSha1.CalculateHash(Encoding.UTF8.GetBytes(line.ToLower()));
+                    Account account = null;
 
-                    if (!Common.AccountsDb.TryGetValue(GameState.Username, out Account account) || account == null)
+                    if (!autoAccountCreate && (!Common.AccountsDb.TryGetValue(GameState.Username, out account) || account == null))
                     {
                         Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
                         continue;
+                    }
+
+                    if (autoAccountCreate && account == null)
+                    {
+                        Account.CreateStatus status = Account.TryCreate(GameState.Username, inPasswordHash, out account);
+                        if (account == null || status != Account.CreateStatus.Success)
+                        {
+                            Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
+                            continue;
+                        }
                     }
 
                     var dbPasswordHash = (byte[])account.Get(Account.PasswordKey, new byte[20]);

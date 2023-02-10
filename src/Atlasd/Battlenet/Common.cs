@@ -257,6 +257,7 @@ namespace Atlasd.Battlenet
 
         static void ProcessPingTimer(object state)
         {
+            var chatGatewayReceivesPings = Settings.GetBoolean(new string[] { "battlenet", "emulation", "chat_gateway", "receive_ping_messages" }, false);
             var gameStates = state as ConcurrentDictionary<string, GameState>;
             var msg = new SID_PING();
             var r = new Random();
@@ -270,6 +271,7 @@ namespace Atlasd.Battlenet
                 if (gameState == null) continue;
                 if (gameState.Client == null) continue;
                 if (!gameState.Client.Connected) continue;
+                if (gameState.Client.ProtocolType.IsChat() && !chatGatewayReceivesPings) continue;
                 if (gameState.LastPing == null) continue;
 
                 if (gameState.LastPing + interval <= now)
