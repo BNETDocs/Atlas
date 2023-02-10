@@ -236,9 +236,11 @@ namespace Atlasd.Battlenet
             {
                 GameState.Platform = Platform.PlatformCode.Windows;
                 GameState.Product = Product.ProductCode.Chat;
+
+                Send(Encoding.UTF8.GetBytes($"Enter your login name and password.{Common.NewLine}"));
             }
         }
-
+ 
         protected void ReceiveProtocol(SocketAsyncEventArgs e)
         {
             if (e.SocketError != SocketError.Success) return;
@@ -252,7 +254,10 @@ namespace Atlasd.Battlenet
                 case ProtocolType.Types.Chat:
                 case ProtocolType.Types.Chat_Alt1:
                 case ProtocolType.Types.Chat_Alt2:
-                    ReceiveProtocolChat(e); break;
+                {
+                    ReceiveProtocolChat(e);
+                    break;
+                }
                 default:
                     throw new ProtocolNotSupportedException(ProtocolType.Type, this, $"Unsupported protocol type [0x{(byte)ProtocolType.Type:X2}]");
             }
@@ -291,27 +296,21 @@ namespace Atlasd.Battlenet
                 var line = text.Substring(0, pos);
                 text = text[(line.Length + Common.NewLine.Length)..];
 
-                if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username) && !string.IsNullOrEmpty(line) && line[0] == 0x04)
+                if (GameState.ActiveAccount == null && !string.IsNullOrEmpty(line) && line[0] == 0x04)
                 {
                     Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, "Client sent login byte [0x04]");
                     line = line[1..];
+
+                    Send(Encoding.UTF8.GetBytes("Username: "));
+                    GameState.Username = null;
                 }
 
                 if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username) && !string.IsNullOrEmpty(line))
                 {
-                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Chat, "Asking client for login credentials");
-                    //Send(Encoding.UTF8.GetBytes($"Enter your login name and password.{Common.NewLine}Username: "));
                     GameState.Username = line;
-                    //if (!string.IsNullOrEmpty(GameState.Username)) Send(Encoding.UTF8.GetBytes($"Password: \x01"));
+                    Send(Encoding.UTF8.GetBytes("Password: "));
                     continue;
                 }
-
-                /*if (GameState.ActiveAccount == null && string.IsNullOrEmpty(GameState.Username))
-                {
-                    GameState.Username = line;
-                    Send(Encoding.UTF8.GetBytes($"Password: \x01"));
-                    return;
-                }*/
 
                 if (GameState.ActiveAccount == null)
                 {
@@ -319,7 +318,6 @@ namespace Atlasd.Battlenet
 
                     if (!Common.AccountsDb.TryGetValue(GameState.Username, out Account account) || account == null)
                     {
-                        GameState.Username = null;
                         Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
                         continue;
                     }
@@ -327,7 +325,6 @@ namespace Atlasd.Battlenet
                     var dbPasswordHash = (byte[])account.Get(Account.PasswordKey, new byte[20]);
                     if (!inPasswordHash.SequenceEqual(dbPasswordHash))
                     {
-                        GameState.Username = null;
                         Send(Encoding.UTF8.GetBytes($"Incorrect username/password.{Common.NewLine}"));
                         continue;
                     }
@@ -335,7 +332,6 @@ namespace Atlasd.Battlenet
                     var flags = (Account.Flags)account.Get(Account.FlagsKey, Account.Flags.None);
                     if ((flags & Account.Flags.Closed) != 0)
                     {
-                        GameState.Username = null;
                         Send(Encoding.UTF8.GetBytes($"Account closed.{Common.NewLine}"));
                         continue;
                     }
