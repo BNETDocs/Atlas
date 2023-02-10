@@ -89,6 +89,9 @@
       "required_game_key_count": {
         "D2DV": 1,
         "D2XP": 2,
+        "JSTR": 0,
+        "SEXP": 0,
+        "STAR": 0,
         "W2BN": 1,
         "WAR3": 1,
         "W3XP": 2
