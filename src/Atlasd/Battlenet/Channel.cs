@@ -33,8 +33,10 @@ namespace Atlasd.Battlenet
         public Flags ActiveFlags { get; protected set; }
         public bool AllowNewUsers { get; protected set; }
         protected List<GameState> BannedUsers { get; private set; }
-        public int Count { get => Users.Count; }
+        public int Count { get => Users != null ? Users.Count : 0; }
         public ConcurrentDictionary<GameState, GameState> DesignatedHeirs { get; protected set; }
+        public bool IsClosed { get; private set; }
+        private object IsClosing = new object();
         public int MaxUsers { get; protected set; }
         public string Name { get; protected set; }
         public string Topic { get; protected set; }
@@ -46,6 +48,7 @@ namespace Atlasd.Battlenet
             AllowNewUsers = true;
             BannedUsers = new List<GameState>();
             DesignatedHeirs = new ConcurrentDictionary<GameState, GameState>();
+            IsClosed = false;
             MaxUsers = maxUsers;
             Name = name;
             Topic = topic;
@@ -54,6 +57,8 @@ namespace Atlasd.Battlenet
 
         public void AcceptUser(GameState user, bool ignoreLimits = false, bool extendedErrors = false)
         {
+            if (IsClosed) return;
+
             if (!ignoreLimits)
             {
                 Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Channel, $"[{Name}] Evaluating limits for user [{user.OnlineName}]");
@@ -241,20 +246,29 @@ namespace Atlasd.Battlenet
 
         public void Close()
         {
-            if (!Common.ActiveChannels.TryRemove(Name, out _))
+            lock (IsClosing)
             {
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Channel, $"Failed to remove channel [{Name}] from active channel cache");
-            }
+                if (IsClosed) return;
 
-            if (Users != null && Users.Count > 0)
-            {
-                var theVoid = GetChannelByName(Resources.TheVoid, true);
-                if (theVoid != null) foreach (var pair in Users) MoveUser(pair.Value, theVoid, true);
-            }
+                if (!Common.ActiveChannels.TryRemove(Name, out _))
+                {
+                    Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Channel, $"Failed to remove channel [{Name}] from active channel cache");
+                }
 
-            BannedUsers = null;
-            DesignatedHeirs = null;
-            Users = null;
+                lock (Users)
+                {
+                    if (Users != null && Users.Count > 0)
+                    {
+                        var theVoid = GetChannelByName(Resources.TheVoid, true);
+                        if (theVoid != null) foreach (var pair in Users) MoveUser(pair.Value, theVoid, true);
+                    }
+                }
+
+                BannedUsers = null;
+                DesignatedHeirs = null;
+                IsClosed = true;
+                Users = null;
+            }
         }
 
         public void Designate(GameState designator, GameState heir)
@@ -501,7 +515,7 @@ namespace Atlasd.Battlenet
             bool notify = false;
 
             var userId = string.Empty;
-            var users = Users.ToArray();
+            var users = (Users != null ? Users : new ConcurrentDictionary<string, GameState>()).ToArray();
             foreach (var pair in users)
             {
                 GameState subuser = pair.Value;
@@ -513,7 +527,7 @@ namespace Atlasd.Battlenet
                 }
             }
 
-            if (!string.IsNullOrEmpty(userId))
+            if (!string.IsNullOrEmpty(userId) && Users != null)
             {
                 if (Users.TryRemove(userId, out _))
                     users = Users.ToArray();
