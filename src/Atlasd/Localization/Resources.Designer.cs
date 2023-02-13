@@ -254,6 +254,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Set {user}&apos;s game to {game}..
+        /// </summary>
+        public static string AdminSpoofUserStatstringCommand {
+            get {
+                return ResourceManager.GetString("AdminSpoofUserStatstringCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {friend} is already in your friends list..
         /// </summary>
         public static string AlreadyAddedFriend {

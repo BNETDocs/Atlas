@@ -190,6 +190,9 @@ Supported number prefixes:
 - Decimal: Any whole number, not prefixed with zero (octal indication)
 Example: 0x10 = 16 decimal</value>
   </data>
+  <data name="AdminSpoofUserStatstringCommand" xml:space="preserve">
+    <value>Set {user}'s statstring for {game}.</value>
+  </data>
   <data name="AlreadyAddedFriend" xml:space="preserve">
     <value>{friend} is already in your friends list.</value>
   </data>
