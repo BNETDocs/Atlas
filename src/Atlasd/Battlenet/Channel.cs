@@ -504,12 +504,12 @@ namespace Atlasd.Battlenet
             MoveUser(targetClient, theVoid, true);
         }
 
-        public static bool MoveUser(GameState client, string name, bool ignoreLimits = true)
+        public static bool MoveUser(GameState client, string name, bool autoCreate = true, bool ignoreLimits = true, bool extendedErrors = false)
         {
-            return MoveUser(client, GetChannelByName(name, true), ignoreLimits);
+            return MoveUser(client, GetChannelByName(name, autoCreate), ignoreLimits, extendedErrors);
         }
 
-        public static bool MoveUser(GameState client, Channel channel, bool ignoreLimits = true)
+        public static bool MoveUser(GameState client, Channel channel, bool ignoreLimits = true, bool extendedErrors = false)
         {
             if (client == null) return false;
             if (channel == null) return false;
@@ -522,7 +522,7 @@ namespace Atlasd.Battlenet
             }
             else
             {
-                return channel.AcceptUser(client, ignoreLimits);
+                return channel.AcceptUser(client, ignoreLimits, extendedErrors);
             }
         }
 

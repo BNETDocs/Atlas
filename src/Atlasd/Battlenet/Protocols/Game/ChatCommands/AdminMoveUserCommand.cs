@@ -40,7 +40,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 return;
             }
 
-            Channel.MoveUser(target, string.Join(" ", Arguments), true);
+            Channel.MoveUser(target, string.Join(" ", Arguments), true, true);
 
             var targetEnv = new Dictionary<string, string>()
             {

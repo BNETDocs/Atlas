@@ -26,7 +26,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             context.GameState.ActiveAccount.Get(Account.FlagsKey, out var userFlags);
             var ignoreLimits = ((Account.Flags)((AccountKeyValue)userFlags).Value).HasFlag(Account.Flags.Employee);
 
-            Channel.MoveUser(context.GameState, channelName, ignoreLimits);
+            Channel.MoveUser(context.GameState, channelName, true, ignoreLimits, false);
         }
     }
 }
