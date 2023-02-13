@@ -286,13 +286,19 @@ namespace Atlasd.Battlenet
 
         public bool DisbandInto(Channel destination)
         {
+            if (IsClosed)
+            {
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Channel, $"Cannot disband channel [{Name}] because it is closed");
+                return false;
+            }
+
             if (destination == this)
             {
                 Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Channel, $"Cannot disband channel [{Name}] into itself");
                 return false;
             }
 
-            lock (Users) foreach (var user in Users) destination.AcceptUser(user, true, true);
+            foreach (var user in Users.ToArray()) destination.AcceptUser(user, true, true);
             Close();
             return true;
         }
