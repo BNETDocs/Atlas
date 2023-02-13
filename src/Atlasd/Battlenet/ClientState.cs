@@ -312,9 +312,9 @@ namespace Atlasd.Battlenet
                 {
                     var autoAccountCreate = Settings.GetBoolean(new string[] { "battlenet", "emulation", "chat_gateway", "auto_account_create" }, false);
                     var inPasswordHash = MBNCSUtil.XSha1.CalculateHash(Encoding.UTF8.GetBytes(line.ToLower()));
-                    Account account = null;
+                    line = string.Empty; // prevent echoing password as a message if successfully authenticated
 
-                    if (!Common.AccountsDb.TryGetValue(GameState.Username, out account) || account == null)
+                    if (!Common.AccountsDb.TryGetValue(GameState.Username, out Account account) || account == null)
                     {
                         if (!autoAccountCreate)
                         {
