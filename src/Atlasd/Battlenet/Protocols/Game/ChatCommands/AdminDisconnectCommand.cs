@@ -1,4 +1,5 @@
 ﻿using Atlasd.Battlenet.Protocols.Game.Messages;
+using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
@@ -39,11 +40,11 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 { "accountName", target.Username },
                 { "channel", target.ActiveChannel == null ? "(null)" : target.ActiveChannel.Name },
                 { "game", Product.ProductName(target.Product, true) },
-                { "host", "BNETDocs" },
+                { "host", Settings.GetString(new string[] { "battlenet", "realm", "host" }, "(null)") },
                 { "localTime", target.LocalTime.ToString(Common.HumanDateTimeFormat).Replace(" 0", "  ") },
                 { "name", target.OnlineName },
                 { "onlineName", target.OnlineName },
-                { "realm", "BNETDocs" },
+                { "realm", Settings.GetString(new string[] { "battlenet", "realm", "name" }, Resources.Battlenet) },
                 { "realmTime", DateTime.Now.ToString(Common.HumanDateTimeFormat).Replace(" 0", "  ") },
                 { "realmTimezone", $"UTC{DateTime.Now:zzz}" },
                 { "user", target.OnlineName },

@@ -164,7 +164,7 @@ namespace Atlasd.Battlenet
                 m = m.Replace("{message}", Common.ScheduledShutdown.AdminMessage);
                 m = m.Replace("{period}", tsStr);
 
-                new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, Account.Flags.Admin, -1, "Battle.net", m).WriteTo(user.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, Account.Flags.Admin, -1, Settings.GetString(new string[] { "battlenet", "realm", "name" }, Resources.Battlenet), m).WriteTo(user.Client);
             }
 
             var autoOp = Settings.GetBoolean(new string[] { "channel", "auto_op" }, false);

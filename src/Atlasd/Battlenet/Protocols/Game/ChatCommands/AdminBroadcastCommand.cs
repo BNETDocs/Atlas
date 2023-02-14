@@ -1,5 +1,5 @@
-﻿using Atlasd.Localization;
-using System;
+﻿using Atlasd.Daemon;
+using Atlasd.Localization;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -18,12 +18,14 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
         {
             Task.Run(() =>
             {
-                var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, context.GameState.ChannelFlags, context.GameState.Ping, context.GameState.OnlineName, RawBuffer);
+                var maskBroadcaster = Settings.GetBoolean(new string[] { "battlenet", "emulation", "mask_admins_in_broadcasts" }, false);
 
-                foreach (var gameState in Battlenet.Common.ActiveGameStates.Values)
-                {
-                    chatEvent.WriteTo(gameState.Client);
-                }
+                var broadcasterFlags = maskBroadcaster ? Account.Flags.Admin : context.GameState.ChannelFlags;
+                var broadcasterPing = maskBroadcaster ? -1 : context.GameState.Ping;
+                var broadcasterName = maskBroadcaster ? Settings.GetString(new string[] { "battlenet", "realm", "name" }, Resources.Battlenet) : context.GameState.OnlineName;
+
+                var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, broadcasterFlags, broadcasterPing, broadcasterName, RawBuffer);
+                foreach (var gameState in Battlenet.Common.ActiveGameStates.Values) chatEvent.WriteTo(gameState.Client);
             });
         }
     }

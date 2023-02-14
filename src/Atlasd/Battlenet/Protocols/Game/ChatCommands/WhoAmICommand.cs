@@ -1,4 +1,5 @@
-﻿using Atlasd.Localization;
+﻿using Atlasd.Daemon;
+using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
 
@@ -24,7 +25,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
 
             r = r.Replace("{channel}", ch == null ? "(null)" : ch.Name);
-            r = r.Replace("{realm}", "BNETDocs");
+            r = r.Replace("{realm}", Settings.GetString(new string[] { "battlenet", "realm", "name" }, Resources.Battlenet));
 
             foreach (var kv in context.Environment)
             {

@@ -326,6 +326,15 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Battle.net.
+        /// </summary>
+        public static string Battlenet {
+            get {
+                return ResourceManager.GetString("Battlenet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Battle.net administrator.
         /// </summary>
         public static string BattlenetAdministrator {

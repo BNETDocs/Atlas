@@ -84,6 +84,7 @@
       },
       "enable_ip_address_in_chatevents": false,
       "grant_sudo_to_spoofed_admins": true,
+      "mask_admins_in_broadcasts": false,
       "mask_admins_in_ban_message": true,
       "mask_admins_in_kick_message": true,
       "required_game_key_count": {
@@ -109,6 +110,10 @@
       "interface": "0.0.0.0",
       "port": 6112,
       "tcp_nodelay": true
+    },
+    "realm": {
+      "host": "Anonymous",
+      "name": "Atlas"
     }
   },
   "bnftp": {

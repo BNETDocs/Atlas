@@ -60,7 +60,7 @@ namespace Atlasd.Battlenet
 
             r = r.Replace("{host}", "BNETDocs");
             r = r.Replace("{serverStats}", GetServerStats(receiver));
-            r = r.Replace("{realm}", "Battle.net");
+            r = r.Replace("{realm}", Settings.GetString(new string[] { "battlenet", "realm", "name" }, Resources.Battlenet));
 
             return r;
         }
@@ -74,6 +74,7 @@ namespace Atlasd.Battlenet
             var numGameAdvertisements = 0;
             var numTotalOnline = ActiveClientStates.Count;
             var numTotalAdvertisements = 0;
+            var realmName = Settings.GetString(new string[] { "battlenet", "realm", "name" }, Resources.Battlenet);
             var strGame = Product.ProductName(receiver.GameState.Product, true);
 
             var r = Resources.ServerStatistics;
@@ -83,7 +84,7 @@ namespace Atlasd.Battlenet
             r = r.Replace("{game}", strGame);
             r = r.Replace("{gameUsers}", numGameOnline.ToString("#,0"));
             r = r.Replace("{gameAds}", numGameAdvertisements.ToString("#,0"));
-            r = r.Replace("{realm}", "Battle.net");
+            r = r.Replace("{realm}", realmName);
             r = r.Replace("{totalUsers}", numTotalOnline.ToString("#,0"));
             r = r.Replace("{totalGameAds}", numTotalAdvertisements.ToString("#,0"));
 
@@ -343,7 +344,8 @@ namespace Atlasd.Battlenet
 
             Task.Run(() =>
             {
-                var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, Account.Flags.Admin, -1, "Battle.net", m);
+                var realmName = Settings.GetString(new string[] { "battlenet", "realm", "name" }, Resources.Battlenet);
+                var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, Account.Flags.Admin, -1, realmName, m);
                 foreach (var gameState in ActiveGameStates.Values) chatEvent.WriteTo(gameState.Client);
 
                 if (command != null)
@@ -400,7 +402,8 @@ namespace Atlasd.Battlenet
 
                 Task.Run(() =>
                 {
-                    var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, Account.Flags.Admin, -1, "Battle.net", m);
+                    var realmName = Settings.GetString(new string[] { "battlenet", "realm", "name" }, Resources.Battlenet);
+                    var chatEvent = new ChatEvent(ChatEvent.EventIds.EID_BROADCAST, Account.Flags.Admin, -1, realmName, m);
                     foreach (var gameState in ActiveGameStates.Values) chatEvent.WriteTo(gameState.Client);
 
                     if (command != null)
