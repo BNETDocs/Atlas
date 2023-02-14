@@ -93,8 +93,16 @@
         "SEXP": 0,
         "STAR": 0,
         "W2BN": 1,
-        "WAR3": 1,
-        "W3XP": 2
+        "W3XP": 2,
+        "WAR3": 1
+      },
+      "statstring_updates": {
+        "D2DV": true,
+        "D2XP": true,
+        "DRTL": true,
+        "DSHR": true,
+        "W3XP": true,
+        "WAR3": true
       }
     },
     "listener": {

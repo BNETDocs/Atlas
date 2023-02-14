@@ -109,6 +109,29 @@ namespace Atlasd.Battlenet.Protocols.Game
             Username = null;
         }
 
+        public static bool CanStatstringUpdate(Product.ProductCode code)
+        {
+            var buf = new byte[4];
+            using var m = new MemoryStream(buf);
+            using var w = new BinaryWriter(m);
+            w.Write((uint)code);
+            var productStr = Daemon.Common.ReverseString(Encoding.UTF8.GetString(buf));
+
+            try
+            {
+                Settings.State.RootElement.TryGetProperty("battlenet", out var battlenetJson);
+                battlenetJson.TryGetProperty("emulation", out var emulationJson);
+                emulationJson.TryGetProperty("statstring_updates", out var statstringProductJson);
+                statstringProductJson.TryGetProperty(productStr, out var productJson);
+                return productJson.GetBoolean();
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
+                return false;
+            }
+        }
+
         public void Close()
         {
             // Remove this GameState from ActiveChannel
@@ -155,8 +178,9 @@ namespace Atlasd.Battlenet.Protocols.Game
             IsDisposing = false;
         }
 
-        public void GenerateStatstring()
+        public byte[] GenerateStatstring()
         {
+            byte[] statstring = null;
             byte[] buf = null;
             MemoryStream m = null;
             BinaryWriter w = null;
@@ -270,17 +294,19 @@ namespace Atlasd.Battlenet.Protocols.Game
             {
                 if (w == null)
                 {
-                    Statstring = buf;
+                    statstring = buf;
                 }
                 else
                 {
-                    Statstring = new byte[(int)w.BaseStream.Position];
-                    Buffer.BlockCopy(buf, 0, Statstring, 0, (int)w.BaseStream.Position);
+                    statstring = new byte[(int)w.BaseStream.Position];
+                    Buffer.BlockCopy(buf, 0, statstring, 0, (int)w.BaseStream.Position);
                     w.Close();
                 }
 
                 if (m != null) m.Close();
             }
+
+            return statstring;
         }
 
         /**
