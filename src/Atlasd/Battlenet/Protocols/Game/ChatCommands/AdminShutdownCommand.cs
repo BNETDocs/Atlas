@@ -25,7 +25,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 periodStr = "30"; // default 30 seconds delay if empty periodStr
             }
 
-            if (periodStr.Equals("cancel"))
+            if (StringComparer.OrdinalIgnoreCase.Equals(periodStr, "cancel") || StringComparer.OrdinalIgnoreCase.Equals(periodStr, "abort"))
             {
                 Battlenet.Common.ScheduleShutdownCancelled(message, context);
             }
