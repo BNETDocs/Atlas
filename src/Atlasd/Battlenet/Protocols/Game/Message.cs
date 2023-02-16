@@ -69,6 +69,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_CDKEY => new SID_CDKEY(buffer),
                 MessageIds.SID_CHECKDATAFILE => new SID_CHECKDATAFILE(buffer),
                 MessageIds.SID_GETFILETIME => new SID_GETFILETIME(buffer),
+                MessageIds.SID_QUERYREALMS => new SID_QUERYREALMS(buffer),
                 MessageIds.SID_CDKEY2 => new SID_CDKEY2(buffer),
                 MessageIds.SID_LOGONRESPONSE2 => new SID_LOGONRESPONSE2(buffer),
                 MessageIds.SID_CHECKDATAFILE2 => new SID_CHECKDATAFILE2(buffer),
