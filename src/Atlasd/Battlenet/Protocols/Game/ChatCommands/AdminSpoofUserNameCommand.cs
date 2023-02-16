@@ -90,7 +90,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
 
             // send a new SID_ENTERCHAT to target
-            new SID_ENTERCHAT().Invoke(new MessageContext(target.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {}));
+            new SID_ENTERCHAT().Invoke(new MessageContext(target.Client, MessageDirection.ServerToClient, new Dictionary<string, object>{
+                { "username", target.Username }, { "statstring", target.Statstring }
+            }));
 
             // put them back in their channel
             target.ChannelFlags = oldFlags;

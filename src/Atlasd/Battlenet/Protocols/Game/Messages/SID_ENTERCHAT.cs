@@ -70,12 +70,14 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         _w.BaseStream.Position = 0;
                         _w.Write(productId); // ensure first 4 bytes of statstring always matches their agreed upon productId
 
-                        return new SID_ENTERCHAT().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){{ "username", username }, { "statstring", statstring }}));
+                        return new SID_ENTERCHAT().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient,
+                            new Dictionary<string, dynamic>(){{ "username", username }, { "statstring", statstring }})
+                        );
                     }
                 case MessageDirection.ServerToClient:
                     {
                         var uniqueName = gameState.OnlineName;
-                        var statstring = (byte[])context.Arguments["statstring"];
+                        var statstring = context.Arguments.ContainsKey("statstring") ? (byte[])context.Arguments["statstring"] : gameState.Statstring;
                         var accountName = gameState.Username;
 
                         /**

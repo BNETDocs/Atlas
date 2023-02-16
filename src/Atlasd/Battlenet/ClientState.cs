@@ -5,6 +5,7 @@ using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -412,7 +413,9 @@ namespace Atlasd.Battlenet
                         w1.Write(GameState.OnlineName);
                         w1.Write(GameState.Statstring);
 
-                        new SID_ENTERCHAT(m1.ToArray()).Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer));
+                        new SID_ENTERCHAT(m1.ToArray()).Invoke(new MessageContext(this, Protocols.MessageDirection.ClientToServer,
+                            new Dictionary<string, dynamic>{{ "username", GameState.Username }, { "statstring", GameState.Statstring }})
+                        );
                     }
 
                     using var m2 = new MemoryStream(128);
