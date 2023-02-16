@@ -26,6 +26,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 { "/admin channel rename <new name...>" },
                 { "/admin channel resync" },
                 { "/admin channel topic <new topic...>" },
+                { "/admin clan list" },
                 { "/admin dc (alias: /admin disconnect)" },
                 { "/admin disconnect <user> [reason]" },
                 { "/admin help (this text)" },

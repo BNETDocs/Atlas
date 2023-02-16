@@ -41,6 +41,7 @@ namespace Atlasd.Battlenet
         }
 
         public Channel ActiveChannel { get; protected set; }
+        public int Count { get => Users != null ? Users.Count : 0; }
         public byte[] Tag { get; protected set; }
         public byte[] Name { get; protected set; }
         public ConcurrentDictionary<byte[], Ranks> Users { get; protected set; }

@@ -88,6 +88,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Registered clans:.
+        /// </summary>
+        public static string AdminClanListCommand {
+            get {
+                return ResourceManager.GetString("AdminClanListCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no registered clans..
+        /// </summary>
+        public static string AdminClanListCommandEmpty {
+            get {
+                return ResourceManager.GetString("AdminClanListCommandEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {user} was disconnected..
         /// </summary>
         public static string AdminDisconnectCommand {

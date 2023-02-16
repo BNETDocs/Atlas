@@ -23,13 +23,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 return;
             }
 
-            string cmd;
-
-            if (Arguments.Count == 0)
-            {
-                cmd = "";
-            }
-            else
+            var cmd = string.Empty;
+            if (Arguments.Count > 0)
             {
                 cmd = Arguments[0];
                 Arguments.RemoveAt(0);
@@ -47,6 +42,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 case "chan":
                 case "ch":
                     new AdminChannelCommand(RawBuffer, Arguments).Invoke(context); return;
+                case "clan":
+                    new AdminClanCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "disconnect":
                 case "dc":
                     new AdminDisconnectCommand(RawBuffer, Arguments).Invoke(context); return;
@@ -74,12 +71,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 default:
                     {
                         var r = Localization.Resources.InvalidAdminCommand;
-
-                        foreach (var kv in context.Environment)
-                        {
-                            r = r.Replace("{" + kv.Key + "}", kv.Value);
-                        }
-
+                        foreach (var kv in context.Environment) r = r.Replace("{" + kv.Key + "}", kv.Value);
                         foreach (var line in r.Split(Battlenet.Common.NewLine))
                             new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
                         break;

@@ -126,6 +126,12 @@
   <data name="AddFriendEmptyTarget" xml:space="preserve">
     <value>Who do you want to add?</value>
   </data>
+  <data name="AdminClanListCommand" xml:space="preserve">
+    <value>Registered clans:</value>
+  </data>
+  <data name="AdminClanListCommandEmpty" xml:space="preserve">
+    <value>There are no registered clans.</value>
+  </data>
   <data name="AdminDisconnectCommand" xml:space="preserve">
     <value>{user} was disconnected.</value>
   </data>
