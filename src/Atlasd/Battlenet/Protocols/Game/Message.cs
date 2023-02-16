@@ -54,6 +54,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_STARTADVEX3 => new SID_STARTADVEX3(buffer),
                 MessageIds.SID_LOGONCHALLENGEEX => new SID_LOGONCHALLENGEEX(buffer),
                 MessageIds.SID_CLIENTID2 => new SID_CLIENTID2(buffer),
+                MessageIds.SID_LEAVEGAME => new SID_LEAVEGAME(buffer),
                 MessageIds.SID_DISPLAYAD => new SID_DISPLAYAD(buffer),
                 MessageIds.SID_NOTIFYJOIN => new SID_NOTIFYJOIN(buffer),
                 MessageIds.SID_PING => new SID_PING(buffer),
