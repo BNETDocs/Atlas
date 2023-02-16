@@ -36,12 +36,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (UINT32) Product Id
                          */
 
-                        var channels = new List<string>();
+                        var channels = new List<byte[]>();
 
                         foreach (var channel in Battlenet.Common.ActiveChannels.Values)
                         {
                             //if ((channel.ActiveFlags & Channel.Flags.Public) > 0)
-                            channels.Add(channel.Name);
+                            channels.Add(Encoding.UTF8.GetBytes(channel.Name));
                         }
 
                         return new SID_GETCHANNELLIST().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {
@@ -54,20 +54,18 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (STRING) [] Channel name
                          */
 
-                        var channels = (List<string>)context.Arguments["channels"];
+                        var channels = (List<byte[]>)context.Arguments["channels"];
                         var size = (uint)1;
 
                         foreach (var channel in channels)
-                            size += (uint)(1 + Encoding.UTF8.GetByteCount(channel));
+                            size += (uint)(1 + channel.Length);
 
                         Buffer = new byte[size];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
 
-                        foreach (var channel in channels)
-                            w.Write((string)channel);
-
+                        foreach (var channel in channels) w.WriteByteString(channel);
                         w.Write((byte)0); // Official Blizzard servers end list with an empty string.
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
