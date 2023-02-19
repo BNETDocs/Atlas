@@ -63,45 +63,23 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 case MessageDirection.ServerToClient:
                     {
                         /**
-                         * OLD:
+                         * [Note this format is slightly different from BNETDocs reference as of 2023-02-18]
                          * (UINT32)     MCP Cookie
                          * (UINT32)     MCP Status
                          * (UINT32)[2]  MCP Chunk 1
                          * (UINT32)     IP
                          * (UINT32)     Port
                          * (UINT32)[12] MCP Chunk 2
-                         * (STRING)     Battle.net unique name
-                         *
-                         * NEW (as of D2 1.14d):
-                         * (UINT8)[16] Unknown 1 (MD5?)
-                         * (UINT32)    IP (Big Endian)
-                         * (UINT32)    Port (Big endian)
-                         * (UINT8)[40] Unknown 2 (SHA-1?)
-                         * (UINT8)[9]  Null padding
+                         * (STRING)     Battle.net unique name (* as of D2 1.14d, this is empty)
                          */
 
-                        if (gameState.Version.VersionByte <= 13)
-                        {
-                            Buffer = new byte[8];
+                        Buffer = new byte[8]; // MCP Cookie + MCP Status only; Atlas does not have realm/MCP servers implemented yet.
 
-                            using var m = new MemoryStream(Buffer);
-                            using var w = new BinaryWriter(m);
+                        using var m = new MemoryStream(Buffer);
+                        using var w = new BinaryWriter(m);
 
-                            w.Write((UInt32)(new Random()).Next());
-                            w.Write((UInt32)Statuses.RealmUnavailable);
-                        }
-                        else
-                        {
-                            Buffer = new byte[16 + 8 + 40 + 9];
-
-                            using var m = new MemoryStream(Buffer);
-                            using var w = new BinaryWriter(m);
-
-                            w.Write(new byte[16]);
-                            w.Write((UInt32)0);
-                            w.Write((UInt32)0);
-                            w.Write(new byte[49]);
-                        }
+                        w.Write((UInt32)(new Random()).Next()); // Cookie is randomized.
+                        w.Write((UInt32)Statuses.RealmUnavailable); // Atlas does not have realm/MCP servers implemented yet.
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
