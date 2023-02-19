@@ -62,9 +62,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     }
                 case MessageDirection.ServerToClient:
                     {
+                        var clientToken = (UInt32)context.Arguments["clientToken"];
+
                         /**
                          * [Note this format is slightly different from BNETDocs reference as of 2023-02-18]
-                         * (UINT32)     MCP Cookie
+                         * (UINT32)     MCP Cookie (Client Token)
                          * (UINT32)     MCP Status
                          * (UINT32)[2]  MCP Chunk 1
                          * (UINT32)     IP
@@ -78,7 +80,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
 
-                        w.Write((UInt32)(new Random()).Next()); // Cookie is randomized.
+                        w.Write((UInt32)clientToken);
                         w.Write((UInt32)Statuses.RealmUnavailable); // Atlas does not have realm/MCP servers implemented yet.
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
