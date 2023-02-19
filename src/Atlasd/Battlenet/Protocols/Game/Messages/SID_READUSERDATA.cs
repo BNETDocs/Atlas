@@ -103,7 +103,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             var high = (uint)(_value >> 32);
                             var low = (uint)_value;
                             values.Add(high.ToString() + " " + low.ToString());
-                        } else
+                        }
+                        else if (kv.Value is byte[] @bytestring)
+                        {
+                            values.Add(Encoding.UTF8.GetString(@bytestring));
+                        }
+                        else
                         {
                             values.Add("");
                         }
