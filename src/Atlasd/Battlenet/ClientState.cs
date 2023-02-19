@@ -267,6 +267,8 @@ namespace Atlasd.Battlenet
 
         protected void ReceiveProtocolChat(SocketAsyncEventArgs e)
         {
+            // TODO: Move the protocol parsing part of this function somewhere else under Protocols/ChatGateway (similar to Protocols/Game, etc.)
+
             string text;
             try
             {
