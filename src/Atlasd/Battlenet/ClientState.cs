@@ -395,8 +395,9 @@ namespace Atlasd.Battlenet
                         var onlineName = GameState.Username;
                         while (!Common.ActiveAccounts.TryAdd(onlineName, account)) onlineName = $"{GameState.Username}#{++serial}";
                         GameState.OnlineName = onlineName;
-
                         GameState.Username = (string)account.Get(Account.UsernameKey, GameState.Username);
+
+                        GameState.Ping = 0;
                         GameState.Statstring = new byte[1];
                     }
 

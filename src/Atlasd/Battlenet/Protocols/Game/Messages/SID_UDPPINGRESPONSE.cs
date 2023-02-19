@@ -29,11 +29,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length != 4)
                 throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be 4 bytes");
 
+            var gameState = context.Client.GameState;
+
             // UDP reply must be given between S>C SID_AUTH_INFO and C>S SID_ENTERCHAT, not
             // before or after. Technically, we could allow this while in chat and proceed then
             // by sending a chat event for the update, but the server by convention is not
             // supposed to allow it and should instead disconnect the client.
-            if (!(context.Client.GameState.Statstring == null || context.Client.GameState.Statstring.Length == 0))
+            if (!(gameState.Statstring == null || gameState.Statstring.Length == 0))
                 throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} cannot be sent while in chat");
 
             UInt32 udpToken;
@@ -41,11 +43,14 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             using (var r = new BinaryReader(m))
                 udpToken = r.ReadUInt32();
 
-            context.Client.GameState.UDPSupported = udpToken == 0x626E6574; // "bnet"
+            gameState.UDPSupported = udpToken == 0x626E6574; // "bnet"
 
-            if (context.Client.GameState.UDPSupported && context.Client.GameState.ActiveChannel != null && context.Client.GameState.ChannelFlags.HasFlag(Account.Flags.NoUDP))
+            if (gameState.UDPSupported && gameState.ChannelFlags.HasFlag(Account.Flags.NoUDP))
             {
-                context.Client.GameState.ActiveChannel.UpdateUser(context.Client.GameState, context.Client.GameState.ChannelFlags & ~Account.Flags.NoUDP);
+                if (gameState.ActiveChannel == null)
+                    gameState.ChannelFlags = gameState.ChannelFlags & ~Account.Flags.NoUDP;
+                else
+                    gameState.ActiveChannel.UpdateUser(gameState, gameState.ChannelFlags & ~Account.Flags.NoUDP);
             }
 
             return true;

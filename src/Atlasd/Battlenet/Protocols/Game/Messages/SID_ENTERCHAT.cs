@@ -80,6 +80,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var statstring = context.Arguments.ContainsKey("statstring") ? (byte[])context.Arguments["statstring"] : gameState.Statstring;
                         var accountName = gameState.Username;
 
+                        // Do not use client-provided statstring if config.battlenet.emulation.statstring_updates is not enabled for this product.
+                        // Blizzard servers allowed statstring updates for Diablo, Diablo II (changing characters), Warcraft III (changing icons), and Shareware variants.
+                        if (!GameState.CanStatstringUpdate(gameState.Product)) statstring = gameState.GenerateStatstring();
+
                         /**
                          * (STRING) Unique name
                          * (STRING) Statstring
@@ -95,30 +99,26 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.WriteByteString(statstring);
                         w.Write((string)accountName);
 
-                        // Use their statstring if config -> battlenet -> emulation -> statstring_updates is enabled for this product.
-                        // Blizzard servers allowed on the fly statstring updates for Diablo, Diablo II (changing characters), and Warcraft III.
-                        if (!GameState.CanStatstringUpdate(gameState.Product)) statstring = gameState.GenerateStatstring();
-
                         lock (gameState)
                         {
+                            var newFlags = (Account.Flags)gameState.ActiveAccount.Get(Account.FlagsKey);
+                            if (!(Product.IsUDPSupported(gameState.Product) && gameState.UDPSupported)) newFlags |= Account.Flags.NoUDP;
+
+                            var newPing = gameState.Ping;
+                            if (Product.IsChat(gameState.Product)) newPing = 0;
+
                             if (gameState.ActiveChannel == null)
                             {
                                 Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Entering chat as [{uniqueName}]");
 
-                                gameState.ChannelFlags = (Account.Flags)gameState.ActiveAccount.Get(Account.FlagsKey);
-
-                                if (Product.IsUDPSupported(gameState.Product)
-                                    && !gameState.UDPSupported)
-                                {
-                                    gameState.ChannelFlags |= Account.Flags.NoUDP;
-                                }
-
+                                gameState.ChannelFlags = newFlags;
+                                gameState.Ping = newPing;
                                 gameState.Statstring = statstring;
                             }
                             else
                             {
                                 Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Re-entering chat as [{uniqueName}]");
-                                gameState.ActiveChannel.UpdateUser(gameState, statstring); // also sets gameState.Statstring = statstring
+                                gameState.ActiveChannel.UpdateUser(gameState, newFlags, newPing, statstring);
                             }
                         }
 
