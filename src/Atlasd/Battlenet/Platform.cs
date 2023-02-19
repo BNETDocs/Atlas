@@ -8,8 +8,8 @@ namespace Atlasd.Battlenet
         public enum PlatformCode : UInt32
         {
             None = 0, // None/Zero/Null
-            MacOSClassic = 0x504D4143, // PMAC
-            MacOSX = 0x584D4143, // XMAC
+            MacOSPPC = 0x504D4143, // PMAC
+            MacOSX86 = 0x584D4143, // XMAC
             Windows = 0x49583836, // IX86
         }
 
@@ -17,11 +17,11 @@ namespace Atlasd.Battlenet
         {
             return code switch
             {
-                PlatformCode.None         => "None",
-                PlatformCode.MacOSClassic => "Mac OS Classic",
-                PlatformCode.MacOSX       => "Mac OS X",
-                PlatformCode.Windows      => "Windows",
-                _ => "Unknown" + (extended ? " (" + code.ToString() + ")" : ""),
+                PlatformCode.None     => "None",
+                PlatformCode.MacOSPPC => $"macOS Classic{(extended ? " (PowerPC)" : "")}",
+                PlatformCode.MacOSX86 => $"macOS{(extended ? " (x86)" : "")}",
+                PlatformCode.Windows  => $"Windows{(extended ? " (x86)" : "")}",
+                _ => $"Unknown{(extended ? $" (0x{(UInt32)code:X8})" : "")}",
             };
         }
     }
