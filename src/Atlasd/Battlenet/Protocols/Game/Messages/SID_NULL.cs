@@ -24,6 +24,9 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length != 0)
                 throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be 0 bytes");
 
+            if (context.Direction == MessageDirection.ServerToClient)
+                context.Client.Send(ToByteArray(context.Client.ProtocolType));
+
             return true;
         }
     }

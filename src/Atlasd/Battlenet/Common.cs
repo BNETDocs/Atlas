@@ -254,7 +254,6 @@ namespace Atlasd.Battlenet
 
                 gameState.LastNull = now;
                 msg.Invoke(new MessageContext(gameState.Client, Protocols.MessageDirection.ServerToClient));
-                gameState.Client.Send(msg.ToByteArray(gameState.Client.ProtocolType));
             }
         }
 
@@ -283,7 +282,6 @@ namespace Atlasd.Battlenet
                     gameState.PingToken = (uint)r.Next(0, 0x7FFFFFFF);
 
                     msg.Invoke(new MessageContext(gameState.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){{ "token", gameState.PingToken }}));
-                    gameState.Client.Send(msg.ToByteArray(gameState.Client.ProtocolType));
                 }
 
                 // TODO: Fix this commented out code. It seems to have false-positive conditions and abruptly sets unresponsive ping on timely clients.
