@@ -397,6 +397,7 @@ namespace Atlasd.Battlenet
                         GameState.OnlineName = onlineName;
                         GameState.Username = (string)account.Get(Account.UsernameKey, GameState.Username);
 
+                        GameState.UDPSupported = false; // SID_ENTERCHAT will set NoUDP flag later below.
                         GameState.Ping = 0;
                         GameState.Statstring = new byte[1];
                     }

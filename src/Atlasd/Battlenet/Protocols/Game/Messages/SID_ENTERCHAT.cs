@@ -102,7 +102,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         lock (gameState)
                         {
                             var newFlags = (Account.Flags)gameState.ActiveAccount.Get(Account.FlagsKey);
-                            if (Product.IsUDPSupported(gameState.Product) && !gameState.UDPSupported) newFlags |= Account.Flags.NoUDP;
+                            if (!gameState.UDPSupported && (Product.IsUDPSupported(gameState.Product) || Product.IsChat(gameState.Product))) newFlags |= Account.Flags.NoUDP;
 
                             var newPing = gameState.Ping;
                             if (Product.IsChat(gameState.Product)) newPing = 0;
