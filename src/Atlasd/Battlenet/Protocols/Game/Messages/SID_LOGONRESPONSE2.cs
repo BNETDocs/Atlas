@@ -31,6 +31,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
         public override bool Invoke(MessageContext context)
         {
+            if (context == null || context.Client == null || !context.Client.Connected || context.Client.GameState == null) return false;
+
             switch (context.Direction)
             {
                 case MessageDirection.ClientToServer:
@@ -39,6 +41,9 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         if (Buffer.Length < 29)
                             throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 29 bytes");
+
+                        if (context.Client.GameState.ActiveAccount != null)
+                            throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} cannot be sent after logging into an account");
 
                         /**
                          * (UINT32)     Client Token
@@ -99,11 +104,20 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Failed to add game state to active game state cache");
                             account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
                             Battlenet.Common.ActiveAccounts.TryRemove(onlineName, out _);
-                            return new SID_LOGONRESPONSE2().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.BadPassword }}));
+                            return false;
                         }
 
                         Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Account [{context.Client.GameState.Username}] logon success as [{context.Client.GameState.OnlineName}]");
-                        return new SID_LOGONRESPONSE2().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.Success }}));
+                        if (!(new SID_LOGONRESPONSE2()).Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.Success }}))) return false;
+
+                        var emailAddress = account.Get(Account.EmailKey, new byte[0]);
+                        if (emailAddress.Length == 0)
+                        {
+                            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Account [{context.Client.GameState.Username}] does not have an email set");
+                            new SID_SETEMAIL().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient));
+                        }
+
+                        return true;
                     }
                 case MessageDirection.ServerToClient:
                     {

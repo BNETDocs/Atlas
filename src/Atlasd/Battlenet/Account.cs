@@ -10,6 +10,7 @@ namespace Atlasd.Battlenet
     class Account
     {
         public const string AccountCreatedKey = "System\\Account Created";
+        public const string EmailKey = "System\\Email";
         public const string FailedLogonsKey = "System\\Total Failed Logons";
         public const string FlagsKey = "System\\Flags";
         public const string FriendsKey = "System\\Friends";
@@ -62,6 +63,7 @@ namespace Atlasd.Battlenet
             Userdata = new List<AccountKeyValue>()
             {
                 { new AccountKeyValue(AccountCreatedKey, DateTime.Now, AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.ReadOnly) },
+                { new AccountKeyValue(EmailKey, new byte[0], AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.ReadOnly) },
                 { new AccountKeyValue(FailedLogonsKey, (long)0, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
                 { new AccountKeyValue(FlagsKey, Flags.None, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
                 { new AccountKeyValue(FriendsKey, new List<byte[]>(), AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
