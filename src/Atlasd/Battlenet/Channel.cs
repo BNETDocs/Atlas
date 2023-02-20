@@ -169,8 +169,11 @@ namespace Atlasd.Battlenet
 
             var autoOp = Settings.GetBoolean(new string[] { "channel", "auto_op" }, false);
 
-            if ((autoOp == true && Count == 1 && IsPrivate()) || Name.ToLower() == "op " + user.OnlineName.ToLower())
+            if (((autoOp == true && Count == 1 && IsPrivate()) || Name.ToLower() == "op " + user.OnlineName.ToLower())
+                && !(user.ChannelFlags.HasFlag(Account.Flags.Employee) || user.ChannelFlags.HasFlag(Account.Flags.ChannelOp) || user.ChannelFlags.HasFlag(Account.Flags.Admin)))
+            {
                 UpdateUser(user, user.ChannelFlags | Account.Flags.ChannelOp);
+            }
 
             return true;
         }
