@@ -52,7 +52,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             var stripSize = cmd.Length + (text.Length - cmd.Length > 0 ? 1 : 0);
             var _raw = raw[stripSize..];
 
-            switch (cmd)
+            switch (cmd.ToLower())
             {
                 case "admin":
                     return new AdminCommand(_raw, args);
