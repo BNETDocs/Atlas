@@ -28,6 +28,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (Buffer.Length != 0)
                 throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be 0 bytes");
 
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Sent flood detected to client");
             context.Client.Send(ToByteArray(context.Client.ProtocolType));
             return true;
         }

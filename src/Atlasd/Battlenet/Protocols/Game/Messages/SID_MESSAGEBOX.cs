@@ -43,7 +43,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             w.Write((string)text);
             w.Write((string)caption);
 
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
+            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Sent MessageBox parameters to client");
             context.Client.Send(ToByteArray(context.Client.ProtocolType));
             return true;
         }
