@@ -30,6 +30,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 { "/admin dc (alias: /admin disconnect)" },
                 { "/admin disconnect <user> [reason]" },
                 { "/admin help (this text)" },
+                { "/admin msgbox <target> <message>" },
                 { "/admin move (alias: /admin moveuser)" },
                 { "/admin moveuser <user> <channel>" },
                 { "/admin shutdown [(cancel [message])|(delay-seconds|30 [message])]" },

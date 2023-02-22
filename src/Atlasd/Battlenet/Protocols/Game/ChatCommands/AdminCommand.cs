@@ -50,6 +50,10 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 case "help":
                 case "?":
                     new AdminHelpCommand(RawBuffer, Arguments).Invoke(context); return;
+                case "messagebox":
+                case "msgbox":
+                case "msg":
+                    new AdminMessageBoxCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "moveuser":
                 case "move":
                     new AdminMoveUserCommand(RawBuffer, Arguments).Invoke(context); return;

@@ -138,6 +138,12 @@
   <data name="AdminHelpCommand" xml:space="preserve">
     <value>Admin Command List:</value>
   </data>
+  <data name="AdminMessageBoxCommand" xml:space="preserve">
+    <value>Sent MessageBox parameters to {user}.</value>
+  </data>
+  <data name="AdminMessageBoxCommandInvalid" xml:space="preserve">
+    <value>Invalid MessageBox parameters.</value>
+  </data>
   <data name="AdminMoveUserCommand" xml:space="preserve">
     <value>Forcefully moved {user} to the channel {channel}.</value>
   </data>

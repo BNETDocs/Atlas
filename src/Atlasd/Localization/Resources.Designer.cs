@@ -124,6 +124,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sent MessageBox parameters to {user}..
+        /// </summary>
+        public static string AdminMessageBoxCommand {
+            get {
+                return ResourceManager.GetString("AdminMessageBoxCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid MessageBox parameters..
+        /// </summary>
+        public static string AdminMessageBoxCommandInvalid {
+            get {
+                return ResourceManager.GetString("AdminMessageBoxCommandInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Forcefully moved {user} to the channel {channel}..
         /// </summary>
         public static string AdminMoveUserCommand {
