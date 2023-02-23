@@ -301,6 +301,9 @@ This server is hosted by {host}.
   <data name="DisconnectedByAdminWithReason" xml:space="preserve">
     <value>You have been disconnected by a system administrator ({reason}).</value>
   </data>
+  <data name="DisconnectedForFlooding" xml:space="preserve">
+    <value>You have been disconnected for flooding.</value>
+  </data>
   <data name="ErrorCaption" xml:space="preserve">
     <value>Error</value>
   </data>

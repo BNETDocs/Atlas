@@ -29,6 +29,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 { "/admin clan list" },
                 { "/admin dc (alias: /admin disconnect)" },
                 { "/admin disconnect <user> [reason]" },
+                { "/admin disconnectforflooding <user>" },
                 { "/admin help (this text)" },
                 { "/admin msgbox <target> <message>" },
                 { "/admin move (alias: /admin moveuser)" },
@@ -42,11 +43,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 { "" },
             });
 
-            foreach (var kv in context.Environment)
-            {
-                r = r.Replace("{" + kv.Key + "}", kv.Value);
-            }
-
+            foreach (var kv in context.Environment) r = r.Replace("{" + kv.Key + "}", kv.Value);
             foreach (var line in r.Split(Battlenet.Common.NewLine))
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
         }

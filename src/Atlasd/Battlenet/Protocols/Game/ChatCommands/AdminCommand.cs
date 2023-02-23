@@ -47,6 +47,11 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 case "disconnect":
                 case "dc":
                     new AdminDisconnectCommand(RawBuffer, Arguments).Invoke(context); return;
+                case "disconnectforflooding":
+                case "disconnectforflood":
+                case "dcforflooding":
+                case "dcforflood":
+                    new AdminDisconnectForFloodingCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "help":
                 case "?":
                     new AdminHelpCommand(RawBuffer, Arguments).Invoke(context); return;
