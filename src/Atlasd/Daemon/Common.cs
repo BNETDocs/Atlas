@@ -42,16 +42,6 @@ namespace Atlasd.Daemon
             HttpListener = new Battlenet.Protocols.Http.HttpListener(listenerEndPoint);
         }
 
-        /**
-         * <seealso cref="https://stackoverflow.com/a/228060/2367146"/>
-         */
-        public static string ReverseString(string s)
-        {
-            char[] charArray = s.ToCharArray();
-            Array.Reverse(charArray);
-            return new string(charArray);
-        }
-
         public static bool TryToInt32FromString(string value, out int number, int defaultNumber = 0)
         {
             string v = value;

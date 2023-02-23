@@ -115,7 +115,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             using var m = new MemoryStream(buf);
             using var w = new BinaryWriter(m);
             w.Write((uint)code);
-            var productStr = Daemon.Common.ReverseString(Encoding.UTF8.GetString(buf));
+            var productStr = Encoding.UTF8.GetString(buf).Reverse().ToString();
 
             try
             {
