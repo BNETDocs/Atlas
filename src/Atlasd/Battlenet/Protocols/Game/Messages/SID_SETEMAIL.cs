@@ -29,15 +29,15 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 case MessageDirection.ClientToServer:
                 {
-                    if (Buffer.Length < 5)
-                        throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 5 bytes");
+                    if (Buffer.Length < 1)
+                        throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 1 bytes");
 
                     using var m = new MemoryStream(Buffer);
                     using var r = new BinaryReader(m);
 
                     var emailAddress = r.ReadByteString();
-                    if (emailAddress.Length < 1 || emailAddress.Length > 255)
-                        throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} email address must be within 1-255 bytes, got {emailAddress.Length}");
+                    if (emailAddress.Length < 0 || emailAddress.Length > 255)
+                        throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} email address must be within 0-255 bytes, got {emailAddress.Length}");
 
                     var gameState = context.Client.GameState;
                     if (gameState.ActiveAccount == null)
