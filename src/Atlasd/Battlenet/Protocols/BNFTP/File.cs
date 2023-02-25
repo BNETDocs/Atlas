@@ -12,6 +12,8 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
         public string Name { get; private set; }
         public DateTime LastAccessTime { get => System.IO.File.GetLastAccessTime(System.IO.Path.Combine(BNFTPPath, Name)); }
         public DateTime LastAccessTimeUtc { get => System.IO.File.GetLastAccessTimeUtc(System.IO.Path.Combine(BNFTPPath, Name)); }
+        public DateTime LastWriteTime { get => System.IO.File.GetLastWriteTime(System.IO.Path.Combine(BNFTPPath, Name)); }
+        public DateTime LastWriteTimeUtc { get => System.IO.File.GetLastWriteTimeUtc(System.IO.Path.Combine(BNFTPPath, Name)); }
         public long Length { get => GetFileInfo().Length; }
         public string Path { get => System.IO.Path.GetFullPath(System.IO.Path.Combine(BNFTPPath, Name)); }
         public StreamReader StreamReader { get; private set; } = null;

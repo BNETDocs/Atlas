@@ -49,15 +49,20 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     }
                 case MessageDirection.ServerToClient:
                     {
-                        var rand = new Random();
-                        UInt32 adId;
-
-                        // Get random advertisement
-                        adId = (UInt32)rand.Next(0, Battlenet.Common.ActiveAds.Count - 1);
+                        // Get advertisement by random index from ActiveAds, in the future this could be managed via ad campaigns
+                        UInt32 adId = (UInt32)(new Random()).Next(0, Battlenet.Common.ActiveAds.Count);
                         if (!Battlenet.Common.ActiveAds.TryGetValue(adId, out var ad) || ad == null)
                         {
                             Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Config, $"Failed to get advertisement [0x{adId:X8}] from active advertisement cache");
                             return true;
+                        }
+
+                        var extStr = Path.GetExtension(ad.Filename);
+                        var fileExtension = new byte[4];
+                        if (!string.IsNullOrEmpty(extStr))
+                        {
+                            extStr = extStr.Substring(0, Math.Min(extStr.Length, 4));
+                            Encoding.ASCII.GetBytes(extStr, 0, extStr.Length, fileExtension, 0);
                         }
 
                         Buffer = new byte[18 + Encoding.UTF8.GetByteCount(ad.Filename) + Encoding.UTF8.GetByteCount(ad.Url)];
@@ -66,7 +71,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)adId);
-                        w.Write((UInt32)0); // File extension
+                        w.Write(fileExtension);
                         w.Write((UInt64)ad.Filetime.ToFileTimeUtc());
                         w.Write((string)ad.Filename);
                         w.Write((string)ad.Url);

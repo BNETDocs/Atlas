@@ -73,6 +73,27 @@
       "url": "http://davnit.net/bnet/vL/index.php",
       "products": null,
       "locales": null
+    },
+    {
+      "enabled": true,
+      "filename": "ad-20230225-pvpgn-1.smk",
+      "url": "http://pvpgn.pro",
+      "products": null,
+      "locales": null
+    },
+    {
+      "enabled": true,
+      "filename": "ad-20230225-pvpgn-2.smk",
+      "url": "http://pvpgn.pro",
+      "products": null,
+      "locales": null
+    },
+    {
+      "enabled": true,
+      "filename": "ad-20230225-pvpgn-2.mng",
+      "url": "http://pvpgn.pro",
+      "products": null,
+      "locales": null
     }
   ],
   "battlenet": {

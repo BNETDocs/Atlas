@@ -34,10 +34,19 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             var platformId = r.ReadUInt32();
             var productId = r.ReadUInt32();
             var adId = r.ReadUInt32();
-            var adFilename = r.ReadString();
-            var adUrl = r.ReadString();
+            var adFilename = r.ReadByteString();
+            var adUrl = r.ReadByteString();
 
-            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Ad [Id: 0x{adId:X8}] was displayed!");
+            if (Battlenet.Common.ActiveAds.TryGetValue(adId, out var ad) && ad != null)
+            {
+                ad.IncrementDisplayCount();
+
+                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Client displayed advertisement (id: {adId}) (filename: {ad.Filename})");
+            }
+            else
+            {
+                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Client displayed advertisement (id: 0x{adId:X8}) but id cannot be found");
+            }
 
             return true;
         }

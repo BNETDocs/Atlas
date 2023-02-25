@@ -140,7 +140,7 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
                         {
                             if (uploaded)
                             {
-                                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_BNFTP, Client.RemoteEndPoint, $"Uploaded file [{FileName}]");
+                                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_BNFTP, Client.RemoteEndPoint, $"Uploaded file [{FileName}] ({file.Length} bytes)");
                             }
 
                             if (stream != null)
