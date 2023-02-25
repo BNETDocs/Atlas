@@ -58,6 +58,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         foreach (var friendString in friendStrings)
                         {
                             var friend = new Friend(context.Client.GameState, friendString);
+                            friend.Sync(context.Client.GameState);
                             friends.Add(friend);
                             bufferSize += (uint)(8 + friend.Username.Length + friend.LocationString.Length);
 
