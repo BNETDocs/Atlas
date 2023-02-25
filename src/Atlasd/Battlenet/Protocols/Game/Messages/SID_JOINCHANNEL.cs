@@ -3,6 +3,7 @@ using Atlasd.Daemon;
 using Atlasd.Localization;
 using System;
 using System.IO;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -47,18 +48,16 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             using var r = new BinaryReader(m);
 
             var flags = (Flags)r.ReadUInt32();
-            var channelName = r.ReadString();
+            var channelName = r.ReadByteString();
 
-            if (channelName.Length < 1) throw new GameProtocolViolationException(context.Client, "Channel name must be greater than zero");
+            if (channelName.Length > 31) channelName = channelName[0..31];
 
-            if (channelName.Length > 31) channelName = channelName.Substring(0, 31);
-
-            foreach (var c in channelName)
+            foreach (byte c in channelName)
             {
-                if ((uint)c < 31) throw new GameProtocolViolationException(context.Client, "Channel name must not have ASCII control characters");
+                if (c < 31) throw new GameProtocolViolationException(context.Client, "Channel name must not have ASCII control characters");
             }
 
-            var userCountryAbbr = (string)null;
+            var userCountryAbbr = string.Empty;
             var userFlags = Account.Flags.None;
             var userPing = (int)-1;
             var userName = (string)null;
@@ -68,7 +67,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             {
                 lock (context.Client.GameState)
                 {
-                    userCountryAbbr = context.Client.GameState.Locale.CountryNameAbbreviated;
+                    userCountryAbbr = " " + context.Client.GameState.Locale.CountryNameAbbreviated;
                     userFlags = (Account.Flags)context.Client.GameState.ActiveAccount.Get(Account.FlagsKey);
                     userPing = context.Client.GameState.Ping;
                     userName = context.Client.GameState.OnlineName;
@@ -82,70 +81,75 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 return false;
             }
 
+            var channelNameStr = Encoding.ASCII.GetString(channelName);
+
             var firstJoin = flags == Flags.First || flags == Flags.First_D2;
-            if (firstJoin) channelName = $"{Product.ProductChannelName(userGame)} {userCountryAbbr}-1";
+            if (firstJoin || channelName.Length == 0)
+            {
+                channelNameStr = $"{Product.ProductChannelName(userGame)}{userCountryAbbr}-1";
+                channelName = Encoding.ASCII.GetBytes(channelNameStr);
+            }
 
             var ignoreLimits = userFlags.HasFlag(Account.Flags.Employee) || userFlags.HasFlag(Account.Flags.Admin);
-            var channel = Channel.GetChannelByName(channelName, false);
+            var channel = Channel.GetChannelByName(channelNameStr, false);
 
             if (channel == null && flags == Flags.NoCreate)
             {
-                new ChatEvent(ChatEvent.EventIds.EID_CHANNELFULL, Channel.Flags.None, userPing, userName, channelName).WriteTo(context.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_CHANNELNOTFOUND, Channel.Flags.None, userPing, userName, channelName).WriteTo(context.Client);
                 return true;
             }
 
-            if (channel == null) channel = Channel.GetChannelByName(channelName, true);
+            if (channel == null) channel = Channel.GetChannelByName(channelNameStr, true);
             channel.AcceptUser(context.Client.GameState, ignoreLimits, true);
 
-            if (firstJoin)
+            if (!firstJoin) return true; // Return here if not first-join, the rest is setup for the server motd, etc.
+
+            Account account;
+            Account.Flags activeUserFlags;
+            int activeUserPing;
+            DateTime lastLogon;
+            string onlineName;
+
+            try
             {
-                Account account;
-                Account.Flags activeUserFlags;
-                int activeUserPing;
-                DateTime lastLogon;
-                string onlineName;
+                var gameState = context.Client.GameState;
 
-                try
+                lock (gameState)
                 {
-                    var gameState = context.Client.GameState;
-
-                    lock (gameState)
-                    {
-                        account = gameState.ActiveAccount;
-                        activeUserFlags = gameState.ChannelFlags;
-                        activeUserPing = gameState.Ping;
-                        lastLogon = gameState.LastLogon;
-                        onlineName = gameState.OnlineName;
-                    }
+                    account = gameState.ActiveAccount;
+                    activeUserFlags = gameState.ChannelFlags;
+                    activeUserPing = gameState.Ping;
+                    lastLogon = gameState.LastLogon;
+                    onlineName = gameState.OnlineName;
                 }
-                catch (Exception ex)
-                {
-                    if (!(ex is ArgumentNullException || ex is NullReferenceException)) throw;
-                    Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"{ex.GetType().Name} error occurred while processing {MessageName(Id)} for GameState object");
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException || ex is NullReferenceException)) throw;
+                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"{ex.GetType().Name} error occurred while processing {MessageName(Id)} for GameState object");
+                return false;
+            }
 
-                var serverGreeting = Battlenet.Common.GetServerGreeting(context.Client).Split(Battlenet.Common.NewLine);
+            var serverGreeting = Battlenet.Common.GetServerGreeting(context.Client).Split(Battlenet.Common.NewLine);
 
-                // Welcome to Battle.net!
-                foreach (var line in serverGreeting)
-                    new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, line).WriteTo(context.Client);
+            // Welcome to Battle.net!
+            foreach (var line in serverGreeting)
+                new ChatEvent(ChatEvent.EventIds.EID_INFO, channel.ActiveFlags, 0, channel.Name, line).WriteTo(context.Client);
 
-                if (Product.IsChatRestricted(userGame))
-                {
-                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, activeUserFlags, activeUserPing, onlineName, Resources.GameProductIsChatRestricted).WriteTo(context.Client);
-                }
+            if (Product.IsChatRestricted(userGame))
+            {
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, activeUserFlags, activeUserPing, onlineName, Resources.GameProductIsChatRestricted).WriteTo(context.Client);
+            }
 
-                // Send EID_INFO "Last logon: ..."
-                new ChatEvent(ChatEvent.EventIds.EID_INFO, activeUserFlags, activeUserPing, onlineName, Resources.LastLogonInfo.Replace("{timestamp}", lastLogon.ToString(Common.HumanDateTimeFormat))).WriteTo(context.Client);
+            // Send EID_INFO "Last logon: ..."
+            new ChatEvent(ChatEvent.EventIds.EID_INFO, activeUserFlags, activeUserPing, onlineName, Resources.LastLogonInfo.Replace("{timestamp}", lastLogon.ToString(Common.HumanDateTimeFormat))).WriteTo(context.Client);
 
-                var failedLogins = context.Client.GameState.FailedLogons;
-                context.Client.GameState.FailedLogons = 0;
+            var failedLogins = context.Client.GameState.FailedLogons;
+            context.Client.GameState.FailedLogons = 0;
 
-                if (failedLogins > 0)
-                {
-                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, activeUserFlags, activeUserPing, onlineName, Resources.FailedLogonAttempts.Replace("{count}", failedLogins.ToString("##,0"))).WriteTo(context.Client);
-                }
+            if (failedLogins > 0)
+            {
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, activeUserFlags, activeUserPing, onlineName, Resources.FailedLogonAttempts.Replace("{count}", failedLogins.ToString("##,0"))).WriteTo(context.Client);
             }
 
             return true;
