@@ -10,6 +10,7 @@ namespace Atlasd.Battlenet
     class Account
     {
         public const string AccountCreatedKey = "System\\Account Created";
+        public const string ClosedKey = "System\\Closed";
         public const string EmailKey = "System\\Email";
         public const string FailedLogonsKey = "System\\Total Failed Logons";
         public const string FlagsKey = "System\\Flags";
@@ -21,6 +22,7 @@ namespace Atlasd.Battlenet
         public const string PortKey = "System\\Port";
         public const string ProfileAgeKey = "profile\\age";
         public const string ProfileDescriptionKey = "profile\\description";
+        public const string ProfileHomepageKey = "profile\\homepage";
         public const string ProfileLocationKey = "profile\\location";
         public const string ProfileSexKey = "profile\\sex";
         public const string TimeLoggedKey = "System\\Time Logged";
@@ -62,8 +64,9 @@ namespace Atlasd.Battlenet
         {
             Userdata = new List<AccountKeyValue>()
             {
-                { new AccountKeyValue(AccountCreatedKey, DateTime.Now, AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.ReadOnly) },
-                { new AccountKeyValue(EmailKey, new byte[0], AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.ReadOnly) },
+                { new AccountKeyValue(AccountCreatedKey, DateTime.Now, AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.Internal) },
+                { new AccountKeyValue(ClosedKey, new byte[0], AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.Internal) },
+                { new AccountKeyValue(EmailKey, new byte[0], AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.Internal) },
                 { new AccountKeyValue(FailedLogonsKey, (long)0, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
                 { new AccountKeyValue(FlagsKey, Flags.None, AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
                 { new AccountKeyValue(FriendsKey, new List<byte[]>(), AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
@@ -74,6 +77,7 @@ namespace Atlasd.Battlenet
                 { new AccountKeyValue(PasswordKey, new byte[0], AccountKeyValue.ReadLevel.Internal, AccountKeyValue.WriteLevel.Internal) },
                 { new AccountKeyValue(ProfileAgeKey, "", AccountKeyValue.ReadLevel.Any, AccountKeyValue.WriteLevel.Owner) },
                 { new AccountKeyValue(ProfileDescriptionKey, "", AccountKeyValue.ReadLevel.Any, AccountKeyValue.WriteLevel.Owner) },
+                { new AccountKeyValue(ProfileHomepageKey, "", AccountKeyValue.ReadLevel.Any, AccountKeyValue.WriteLevel.Owner) },
                 { new AccountKeyValue(ProfileLocationKey, "", AccountKeyValue.ReadLevel.Any, AccountKeyValue.WriteLevel.Owner) },
                 { new AccountKeyValue(ProfileSexKey, "", AccountKeyValue.ReadLevel.Any, AccountKeyValue.WriteLevel.Owner) },
                 { new AccountKeyValue(TimeLoggedKey, (long)0, AccountKeyValue.ReadLevel.Owner, AccountKeyValue.WriteLevel.Internal) },
@@ -96,20 +100,18 @@ namespace Atlasd.Battlenet
             return false;
         }
 
-        public bool Get(byte[] key, out dynamic value)
+        public bool Get(byte[] key, out AccountKeyValue value)
         {
             return Get(Encoding.UTF8.GetString(key), out value);
         }
 
-        public bool Get(string key, out dynamic value)
+        public bool Get(string key, out AccountKeyValue value)
         {
-            var keyL = key.ToLower();
-
             lock (Userdata)
             {
                 foreach (var kv in Userdata)
                 {
-                    if (kv.Key.ToLower() == keyL)
+                    if (StringComparer.OrdinalIgnoreCase.Compare(kv.Key, key) == 0)
                     {
                         value = kv;
                         return true;
@@ -123,26 +125,36 @@ namespace Atlasd.Battlenet
 
         public dynamic Get(string key, dynamic onKeyNotFound = null)
         {
-            if (!Get(key, out dynamic value))
-            {
-                return onKeyNotFound;
-            }
-
-            if (value == null) return onKeyNotFound;
-            if (!(value is AccountKeyValue)) return value;
-
-            return ((AccountKeyValue)value).Value;
+            if (!Get(key, out AccountKeyValue value) || value == null) return onKeyNotFound;
+            return value.Value;
         }
 
-        public void Set(string key, dynamic value)
+        public void Set(AccountKeyValue value)
         {
-            var keyL = key.ToLower();
+            if (value == null) return;
 
             lock (Userdata)
             {
                 foreach (var kv in Userdata)
                 {
-                    if (kv.Key.ToLower() == keyL)
+                    if (StringComparer.OrdinalIgnoreCase.Compare(kv.Key, value.Key) == 0)
+                    {
+                        Userdata.Remove(kv);
+                        break;
+                    }
+                }
+
+                Userdata.Add(value);
+            }
+        }
+
+        public void Set(string key, dynamic value)
+        {
+            lock (Userdata)
+            {
+                foreach (var kv in Userdata)
+                {
+                    if (StringComparer.OrdinalIgnoreCase.Compare(kv.Key, key) == 0)
                     {
                         kv.Value = value;
                         return;

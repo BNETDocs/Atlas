@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -78,11 +79,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var flags = (Account.Flags)account.Get(Account.FlagsKey, Account.Flags.None);
                         if ((flags & Account.Flags.Closed) != 0)
                         {
-                            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Account [{context.Client.GameState.Username}] logon failed account closed");
+                            var accountClosedBytes = (byte[])account.Get(Account.ClosedKey, new byte[0]);
+                            Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Account [{context.Client.GameState.Username}] logon failed account closed [{Encoding.UTF8.GetString(accountClosedBytes)}]");
                             account.Set(Account.FailedLogonsKey, ((UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0)) + 1);
-                            return new SID_LOGONRESPONSE2().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.AccountClosed }}));
+                            return new SID_LOGONRESPONSE2().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "status", Statuses.AccountClosed }, { "info", accountClosedBytes }}));
                         }
-                        
+
                         context.Client.GameState.ActiveAccount = account;
                         context.Client.GameState.FailedLogons = (UInt32)account.Get(Account.FailedLogonsKey, (UInt32)0);
                         context.Client.GameState.LastLogon = (DateTime)account.Get(Account.LastLogonKey, DateTime.Now);
@@ -129,14 +131,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var status = (UInt32)(Statuses)context.Arguments["status"];
                         var info = (byte[])(context.Arguments.ContainsKey("info") ? context.Arguments["info"] : new byte[0]);
 
-                        Buffer = new byte[4 + info.Length];
+                        Buffer = new byte[4 + info.Length + (info.Length > 0 ? 1 : 0)];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
 
                         w.Write(status);
-                        w.Write(info);
-                        if (info.Length > 0) w.Write((byte)0);
+                        if (info.Length > 0) w.WriteByteString(info);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes) (status: 0x{status:X8})");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

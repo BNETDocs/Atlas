@@ -55,39 +55,45 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 values.Add(r.ReadByteString());
             }
 
+            var defaultAccountStr = string.Empty;
+            if (!string.IsNullOrEmpty(context.Client.GameState.OnlineName)) defaultAccountStr = context.Client.GameState.OnlineName;
+            if (!string.IsNullOrEmpty(context.Client.GameState.Username)) defaultAccountStr = context.Client.GameState.Username;
+
             var hasSudoPrivs = context.Client.GameState.ChannelFlags.HasFlag(Account.Flags.Admin) ||
                 context.Client.GameState.ChannelFlags.HasFlag(Account.Flags.Employee);
 
             foreach (var accountNameBytes in accounts)
             {
                 var accountNameStr = Encoding.UTF8.GetString(accountNameBytes);
+
+                if (string.IsNullOrEmpty(accountNameStr)) accountNameStr = defaultAccountStr;
+                if (accountNameStr.Contains("*")) accountNameStr = accountNameStr[(accountNameStr.IndexOf("*") + 1)..]; // Strip Diablo II character names
+                if (accountNameStr.Contains("#")) accountNameStr = accountNameStr[0..accountNameStr.IndexOf("#")]; // Strip serial number
+
                 if (!Battlenet.Common.AccountsDb.TryGetValue(accountNameStr, out Account account) || account == null)
                 {
-                    Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, "Client attempted to write userdata for an account that does not exist");
+                    Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Client tried writing userdata for an account that does not exist [account: {accountNameStr}] [hasSudoPrivs: {hasSudoPrivs}]");
                     return false;
                 }
+                bool owner = account == context.Client.GameState.ActiveAccount;
 
                 for (var i = 0; i < numKeys; i++)
                 {
                     var key = Encoding.UTF8.GetString(keys[i]);
                     var value = values[i];
 
-                    if (!account.Get(key, out var dynvalue))
-                    {
-                        // skip this key, we do not write foreign keys
-                        continue;
-                    }
-                    var kv = dynvalue as AccountKeyValue;
+                    if (!account.Get(key, out AccountKeyValue kv) || kv == null)
+                        continue; // do not create client-supplied non-existent userdata keys
 
                     if (!(kv.Writable == AccountKeyValue.WriteLevel.Any ||
-                        (kv.Writable == AccountKeyValue.WriteLevel.Owner && (hasSudoPrivs || context.Client.GameState.ActiveAccount == account))))
+                        (kv.Writable == AccountKeyValue.WriteLevel.Owner && (hasSudoPrivs || owner))))
                     {
-                        Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Client attempted to write userdata to account [{accountNameStr}] key [{key}] but they have no privilege to do so [hasSudoPrivs: {hasSudoPrivs}]");
+                        Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Client tried writing userdata without privileges to do so [account: {accountNameStr}] [key: {key}] [owner: {owner}] [hasSudoPrivs: {hasSudoPrivs}]");
                         return false;
                     }
 
-                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Client wrote userdata to account [{accountNameStr}] key [{key}] with [hasSudoPrivs: {hasSudoPrivs}]");
-                    kv.Value = value;
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Client wrote userdata [account: {accountNameStr}] [key: {key}] [owner: {owner}] [hasSudoPrivs: {hasSudoPrivs}]");
+                    account.Set(kv.Key, value);
                 }
             }
 
