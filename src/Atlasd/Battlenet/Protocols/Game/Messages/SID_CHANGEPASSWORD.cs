@@ -11,8 +11,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
     {
         protected enum Statuses : UInt32
         {
-            Success = 0,
-            Failure = 1,
+            Failure = 0,
+            Success = 1,
         };
 
         public SID_CHANGEPASSWORD()
