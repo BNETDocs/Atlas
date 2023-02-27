@@ -1,9 +1,9 @@
 ﻿using Atlasd.Daemon;
 using Atlasd.Localization;
-using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
@@ -43,18 +43,24 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
 
             var ch = target.ActiveChannel;
-            var str = ch == null ? Resources.UserIsUsingGameInRealm : Resources.UserIsUsingGameInTheChannel;
+            var g = target.GameAd;
+
+            if (g != null) // TODO: Consider private games and friendship.
+                r = Resources.UserIsUsingGameInTheGame;
+            else if (ch != null)
+                r = Resources.UserIsUsingGameInTheChannel;
+            else
+                r = Resources.UserIsUsingGameInRealm;
 
             if (target.Away != null)
-            {
-                str += Battlenet.Common.NewLine + Resources.AwayCommandStatus.Replace("{awayMessage}", target.Away);
-            }
+                r += Battlenet.Common.NewLine + Resources.AwayCommandStatus.Replace("{awayMessage}", target.Away);
 
             var targetEnv = new Dictionary<string, string>()
             {
                 { "accountName", target.Username },
                 { "channel", target.ActiveChannel == null ? "(null)" : target.ActiveChannel.Name },
                 { "game", Product.ProductName(target.Product, true) },
+                { "gameAd", g == null ? "(null)" : Encoding.UTF8.GetString(g.Name) },
                 { "host", Settings.GetString(new string[] { "battlenet", "realm", "host" }, "(null)") },
                 { "localTime", target.LocalTime.ToString(Common.HumanDateTimeFormat).Replace(" 0", "  ") },
                 { "name", Channel.RenderOnlineName(context.GameState, target) },
@@ -68,12 +74,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             };
             var env = targetEnv.Concat(context.Environment);
 
-            foreach (var kv in env)
-            {
-                str = str.Replace("{" + kv.Key + "}", kv.Value);
-            }
-
-            new ChatEvent(ChatEvent.EventIds.EID_INFO, Channel.RenderChannelFlags(context.GameState, target), target.Ping, Channel.RenderOnlineName(context.GameState, target), str).WriteTo(context.GameState.Client);
+            foreach (var kv in env) r = r.Replace("{" + kv.Key + "}", kv.Value);
+            new ChatEvent(ChatEvent.EventIds.EID_INFO, Channel.RenderChannelFlags(context.GameState, target), target.Ping, Channel.RenderOnlineName(context.GameState, target), r).WriteTo(context.GameState.Client);
         }
     }
 }

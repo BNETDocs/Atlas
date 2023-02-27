@@ -2,6 +2,8 @@
 using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 {
@@ -16,23 +18,42 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
-            var ch = context.GameState.ActiveChannel;
+            var gameState = context.GameState;
+            var ch = gameState.ActiveChannel;
+            var g = gameState.GameAd;
             var r = ch == null ? Resources.YouAreUsingGameInRealm : Resources.YouAreUsingGameInTheChannel;
 
-            if (context.GameState.Away != null)
+            if (g != null) // TODO: Consider private games and friendship.
+                r = Resources.UserIsUsingGameInTheGame;
+            else if (ch != null)
+                r = Resources.UserIsUsingGameInTheChannel;
+            else
+                r = Resources.UserIsUsingGameInRealm;
+
+            if (gameState.Away != null)
+                r += Battlenet.Common.NewLine + Resources.AwayCommandStatusSelf.Replace("{awayMessage}", gameState.Away);
+
+            var env = new Dictionary<string, string>()
             {
-                r += Battlenet.Common.NewLine + Resources.AwayCommandStatusSelf.Replace("{awayMessage}", context.GameState.Away);
-            }
+                { "accountName", gameState.Username },
+                { "channel", ch == null ? "(null)" : ch.Name },
+                { "game", Product.ProductName(gameState.Product, true) },
+                { "gameAd", g == null ? "(null)" : Encoding.UTF8.GetString(g.Name) },
+                { "host", Settings.GetString(new string[] { "battlenet", "realm", "host" }, "(null)") },
+                { "localTime", gameState.LocalTime.ToString(Common.HumanDateTimeFormat).Replace(" 0", "  ") },
+                { "name", Channel.RenderOnlineName(gameState, gameState) },
+                { "onlineName", Channel.RenderOnlineName(gameState, gameState) },
+                { "realm", Settings.GetString(new string[] { "battlenet", "realm", "name" }, Resources.Battlenet) },
+                { "realmTime", DateTime.Now.ToString(Common.HumanDateTimeFormat).Replace(" 0", "  ") },
+                { "realmTimezone", $"UTC{DateTime.Now:zzz}" },
+                { "user", Channel.RenderOnlineName(gameState, gameState) },
+                { "username", Channel.RenderOnlineName(gameState, gameState) },
+                { "userName", Channel.RenderOnlineName(gameState, gameState) },
+            };
+            var en2v = env.Concat(context.Environment);
 
-            r = r.Replace("{channel}", ch == null ? "(null)" : ch.Name);
-            r = r.Replace("{realm}", Settings.GetString(new string[] { "battlenet", "realm", "name" }, Resources.Battlenet));
-
-            foreach (var kv in context.Environment)
-            {
-                r = r.Replace("{" + kv.Key + "}", kv.Value);
-            }
-
-            new ChatEvent(ChatEvent.EventIds.EID_INFO, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, r).WriteTo(context.GameState.Client);
+            foreach (var kv in env) r = r.Replace("{" + kv.Key + "}", kv.Value);
+            new ChatEvent(ChatEvent.EventIds.EID_INFO, gameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, gameState.Ping, gameState.OnlineName, r).WriteTo(gameState.Client);
         }
     }
 }
