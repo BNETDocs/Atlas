@@ -113,11 +113,9 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public static uint RequiredKeyCount(Product.ProductCode code)
         {
-            var buf = new byte[4];
-            using var m = new MemoryStream(buf);
-            using var w = new BinaryWriter(m);
-            w.Write((uint)code);
-            var productStr = Encoding.UTF8.GetString(buf).Reverse().ToString();
+            var buf = BitConverter.GetBytes((uint)code);
+            Array.Reverse(buf);
+            var productStr = Encoding.UTF8.GetString(buf);
 
             try
             {
