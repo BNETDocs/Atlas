@@ -15,18 +15,26 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
         public override void Invoke(ChatCommandContext context)
         {
+            var gs = context.GameState;
+            if (gs.ActiveChannel == null)
+            {
+                new InvalidCommand(RawBuffer, Arguments).Invoke(context);
+                return;
+            }
+
             if (Arguments.Count < 1)
             {
-                new ChatEvent(ChatEvent.EventIds.EID_ERROR, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, Resources.InvalidChannelName).WriteTo(context.GameState.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_ERROR, gs.ChannelFlags, gs.Client.RemoteIPAddress, gs.Ping, gs.OnlineName, Resources.InvalidChannelName).WriteTo(gs.Client);
                 return;
             }
 
             var channelName = string.Join(" ", Arguments);
 
-            context.GameState.ActiveAccount.Get(Account.FlagsKey, out var userFlags);
+            gs.ActiveAccount.Get(Account.FlagsKey, out var userFlags);
             var ignoreLimits = ((Account.Flags)((AccountKeyValue)userFlags).Value).HasFlag(Account.Flags.Employee);
 
-            Channel.MoveUser(context.GameState, channelName, true, ignoreLimits, false);
+            if (StringComparer.InvariantCultureIgnoreCase.Equals(channelName, gs.ActiveChannel.Name)) return;
+            Channel.MoveUser(gs, channelName, true, ignoreLimits, false);
         }
     }
 }
