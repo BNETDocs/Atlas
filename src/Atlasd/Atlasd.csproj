@@ -19,6 +19,7 @@
     <FileVersion>0.1.0.0</FileVersion>
     <Version>0.1.0.0</Version>
     <Deterministic>true</Deterministic>
+    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

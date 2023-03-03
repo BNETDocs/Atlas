@@ -31,241 +31,28 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             var friends = (List<byte[]>)context.GameState.ActiveAccount.Get(Account.FriendsKey, new List<byte[]>());
 
-            switch (subcommand.ToLower())
+            switch (subcommand.ToLowerInvariant())
             {
                 case "add":
                 case "a":
-                    {
-                        var targetString = Arguments.Count > 0 ? Arguments[0] : string.Empty;
-                        if (string.IsNullOrEmpty(targetString))
-                        {
-                            reply = Resources.AddFriendEmptyTarget;
-                        }
-                        else
-                        {
-                            var exists = false;
-                            foreach (var friendByteString in friends)
-                            {
-                                string friendString = Encoding.UTF8.GetString(friendByteString);
-                                if (string.Equals(targetString, friendString, StringComparison.CurrentCultureIgnoreCase))
-                                {
-                                    exists = true;
-                                    break;
-                                }
-                            }
-                            if (exists)
-                            {
-                                reply = Resources.AlreadyAddedFriend.Replace("{friend}", targetString);
-                            }
-                            else
-                            {
-                                var friendByteString = Encoding.UTF8.GetBytes(targetString);
-                                var friend = new Friend(context.GameState, friendByteString);
-                                friends.Add(friend.Username);
-
-                                replyEventId = ChatEvent.EventIds.EID_INFO;
-                                reply = Resources.AddedFriend.Replace("{friend}", Encoding.UTF8.GetString(friend.Username));
-
-                                new SID_FRIENDSADD().Invoke(new MessageContext(context.GameState.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>() {{ "friend", friend }}));
-                            }
-                        }
-                        break;
-                    }
+                    new FriendAddCommand(RawBuffer, Arguments).Invoke(context); break;
                 case "demote":
                 case "d":
-                    {
-                        var targetString = Arguments.Count > 0 ? Arguments[0] : string.Empty;
-                        if (string.IsNullOrEmpty(targetString))
-                        {
-                            reply = Resources.DemoteFriendEmptyTarget;
-                        }
-                        else
-                        {
-                            byte[] exists = null;
-                            byte counter1 = 0;
-                            byte counter2 = 0;
-                            foreach (var friendByteString in friends)
-                            {
-                                string friendString = Encoding.UTF8.GetString(friendByteString);
-                                if (string.Equals(targetString, friendString, StringComparison.CurrentCultureIgnoreCase))
-                                {
-                                    exists = friendByteString;
-                                    break;
-                                }
-                                counter1++;
-                            }
-                            if (exists == null || exists.Length == 0)
-                            {
-                                reply = Resources.DemoteFriendEmptyTarget;
-                            }
-                            else
-                            {
-                                if (counter1 == friends.Count - 1)
-                                {
-                                    counter2 = counter1;
-                                }
-                                else
-                                {
-                                    counter2 = (byte)(counter1 + 1);
-                                    friends.RemoveAt(counter1);
-                                    friends.Insert(counter2, exists);
-                                }
-
-                                replyEventId = ChatEvent.EventIds.EID_INFO;
-                                reply = Resources.DemotedFriend.Replace("{friend}", Encoding.UTF8.GetString(exists));
-
-                                if (counter1 != counter2)
-                                    new SID_FRIENDSPOSITION().Invoke(new MessageContext(context.GameState.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>() {{ "old", counter1 }, { "new", counter2 }}));
-                            }
-                        }
-                        break;
-                    }
+                    new FriendDemoteCommand(RawBuffer, Arguments).Invoke(context); break;
                 case "list":
                 case "l":
-                    {
-                        replyEventId = ChatEvent.EventIds.EID_INFO;
-                        reply = Resources.YourFriendsList;
-
-                        var friendCount = 0;
-                        foreach (var friend in friends)
-                        {
-                            if (friendCount++ == 0) reply += Battlenet.Common.NewLine;
-                            var friendString = Encoding.UTF8.GetString(friend);
-
-                            var detailString = "offline";
-                            if (Battlenet.Common.GetClientByOnlineName(friendString, out var friendGameState) && friendGameState != null)
-                            {
-                                detailString = $"using {Battlenet.Product.ProductName(friendGameState.Product, true)}";
-
-                                if (friendGameState.ActiveChannel == null)
-                                    detailString += " in Battle.net"; // emulation note: Blizzard servers use a server-specific realm name here.
-
-                                if (friendGameState.ActiveChannel != null && friendGameState.ActiveChannel.IsPublic())
-                                    detailString += $" in the channel {friendGameState.ActiveChannel.Name}.";
-
-                                if (friendGameState.ActiveChannel != null && !friendGameState.ActiveChannel.IsPublic())
-                                    detailString += $" in a private channel.";
-                            }
-                            if (!string.IsNullOrEmpty(detailString)) detailString = $", {detailString}";
-
-                            reply += $"{friendCount}: {friendString}{detailString}{Battlenet.Common.NewLine}";
-                        }
-                        if (friendCount > 0) reply = reply[0..(reply.Length - Battlenet.Common.NewLine.Length)]; // strip last newline
-
-                        break;
-                    }
+                    new FriendListCommand(RawBuffer, Arguments).Invoke(context); break;
                 case "message":
                 case "msg":
                 case "m":
-                    {
-                        var messageString = string.Join(" ", Arguments);
-                        if (string.IsNullOrEmpty(messageString))
-                        {
-                            reply = Resources.WhisperCommandEmptyMessage;
-                        }
-                        else
-                        {
-                            new ChatEvent(ChatEvent.EventIds.EID_WHISPERTO, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, Resources.WhisperFromYourFriends, messageString).WriteTo(context.GameState.Client);
-
-                            foreach (var friend in friends)
-                            {
-                                var friendString = Encoding.UTF8.GetString(friend);
-                                if (!Battlenet.Common.GetClientByOnlineName(friendString, out var friendGameState) || friendGameState == null) continue;
-                                if (!string.IsNullOrEmpty(friendGameState.DoNotDisturb)) continue;
-                                new ChatEvent(ChatEvent.EventIds.EID_WHISPERFROM, context.GameState.ChannelFlags, context.GameState.Ping, Channel.RenderOnlineName(friendGameState, context.GameState), messageString).WriteTo(friendGameState.Client);
-                            }
-                        }
-
-                        break;
-                    }
+                    new FriendMessageCommand(RawBuffer, Arguments).Invoke(context); break;
                 case "promote":
                 case "p":
-                    {
-                        var targetString = Arguments.Count > 0 ? Arguments[0] : string.Empty;
-                        if (string.IsNullOrEmpty(targetString))
-                        {
-                            reply = Resources.PromoteFriendEmptyTarget;
-                        }
-                        else
-                        {
-                            byte[] exists = null;
-                            byte counter1 = 0;
-                            byte counter2 = 0;
-                            foreach (var friendByteString in friends)
-                            {
-                                string friendString = Encoding.UTF8.GetString(friendByteString);
-                                if (string.Equals(targetString, friendString, StringComparison.CurrentCultureIgnoreCase))
-                                {
-                                    exists = friendByteString;
-                                    break;
-                                }
-                                counter1++;
-                            }
-                            if (exists == null || exists.Length == 0)
-                            {
-                                reply = Resources.PromoteFriendEmptyTarget;
-                            }
-                            else
-                            {
-                                if (counter1 == 0)
-                                {
-                                    counter2 = counter1;
-                                }
-                                else
-                                {
-                                    counter2 = (byte)(counter1 - 1);
-                                    friends.RemoveAt(counter1);
-                                    friends.Insert(counter2, exists);
-                                }
-
-                                replyEventId = ChatEvent.EventIds.EID_INFO;
-                                reply = Resources.PromotedFriend.Replace("{friend}", Encoding.UTF8.GetString(exists));
-
-                                if (counter1 != counter2)
-                                    new SID_FRIENDSPOSITION().Invoke(new MessageContext(context.GameState.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>() {{ "old", counter1 }, { "new", counter2 }}));
-                            }
-                        }
-                        break;
-                    }
+                    new FriendPromoteCommand(RawBuffer, Arguments).Invoke(context); break;
                 case "remove":
                 case "rem":
                 case "r":
-                    {
-                        var targetString = Arguments.Count > 0 ? Arguments[0] : string.Empty;
-                        if (string.IsNullOrEmpty(targetString))
-                        {
-                            reply = Resources.RemoveFriendEmptyTarget;
-                        }
-                        else
-                        {
-                            byte[] exists = null;
-                            byte counter = 0;
-                            foreach (var friendByteString in friends)
-                            {
-                                string friendString = Encoding.UTF8.GetString(friendByteString);
-                                if (string.Equals(targetString, friendString, StringComparison.CurrentCultureIgnoreCase))
-                                {
-                                    exists = friendByteString;
-                                    break;
-                                }
-                                counter++;
-                            }
-                            if (exists == null || exists.Length == 0)
-                            {
-                                reply = Resources.AlreadyRemovedFriend.Replace("{friend}", targetString);
-                            }
-                            else
-                            {
-                                replyEventId = ChatEvent.EventIds.EID_INFO;
-                                reply = Resources.RemovedFriend.Replace("{friend}", targetString);
-
-                                friends.Remove(exists);
-
-                                new SID_FRIENDSREMOVE().Invoke(new MessageContext(context.GameState.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>() {{ "friend", counter }}));
-                            }
-                        }
-                        break;
-                    }
+                    new FriendRemoveCommand(RawBuffer, Arguments).Invoke(context); break;
                 default:
                     {
                         reply = Resources.InvalidChatCommand;
@@ -274,16 +61,9 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             }
 
             if (string.IsNullOrEmpty(reply)) return;
-
-            foreach (var kv in context.Environment)
-            {
-                reply = reply.Replace("{" + kv.Key + "}", kv.Value);
-            }
-
+            foreach (var kv in context.Environment) reply = reply.Replace("{" + kv.Key + "}", kv.Value);
             foreach (var line in reply.Split(Battlenet.Common.NewLine))
-            {
                 new ChatEvent(replyEventId, context.GameState.ChannelFlags, context.GameState.Client.RemoteIPAddress, context.GameState.Ping, context.GameState.OnlineName, line).WriteTo(context.GameState.Client);
-            }
         }
     }
 }
