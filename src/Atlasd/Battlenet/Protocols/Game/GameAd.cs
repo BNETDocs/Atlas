@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Atlasd.Daemon;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game
 {
@@ -49,27 +52,60 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public StateFlags ActiveStateFlags { get; private set; }
         public UInt32 ElapsedTime { get; private set; }
-        public GameState Client { get; private set; }
+        public IList<GameState> Clients { get; private set; }
         public UInt32 GamePort { get; private set; }
         public GameTypes GameType { get; private set; }
         public UInt32 GameVersion { get; private set; }
         public byte[] Name { get; private set; }
+        public LocaleInfo Locale { get; private set; }
         public byte[] Password { get; private set; }
+        public Product.ProductCode Product { get; private set; }
         public byte[] Statstring { get; private set; }
         public ushort SubGameType { get; private set; }
 
         public GameAd(GameState client, byte[] name, byte[] password, byte[] statstring, UInt32 gamePort, GameTypes gameType, ushort subGameType, UInt32 gameVersion)
         {
             ActiveStateFlags = StateFlags.None;
-            Client = client;
+            Clients = new List<GameState>(){client};
             ElapsedTime = 0;
             GamePort = gamePort;
             GameType = gameType;
             GameVersion = gameVersion;
             Name = name;
+            Locale = client.Locale;
             Password = password;
+            Product = client.Product;
             Statstring = statstring;
             SubGameType = subGameType;
+        }
+
+        public bool AddClient(GameState client)
+        {
+            lock (Clients)
+            {
+                if (Clients.Contains(client)) return false;
+                Clients.Add(client);
+            }
+            return true;
+        }
+
+        public bool HasClient(GameState client)
+        {
+            lock (Clients) return Clients.Contains(client);
+        }
+
+        public bool RemoveClient(GameState client)
+        {
+            bool removed = false;
+            lock (Clients) removed = Clients.Remove(client);
+            if (Clients.Count == 0)
+            {
+                if (!Battlenet.Common.ActiveGameAds.TryRemove(Name, out _))
+                {
+                    Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.GameAd, $"Failed to remove game ad [{Encoding.ASCII.GetString(Name)}] from active game ad cache");
+                }
+            }
+            return removed;
         }
 
         public void SetActiveStateFlags(StateFlags newFlags)

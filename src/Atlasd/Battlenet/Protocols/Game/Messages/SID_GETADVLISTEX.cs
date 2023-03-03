@@ -62,8 +62,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         {
                             var _ad = _pair.Value;
 
-                            if (_ad.Client == null) continue;
-                            if (_ad.Client.Product != context.Client.GameState.Product) continue;
+                            if (_ad.Clients.Count == 0) continue;
+                            if (_ad.Product != context.Client.GameState.Product) continue;
 
                             if (viewingFilter == 0xFFFF || viewingFilter == 0x30)
                             {
@@ -130,12 +130,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             foreach (var gameAd in gameAds)
                             {
                                 w.Write(((UInt32)gameAd.GameType) | (((UInt32)gameAd.SubGameType) << 16));
-                                w.Write((UInt32)gameAd.Client.Locale.UserLanguageId);
-                                w.Write((UInt16)2); // always AF_INET
+                                w.Write((UInt32)gameAd.Locale.UserLanguageId);
+                                w.Write((UInt16)System.Net.Sockets.AddressFamily.InterNetwork); // always AF_INET
                                 UInt16 Port;
-                                if (gameAd.Client.GameDataPort != 0)
+                                if (gameAd.Clients.Count > 0 && gameAd.Clients[0].GameDataPort != 0)
                                 {
-                                    Port = gameAd.Client.GameDataPort;
+                                    Port = gameAd.Clients[0].GameDataPort;
                                 }
                                 else
                                 {
@@ -144,20 +144,17 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                                 // because this is a dumped sockaddr_in structure, the port is in reverse byte order
                                 w.Write((UInt16)((Port << 8) | (Port >> 8)));
                                 Byte[] bytes;
-                                if (gameAd.Client.GameDataAddress != null)
+                                if (gameAd.Clients[0].GameDataAddress != null)
                                 {
-                                    bytes = gameAd.Client.GameDataAddress.MapToIPv4().GetAddressBytes();
+                                    bytes = gameAd.Clients[0].GameDataAddress.MapToIPv4().GetAddressBytes();
                                 }
                                 else
                                 {
-                                    IPEndPoint ipEndPoint = gameAd.Client.Client.RemoteEndPoint as IPEndPoint;
+                                    IPEndPoint ipEndPoint = gameAd.Clients[0].Client.RemoteEndPoint as IPEndPoint;
                                     bytes = ipEndPoint.Address.MapToIPv4().GetAddressBytes();
                                 }
                                 System.Diagnostics.Debug.Assert(bytes.Length == 4);
-                                for (int i = 0; i < bytes.Length; i++)
-                                {
-                                    w.Write(bytes[i]);
-                                }
+                                for (int i = 0; i < bytes.Length; i++) w.Write(bytes[i]);
                                 w.Write((UInt32)0);
                                 w.Write((UInt32)0);
                                 w.Write((UInt32)0); // TODO

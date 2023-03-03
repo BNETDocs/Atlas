@@ -73,7 +73,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         foreach (var _pair in gameAds)
                         {
-                            if (_pair.Value.Client == context.Client.GameState)
+                            if (_pair.Value != null && _pair.Value.HasClient(context.Client.GameState))
                             {
                                 gameAd = _pair.Value;
                                 break;

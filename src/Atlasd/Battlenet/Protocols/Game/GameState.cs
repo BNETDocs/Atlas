@@ -362,15 +362,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public void StopGameAd()
         {
             if (GameAd == null) return;
-
-            if (Battlenet.Common.ActiveGameAds.TryRemove(GameAd.Name, out var removedGameAd))
-            {
-                if (removedGameAd != GameAd)
-                {
-                    // Hrm...
-                    Battlenet.Common.ActiveGameAds.TryAdd(GameAd.Name, GameAd);
-                }
-            }
+            if (GameAd.RemoveClient(this)) GameAd = null;
         }
     }
 }

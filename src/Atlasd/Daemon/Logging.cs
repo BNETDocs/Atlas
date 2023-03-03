@@ -29,6 +29,7 @@ namespace Atlasd.Daemon
             Client_IPC,
             Client_MCP,
             Client_UDP,
+            GameAd,
             Http,
             Server,
         };
