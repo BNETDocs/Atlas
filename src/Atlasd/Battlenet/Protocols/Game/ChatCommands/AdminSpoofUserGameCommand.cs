@@ -34,9 +34,10 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             // Calculates and removes (target+' ') from (raw) which prints into (newRaw):
             RawBuffer = RawBuffer[(Encoding.UTF8.GetByteCount(t) + (Arguments.Count > 0 ? 1 : 0))..];
 
-            var strGame = Arguments.Count == 0 ? "" : Arguments[0];
-            var targetGame = Product.StringToProduct(strGame);
-            if (targetGame == Product.ProductCode.None)
+            byte[] targetGameBytes = new byte[4];
+            Array.Copy(RawBuffer, targetGameBytes, Math.Min(4, RawBuffer.Length));
+            var targetGame = Product.FromBytes(targetGameBytes, true);
+            if (targetGame == Product.ProductCode.None || !Product.IsValid(targetGame))
             {
                 r = Resources.AdminSpoofUserGameCommandBadValue;
                 foreach (var line in r.Split(Battlenet.Common.NewLine))

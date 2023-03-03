@@ -375,8 +375,8 @@ namespace Atlasd.Battlenet
                     var _list = new List<Product.ProductCode>();
                     foreach (var productJson in chProductsJson.EnumerateArray())
                     {
-                        var productStr = productJson.GetString();
-                        _list.Add(Product.StringToProduct(productStr));
+                        var product = Product.FromBytes(Encoding.ASCII.GetBytes(productJson.ToString()), true);
+                        _list.Add(product);
                     }
                     chProducts = _list.ToArray();
                 }

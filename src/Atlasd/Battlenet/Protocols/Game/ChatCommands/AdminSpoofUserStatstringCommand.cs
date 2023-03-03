@@ -37,7 +37,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             var product = Product.ProductCode.None;
             lock (target.Statstring)
             {
-                product = Product.StringToProduct(Encoding.UTF8.GetString(target.Statstring[0..4]));
+                product = Product.FromBytes(target.Statstring[0..4], false);
                 var newStatstring = new byte[4 + RawBuffer.Length];
 
                 using var m = new MemoryStream(newStatstring);

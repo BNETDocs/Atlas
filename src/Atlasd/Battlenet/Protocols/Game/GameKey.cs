@@ -113,23 +113,16 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public static uint RequiredKeyCount(Product.ProductCode code)
         {
-            var buf = BitConverter.GetBytes((uint)code);
-            Array.Reverse(buf);
-            var productStr = Encoding.UTF8.GetString(buf);
-
-            try
-            {
-                Settings.State.RootElement.TryGetProperty("battlenet", out var battlenetJson);
-                battlenetJson.TryGetProperty("emulation", out var emulationJson);
-                emulationJson.TryGetProperty("required_game_key_count", out var requiredGameKeyCountJson);
-                requiredGameKeyCountJson.TryGetProperty(productStr, out var productJson);
-                return productJson.GetUInt32();
-            }
-            catch (Exception ex)
-            {
-                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                return 0;
-            }
+            uint count = 0;
+            string codeStr = Battlenet.Product.ToString(code);
+            string codeStrR = new string(codeStr.Reverse().ToArray());
+            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStr }, 0); // Ltrd
+            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStrR }, 0); // Drtl
+            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStr.ToUpperInvariant() }, 0); // LTRD
+            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStrR.ToUpperInvariant() }, 0); // DRTL
+            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStr.ToLowerInvariant() }, 0); // ltrd
+            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStrR.ToLowerInvariant() }, 0); // drtl
+            return count;
         }
 
         public void SetPrivateValue(byte[] privateValue)

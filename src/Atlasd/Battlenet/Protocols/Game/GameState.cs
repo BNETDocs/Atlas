@@ -111,23 +111,16 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public static bool CanStatstringUpdate(Product.ProductCode code)
         {
-            var buf = BitConverter.GetBytes((uint)code);
-            Array.Reverse(buf);
-            var productStr = Encoding.UTF8.GetString(buf);
-
-            try
-            {
-                Settings.State.RootElement.TryGetProperty("battlenet", out var battlenetJson);
-                battlenetJson.TryGetProperty("emulation", out var emulationJson);
-                emulationJson.TryGetProperty("statstring_updates", out var statstringProductJson);
-                statstringProductJson.TryGetProperty(productStr, out var productJson);
-                return productJson.GetBoolean();
-            }
-            catch (Exception ex)
-            {
-                if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                return false;
-            }
+            bool allow = false;
+            string codeStr = Battlenet.Product.ToString(code);
+            string codeStrR = new string(codeStr.Reverse().ToArray());
+            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStr }, false); // Ltrd
+            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStrR }, false); // Drtl
+            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStr.ToUpperInvariant() }, false); // LTRD
+            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStrR.ToUpperInvariant() }, false); // DRTL
+            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStr.ToLowerInvariant() }, false); // ltrd
+            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStrR.ToLowerInvariant() }, false); // drtl
+            return allow;
         }
 
         public void Close()

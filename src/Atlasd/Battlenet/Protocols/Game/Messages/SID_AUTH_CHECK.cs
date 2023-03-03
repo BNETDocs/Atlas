@@ -109,11 +109,17 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         context.Client.GameState.Version.EXEInformation = r.ReadByteString();
                         context.Client.GameState.KeyOwner = r.ReadByteString();
 
+                        var requiredKeyCount = GameKey.RequiredKeyCount(context.Client.GameState.Product);
+
                         var status = Statuses.Success;
                         byte[] info = new byte[0];
 
-                        var requiredKeyCount = GameKey.RequiredKeyCount(context.Client.GameState.Product);
-                        if (context.Client.GameState.GameKeys.Count < requiredKeyCount)
+                        if (!Product.IsValid(context.Client.GameState.Product))
+                        {
+                            // Unknown product code
+                            status = Statuses.InvalidVersion;
+                        }
+                        else if (context.Client.GameState.GameKeys.Count < requiredKeyCount)
                         {
                             // Incorrect number of keys
                             status = Statuses.GameKeyProductMismatch;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 
 namespace Atlasd.Battlenet
@@ -25,6 +26,25 @@ namespace Atlasd.Battlenet
             WarcraftIIIDemo = 0x5733444D, // W3DM
             WarcraftIIIFrozenThrone = 0x57335850, // W3XP
             WarcraftIIIReignOfChaos = 0x57415233, // WAR3
+        }
+
+        public static ProductCode FromBytes(byte[] product, bool validityCheck)
+        {
+            if (product.Length != 4)
+                throw new ArgumentException($"Cannot convert byte array to product, expected 4 bytes, got {product.Length}");
+
+            ProductCode code = (ProductCode)BitConverter.ToUInt32(product);
+
+            if (validityCheck)
+            {
+                var codeStr = Encoding.ASCII.GetString(product);
+                if (!IsValid(code)) code = (ProductCode)BitConverter.ToUInt32(product.Reverse().ToArray());
+                if (!IsValid(code)) code = (ProductCode)BitConverter.ToUInt32(Encoding.ASCII.GetBytes(codeStr.ToUpperInvariant()));
+                if (!IsValid(code)) code = (ProductCode)BitConverter.ToUInt32(Encoding.ASCII.GetBytes(codeStr.ToUpperInvariant().Reverse().ToArray()));
+                if (!IsValid(code)) code = ProductCode.None;
+            }
+
+            return code;
         }
 
         public static bool IsChatRestricted(ProductCode code)
@@ -92,6 +112,27 @@ namespace Atlasd.Battlenet
             };
         }
 
+        public static bool IsValid(ProductCode code)
+        {
+            return code switch
+            {
+                ProductCode.Chat => true,
+                ProductCode.DiabloII => true,
+                ProductCode.DiabloIILordOfDestruction => true,
+                ProductCode.DiabloRetail => true,
+                ProductCode.DiabloShareware => true,
+                ProductCode.StarcraftBroodwar => true,
+                ProductCode.StarcraftJapanese => true,
+                ProductCode.StarcraftOriginal => true,
+                ProductCode.StarcraftShareware => true,
+                ProductCode.WarcraftIIBNE => true,
+                ProductCode.WarcraftIIIDemo => true,
+                ProductCode.WarcraftIIIFrozenThrone => true,
+                ProductCode.WarcraftIIIReignOfChaos => true,
+                _ => false,
+            };
+        }
+
         public static bool IsWarcraftII(ProductCode code)
         {
             return code == ProductCode.WarcraftIIBNE;
@@ -151,52 +192,14 @@ namespace Atlasd.Battlenet
             };
         }
 
-        public static ProductCode StringToProduct(string product)
+        public static byte[] ToByteArray(ProductCode code)
         {
-            switch (product.ToUpper())
-            {
-                case "CHAT":
-                case "TAHC":
-                    return ProductCode.Chat;
-                case "D2DV":
-                case "VD2D":
-                    return ProductCode.DiabloII;
-                case "D2XP":
-                case "PX2D":
-                    return ProductCode.DiabloIILordOfDestruction;
-                case "DRTL":
-                case "LTRD":
-                    return ProductCode.DiabloRetail;
-                case "DSHR":
-                case "RHSD":
-                    return ProductCode.DiabloShareware;
-                case "SEXP":
-                case "PXES":
-                    return ProductCode.StarcraftBroodwar;
-                case "JSTR":
-                case "RTSJ":
-                    return ProductCode.StarcraftJapanese;
-                case "STAR":
-                case "RATS":
-                    return ProductCode.StarcraftOriginal;
-                case "SSHR":
-                case "RHSS":
-                    return ProductCode.StarcraftShareware;
-                case "W2BN":
-                case "NB2W":
-                    return ProductCode.WarcraftIIBNE;
-                case "W3DM":
-                case "MD3W":
-                    return ProductCode.WarcraftIIIDemo;
-                case "W3XP":
-                case "PX3W":
-                    return ProductCode.WarcraftIIIFrozenThrone;
-                case "WAR3":
-                case "3RAW":
-                    return ProductCode.WarcraftIIIReignOfChaos;
-                default:
-                    return ProductCode.None;
-            }
+            return BitConverter.GetBytes((uint)code);
+        }
+
+        public static string ToString(ProductCode code)
+        {
+            return Encoding.ASCII.GetString(ToByteArray(code));
         }
     }
 }
