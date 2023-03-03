@@ -33,7 +33,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             // Calculates and removes (cmd+' ') from (raw) which prints into (newRaw):
             RawBuffer = RawBuffer[(Encoding.UTF8.GetByteCount(cmd) + (Arguments.Count > 0 ? 1 : 0))..];
 
-            switch (cmd.ToLower())
+            switch (cmd.ToLowerInvariant())
             {
                 case "announce":
                 case "broadcast":

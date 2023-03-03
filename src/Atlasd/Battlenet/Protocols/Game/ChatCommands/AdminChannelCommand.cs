@@ -28,7 +28,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             if (channel != null)
             {
-                switch (subcommand.ToLower())
+                switch (subcommand.ToLowerInvariant())
                 {
                     case "disband":
                         {

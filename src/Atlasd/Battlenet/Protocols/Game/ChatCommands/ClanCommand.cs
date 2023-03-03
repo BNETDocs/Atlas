@@ -29,7 +29,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 var subcommand = Arguments.Count > 0 ? Arguments[0] : string.Empty;
                 if (!string.IsNullOrEmpty(subcommand)) Arguments.RemoveAt(0);
 
-                switch (subcommand.ToLower())
+                switch (subcommand.ToLowerInvariant())
                 {
                     case "motd":
                         {
