@@ -21,14 +21,14 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             var gameState = context.GameState;
             var ch = gameState.ActiveChannel;
             var g = gameState.GameAd;
-            var r = ch == null ? Resources.YouAreUsingGameInRealm : Resources.YouAreUsingGameInTheChannel;
+            string r;
 
             if (g != null) // TODO: Consider private games and friendship.
-                r = Resources.UserIsUsingGameInTheGame;
+                r = Resources.YouAreUsingGameInGame;
             else if (ch != null)
-                r = Resources.UserIsUsingGameInTheChannel;
+                r = Resources.YouAreUsingGameInTheChannel;
             else
-                r = Resources.UserIsUsingGameInRealm;
+                r = Resources.YouAreUsingGameInRealm;
 
             if (gameState.Away != null)
                 r += Battlenet.Common.NewLine + Resources.AwayCommandStatusSelf.Replace("{awayMessage}", gameState.Away);
