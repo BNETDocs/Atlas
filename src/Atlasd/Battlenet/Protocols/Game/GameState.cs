@@ -114,12 +114,12 @@ namespace Atlasd.Battlenet.Protocols.Game
             bool allow = false;
             string codeStr = Battlenet.Product.ToString(code);
             string codeStrR = new string(codeStr.Reverse().ToArray());
-            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStr }, false); // Ltrd
-            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStrR }, false); // Drtl
-            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStr.ToUpperInvariant() }, false); // LTRD
-            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStrR.ToUpperInvariant() }, false); // DRTL
-            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStr.ToLowerInvariant() }, false); // ltrd
-            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStrR.ToLowerInvariant() }, false); // drtl
+            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStr }, false, true); // Ltrd
+            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStrR }, false, true); // Drtl
+            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStr.ToUpperInvariant() }, false, true); // LTRD
+            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStrR.ToUpperInvariant() }, false, true); // DRTL
+            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStr.ToLowerInvariant() }, false, true); // ltrd
+            if (!allow) allow = Settings.GetBoolean(new string[]{ "battlenet", "emulation", "statstring_updates", codeStrR.ToLowerInvariant() }, false, true); // drtl
             return allow;
         }
 

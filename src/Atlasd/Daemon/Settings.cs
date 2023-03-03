@@ -56,7 +56,7 @@ namespace Atlasd.Daemon
             }
         }
 
-        public static JsonElement.ArrayEnumerator GetArray(string[] keyPath)
+        public static JsonElement.ArrayEnumerator GetArray(string[] keyPath, bool suppressLog = false)
         {
             try
             {
@@ -70,12 +70,12 @@ namespace Atlasd.Daemon
             catch (Exception ex)
             {
                 if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not an array; check value");
+                if (!suppressLog) Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not an array; check value");
                 return new JsonElement.ArrayEnumerator();
             }
         }
 
-        public static bool GetBoolean(string[] keyPath, bool defaultValue)
+        public static bool GetBoolean(string[] keyPath, bool defaultValue, bool suppressLog = false)
         {
             try
             {
@@ -89,12 +89,12 @@ namespace Atlasd.Daemon
             catch (Exception ex)
             {
                 if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a boolean; check value");
+                if (!suppressLog) Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a boolean; check value");
                 return defaultValue;
             }
         }
 
-        public static byte GetByte(string[] keyPath, byte defaultValue)
+        public static byte GetByte(string[] keyPath, byte defaultValue, bool suppressLog = false)
         {
             try
             {
@@ -108,12 +108,12 @@ namespace Atlasd.Daemon
             catch (Exception ex)
             {
                 if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a byte; check value");
+                if (!suppressLog) Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a byte; check value");
                 return defaultValue;
             }
         }
 
-        public static Int16 GetInt16(string[] keyPath, Int16 defaultValue)
+        public static Int16 GetInt16(string[] keyPath, Int16 defaultValue, bool suppressLog = false)
         {
             try
             {
@@ -127,12 +127,12 @@ namespace Atlasd.Daemon
             catch (Exception ex)
             {
                 if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a signed 16-bit integer; check value");
+                if (!suppressLog) Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a signed 16-bit integer; check value");
                 return defaultValue;
             }
         }
 
-        public static Int32 GetInt32(string[] keyPath, Int32 defaultValue)
+        public static Int32 GetInt32(string[] keyPath, Int32 defaultValue, bool suppressLog = false)
         {
             try
             {
@@ -146,12 +146,12 @@ namespace Atlasd.Daemon
             catch (Exception ex)
             {
                 if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a signed 32-bit integer; check value");
+                if (!suppressLog) Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a signed 32-bit integer; check value");
                 return defaultValue;
             }
         }
 
-        public static Int64 GetInt64(string[] keyPath, Int64 defaultValue)
+        public static Int64 GetInt64(string[] keyPath, Int64 defaultValue, bool suppressLog = false)
         {
             try
             {
@@ -165,12 +165,12 @@ namespace Atlasd.Daemon
             catch (Exception ex)
             {
                 if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a signed 64-bit integer; check value");
+                if (!suppressLog) Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a signed 64-bit integer; check value");
                 return defaultValue;
             }
         }
 
-        public static sbyte GetSByte(string[] keyPath, sbyte defaultValue)
+        public static sbyte GetSByte(string[] keyPath, sbyte defaultValue, bool suppressLog = false)
         {
             try
             {
@@ -184,12 +184,12 @@ namespace Atlasd.Daemon
             catch (Exception ex)
             {
                 if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a signed byte; check value");
+                if (!suppressLog) Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a signed byte; check value");
                 return defaultValue;
             }
         }
 
-        public static string GetString(string[] keyPath, string defaultValue)
+        public static string GetString(string[] keyPath, string defaultValue, bool suppressLog = false)
         {
             try
             {
@@ -203,12 +203,12 @@ namespace Atlasd.Daemon
             catch (Exception ex)
             {
                 if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a string; check value");
+                if (!suppressLog) Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not a string; check value");
                 return defaultValue;
             }
         }
 
-        public static UInt16 GetUInt16(string[] keyPath, UInt16 defaultValue)
+        public static UInt16 GetUInt16(string[] keyPath, UInt16 defaultValue, bool suppressLog = false)
         {
             try
             {
@@ -222,12 +222,12 @@ namespace Atlasd.Daemon
             catch (Exception ex)
             {
                 if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not an unsigned 16-bit integer; check value");
+                if (!suppressLog) Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not an unsigned 16-bit integer; check value");
                 return defaultValue;
             }
         }
 
-        public static UInt32 GetUInt32(string[] keyPath, UInt32 defaultValue)
+        public static UInt32 GetUInt32(string[] keyPath, UInt32 defaultValue, bool suppressLog = false)
         {
             try
             {
@@ -241,12 +241,12 @@ namespace Atlasd.Daemon
             catch (Exception ex)
             {
                 if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not an unsigned 32-bit integer; check value");
+                if (!suppressLog) Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not an unsigned 32-bit integer; check value");
                 return defaultValue;
             }
         }
 
-        public static UInt64 GetUInt64(string[] keyPath, UInt64 defaultValue)
+        public static UInt64 GetUInt64(string[] keyPath, UInt64 defaultValue, bool suppressLog = false)
         {
             try
             {
@@ -260,7 +260,7 @@ namespace Atlasd.Daemon
             catch (Exception ex)
             {
                 if (!(ex is ArgumentNullException || ex is InvalidOperationException)) throw;
-                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not an unsigned 64-bit integer; check value");
+                if (!suppressLog) Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Config, $"Setting [{string.Join("] -> [", keyPath)}] is not an unsigned 64-bit integer; check value");
                 return defaultValue;
             }
         }

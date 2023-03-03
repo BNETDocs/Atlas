@@ -116,12 +116,12 @@ namespace Atlasd.Battlenet.Protocols.Game
             uint count = 0;
             string codeStr = Battlenet.Product.ToString(code);
             string codeStrR = new string(codeStr.Reverse().ToArray());
-            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStr }, 0); // Ltrd
-            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStrR }, 0); // Drtl
-            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStr.ToUpperInvariant() }, 0); // LTRD
-            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStrR.ToUpperInvariant() }, 0); // DRTL
-            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStr.ToLowerInvariant() }, 0); // ltrd
-            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStrR.ToLowerInvariant() }, 0); // drtl
+            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStr }, 0, true); // Ltrd
+            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStrR }, 0, true); // Drtl
+            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStr.ToUpperInvariant() }, 0, true); // LTRD
+            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStrR.ToUpperInvariant() }, 0, true); // DRTL
+            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStr.ToLowerInvariant() }, 0, true); // ltrd
+            if (count == 0) count = Settings.GetUInt32(new string[]{ "battlenet", "emulation", "required_game_key_count", codeStrR.ToLowerInvariant() }, 0, true); // drtl
             return count;
         }
 
