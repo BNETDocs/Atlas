@@ -156,7 +156,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             }
 
             // Remove this GameAd
-            StopGameAd();
+            StopGameAd(true);
         }
 
         public void Dispose() /* part of IDisposable */
@@ -359,10 +359,10 @@ namespace Atlasd.Battlenet.Protocols.Game
             */
         }
 
-        public void StopGameAd()
+        public void StopGameAd(bool leavingGame)
         {
             if (GameAd == null) return;
-            if (GameAd.RemoveClient(this)) GameAd = null;
+            if (leavingGame && GameAd.RemoveClient(this)) GameAd = null;
         }
     }
 }

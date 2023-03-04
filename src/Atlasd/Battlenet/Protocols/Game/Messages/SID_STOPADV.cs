@@ -31,7 +31,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (context.Client.GameState == null)
                 throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} was received without an active GameState");
 
-            context.Client.GameState.StopGameAd();
+            context.Client.GameState.StopGameAd(false);
             return true;
         }
     }
