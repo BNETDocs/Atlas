@@ -180,10 +180,12 @@ namespace Atlasd.Battlenet.Protocols.Game
                         Buffer.BlockCopy(Text, 0, product, 0, Math.Min(4, Text.Length));
                         Array.Reverse(product); // "RATS" becomes "STAR", etc.
 
-                        using var m = new MemoryStream(); // Expandable buffer
-                        using var w = new BinaryWriter(m);
+                        byte[] username = Encoding.UTF8.GetBytes(Username);
 
-                        w.Write($"{1000 + EventId} ");
+                        using var m = new MemoryStream(0xFFFF);
+                        using var w = new System.IO.BinaryWriter(m);
+
+                        w.Write(Encoding.UTF8.GetBytes($"{1000 + EventId} "));
 
                         switch (EventId)
                         {
@@ -191,81 +193,81 @@ namespace Atlasd.Battlenet.Protocols.Game
                             case EventIds.EID_USERJOIN:
                             case EventIds.EID_USERUPDATE:
                                 {
-                                    w.Write(EventId == EventIds.EID_USERJOIN ? "JOIN " : "USER ");
-                                    w.Write(Username);
-                                    w.Write($" {Flags:X4} [");
+                                    w.Write(Encoding.UTF8.GetBytes(EventId == EventIds.EID_USERJOIN ? "JOIN " : "USER "));
+                                    w.Write(username);
+                                    w.Write(Encoding.UTF8.GetBytes($" {Flags:X4} ["));
                                     w.Write(product);
-                                    w.Write(']');
+                                    w.Write((byte)']');
                                     break;
                                 }
                             case EventIds.EID_USERLEAVE:
                                 {
-                                    w.Write("LEAVE ");
-                                    w.Write(Username);
-                                    w.Write($" {Flags:X4}");
+                                    w.Write(Encoding.UTF8.GetBytes("LEAVE "));
+                                    w.Write(username);
+                                    w.Write(Encoding.UTF8.GetBytes($" {Flags:X4}"));
                                     break;
                                 }
                             case EventIds.EID_WHISPERFROM:
                             case EventIds.EID_WHISPERTO:
                                 {
-                                    w.Write("WHISPER ");
-                                    w.Write(Username);
-                                    w.Write($" {Flags:X4} \"");
+                                    w.Write(Encoding.UTF8.GetBytes("WHISPER "));
+                                    w.Write(username);
+                                    w.Write(Encoding.UTF8.GetBytes($" {Flags:X4} \""));
                                     w.Write(Text);
-                                    w.Write('"');
+                                    w.Write((byte)'"');
                                     break;
                                 }
                             case EventIds.EID_TALK:
                             case EventIds.EID_EMOTE:
                                 {
-                                    w.Write(EventId == EventIds.EID_EMOTE ? "EMOTE " : "TALK ");
-                                    w.Write(Username);
-                                    w.Write($" {Flags:X4} \"");
+                                    w.Write(Encoding.UTF8.GetBytes(EventId == EventIds.EID_EMOTE ? "EMOTE " : "TALK "));
+                                    w.Write(username);
+                                    w.Write(Encoding.UTF8.GetBytes($" {Flags:X4} \""));
                                     w.Write(Text);
-                                    w.Write('"');
+                                    w.Write((byte)'"');
                                     break;
                                 }
                             case EventIds.EID_BROADCAST:
                                 {
-                                    w.Write("BROADCAST \"");
+                                    w.Write(Encoding.UTF8.GetBytes("BROADCAST \""));
                                     w.Write(Text);
-                                    w.Write('"');
+                                    w.Write((byte)'"');
                                     break;
                                 }
                             case EventIds.EID_CHANNELJOIN:
                                 {
-                                    w.Write("CHANNEL \"");
+                                    w.Write(Encoding.UTF8.GetBytes("CHANNEL \""));
                                     w.Write(Text);
-                                    w.Write('"');
+                                    w.Write((byte)'"');
                                     break;
                                 }
                             case EventIds.EID_INFO:
                                 {
-                                    w.Write("INFO \"");
+                                    w.Write(Encoding.UTF8.GetBytes("INFO \""));
                                     w.Write(Text);
-                                    w.Write('"');
+                                    w.Write((byte)'"');
                                     break;
                                 }
                             case EventIds.EID_ERROR:
                                 {
-                                    w.Write("ERROR \"");
+                                    w.Write(Encoding.UTF8.GetBytes("ERROR \""));
                                     w.Write(Text);
-                                    w.Write('"');
+                                    w.Write((byte)'"');
                                     break;
                                 }
                             default:
                                 {
-                                    w.Write("UNKNOWN ");
-                                    w.Write(Username);
-                                    w.Write($" {Flags:X4} \"");
+                                    w.Write(Encoding.UTF8.GetBytes("UNKNOWN "));
+                                    w.Write(username);
+                                    w.Write(Encoding.UTF8.GetBytes($" {Flags:X4} \""));
                                     w.Write(Text);
-                                    w.Write('"');
+                                    w.Write((byte)'"');
                                     break;
                                 }
                         }
 
-                        w.Write(Battlenet.Common.NewLine);
-                        return m.GetBuffer();
+                        w.Write(Encoding.UTF8.GetBytes(Battlenet.Common.NewLine));
+                        return m.GetBuffer()[0..(int)w.BaseStream.Length];
                     }
                 default:
                     throw new ProtocolNotSupportedException(protocolType, null, $"Unsupported protocol type [0x{(byte)protocolType:X2}]");

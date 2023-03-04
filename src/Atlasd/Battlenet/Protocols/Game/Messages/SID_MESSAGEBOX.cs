@@ -59,12 +59,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 var caption = r.ReadByteString();
 
                 using var m = new MemoryStream();
-                using var w = new BinaryWriter(m);
-                w.Write($"{2000 + Id} MESSAGEBOX \"");
+                using var w = new System.IO.BinaryWriter(m);
+                w.Write(Encoding.UTF8.GetBytes($"{2000 + Id} MESSAGEBOX \""));
                 w.Write(text);
-                w.Write('"');
-                w.Write(Battlenet.Common.NewLine);
-                return m.GetBuffer();
+                w.Write((byte)'"');
+                w.Write(Encoding.UTF8.GetBytes(Battlenet.Common.NewLine));
+                return m.GetBuffer()[0..(int)w.BaseStream.Length];
             }
             else
             {

@@ -140,12 +140,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 var username = r.ReadByteString();
                 var statstring = r.ReadByteString();
 
-                using var m = new MemoryStream();
-                using var w = new BinaryWriter(m);
-                w.Write($"{2000 + Id} NAME ");
+                using var m = new MemoryStream(0xFFFF);
+                using var w = new System.IO.BinaryWriter(m);
+                w.Write(Encoding.UTF8.GetBytes($"{2000 + Id} NAME "));
                 w.Write(username);
-                w.Write(Battlenet.Common.NewLine);
-                return m.GetBuffer();
+                w.Write(Encoding.UTF8.GetBytes(Battlenet.Common.NewLine));
+                return m.GetBuffer()[0..(int)w.BaseStream.Length];
             }
             else
             {
