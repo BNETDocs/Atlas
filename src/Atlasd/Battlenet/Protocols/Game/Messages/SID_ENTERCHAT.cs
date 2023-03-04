@@ -135,9 +135,17 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
         {
             if (protocolType.IsChat())
             {
-                using var m = new MemoryStream(Buffer);
-                using var r = new BinaryReader(m);
-                return Encoding.UTF8.GetBytes($"{2000 + Id} NAME {Encoding.UTF8.GetString(r.ReadByteString())}{Battlenet.Common.NewLine}");
+                using var _m = new MemoryStream(Buffer);
+                using var r = new BinaryReader(_m);
+                var username = r.ReadByteString();
+                var statstring = r.ReadByteString();
+
+                using var m = new MemoryStream();
+                using var w = new BinaryWriter(m);
+                w.Write($"{2000 + Id} NAME ");
+                w.Write(username);
+                w.Write(Battlenet.Common.NewLine);
+                return m.GetBuffer();
             }
             else
             {
