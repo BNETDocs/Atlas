@@ -193,8 +193,9 @@ namespace Atlasd.Battlenet.Protocols.Game
                                 {
                                     w.Write(EventId == EventIds.EID_USERJOIN ? "JOIN " : "USER ");
                                     w.Write(Username);
-                                    w.Write($" {Flags:X4} ");
+                                    w.Write($" {Flags:X4} [");
                                     w.Write(product);
+                                    w.Write(']');
                                     break;
                                 }
                             case EventIds.EID_USERLEAVE:
