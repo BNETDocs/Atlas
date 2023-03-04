@@ -176,75 +176,95 @@ namespace Atlasd.Battlenet.Protocols.Game
                 case ProtocolType.Types.Chat_Alt1:
                 case ProtocolType.Types.Chat_Alt2:
                     {
-                        var buf = $"{1000 + EventId} ";
                         var product = new byte[4];
-
                         Buffer.BlockCopy(Text, 0, product, 0, Math.Min(4, Text.Length));
-                        Array.Reverse(product); // "RATS" becomes "STAR", "STAR" becomes "RATS", etc.
+                        Array.Reverse(product); // "RATS" becomes "STAR", etc.
+
+                        using var m = new MemoryStream(); // Expandable buffer
+                        using var w = new BinaryWriter(m);
+
+                        w.Write($"{1000 + EventId} ");
 
                         switch (EventId)
                         {
                             case EventIds.EID_USERSHOW:
+                            case EventIds.EID_USERJOIN:
                             case EventIds.EID_USERUPDATE:
                                 {
-                                    buf += $"USER {Username} {Flags:X4} [{Encoding.UTF8.GetString(product)}]";
-                                    break;
-                                }
-                            case EventIds.EID_USERJOIN:
-                                {
-                                    buf += $"JOIN {Username} {Flags:X4} [{Encoding.UTF8.GetString(product)}]";
+                                    w.Write(EventId == EventIds.EID_USERJOIN ? "JOIN " : "USER ");
+                                    w.Write(Username);
+                                    w.Write($" {Flags:X4} ");
+                                    w.Write(product);
                                     break;
                                 }
                             case EventIds.EID_USERLEAVE:
                                 {
-                                    buf += $"LEAVE {Username} {Flags:X4}";
+                                    w.Write("LEAVE ");
+                                    w.Write(Username);
+                                    w.Write($" {Flags:X4}");
                                     break;
                                 }
                             case EventIds.EID_WHISPERFROM:
                             case EventIds.EID_WHISPERTO:
                                 {
-                                    buf += $"WHISPER {Username} {Flags:X4} \"{Encoding.UTF8.GetString(Text)}\"";
+                                    w.Write("WHISPER ");
+                                    w.Write(Username);
+                                    w.Write($" {Flags:X4} \"");
+                                    w.Write(Text);
+                                    w.Write('"');
                                     break;
                                 }
                             case EventIds.EID_TALK:
+                            case EventIds.EID_EMOTE:
                                 {
-                                    buf += $"TALK {Username} {Flags:X4} \"{Encoding.UTF8.GetString(Text)}\"";
+                                    w.Write(EventId == EventIds.EID_EMOTE ? "EMOTE " : "TALK ");
+                                    w.Write(Username);
+                                    w.Write($" {Flags:X4} \"");
+                                    w.Write(Text);
+                                    w.Write('"');
                                     break;
                                 }
                             case EventIds.EID_BROADCAST:
                                 {
-                                    buf += $"BROADCAST \"{Encoding.UTF8.GetString(Text)}\"";
+                                    w.Write("BROADCAST \"");
+                                    w.Write(Text);
+                                    w.Write('"');
                                     break;
                                 }
                             case EventIds.EID_CHANNELJOIN:
                                 {
-                                    buf += $"CHANNEL \"{Encoding.UTF8.GetString(Text)}\"";
+                                    w.Write("CHANNEL \"");
+                                    w.Write(Text);
+                                    w.Write('"');
                                     break;
                                 }
                             case EventIds.EID_INFO:
                                 {
-                                    buf += $"INFO \"{Encoding.UTF8.GetString(Text)}\"";
+                                    w.Write("INFO \"");
+                                    w.Write(Text);
+                                    w.Write('"');
                                     break;
                                 }
                             case EventIds.EID_ERROR:
                                 {
-                                    buf += $"ERROR \"{Encoding.UTF8.GetString(Text)}\"";
-                                    break;
-                                }
-                            case EventIds.EID_EMOTE:
-                                {
-                                    buf += $"EMOTE {Username} {Flags:X4} \"{Encoding.UTF8.GetString(Text)}\"";
+                                    w.Write("ERROR \"");
+                                    w.Write(Text);
+                                    w.Write('"');
                                     break;
                                 }
                             default:
                                 {
-                                    buf += $"UNKNOWN {Username} {Flags:X4} \"{Encoding.UTF8.GetString(Text)}\"";
+                                    w.Write("UNKNOWN ");
+                                    w.Write(Username);
+                                    w.Write($" {Flags:X4} \"");
+                                    w.Write(Text);
+                                    w.Write('"');
                                     break;
                                 }
                         }
 
-                        buf += Battlenet.Common.NewLine;
-                        return Encoding.UTF8.GetBytes(buf);
+                        w.Write(Battlenet.Common.NewLine);
+                        return m.GetBuffer();
                     }
                 default:
                     throw new ProtocolNotSupportedException(protocolType, null, $"Unsupported protocol type [0x{(byte)protocolType:X2}]");
