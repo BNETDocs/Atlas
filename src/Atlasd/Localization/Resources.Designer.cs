@@ -88,6 +88,24 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sent spoofed SID_AUTH_CHECK result to {user}..
+        /// </summary>
+        public static string AdminBotFuckeryCommand {
+            get {
+                return ResourceManager.GetString("AdminBotFuckeryCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid parameters for SID_AUTH_CHECK..
+        /// </summary>
+        public static string AdminBotFuckeryCommandInvalid {
+            get {
+                return ResourceManager.GetString("AdminBotFuckeryCommandInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Registered clans:.
         /// </summary>
         public static string AdminClanListCommand {

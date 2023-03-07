@@ -38,6 +38,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 case "announce":
                 case "broadcast":
                     new AdminBroadcastCommand(RawBuffer, Arguments).Invoke(context); return;
+                case "botfuckery":
+                    new AdminBotFuckeryCommand(RawBuffer, Arguments).Invoke(context); return;
                 case "channel":
                 case "chan":
                 case "ch":

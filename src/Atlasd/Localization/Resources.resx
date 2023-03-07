@@ -126,6 +126,12 @@
   <data name="AddFriendEmptyTarget" xml:space="preserve">
     <value>Who do you want to add?</value>
   </data>
+  <data name="AdminBotFuckeryCommand" xml:space="preserve">
+    <value>Sent spoofed SID_AUTH_CHECK result to {user}.</value>
+  </data>
+  <data name="AdminBotFuckeryCommandInvalid" xml:space="preserve">
+    <value>Invalid parameters for SID_AUTH_CHECK.</value>
+  </data>
   <data name="AdminClanListCommand" xml:space="preserve">
     <value>Registered clans:</value>
   </data>
