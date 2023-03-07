@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -41,6 +42,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     }
                 case MessageDirection.ServerToClient:
                     {
+                        Dictionary<byte[], byte[]> realms = context.Arguments.ContainsKey("realms") ? (Dictionary<byte[], byte[]>)context.Arguments["realms"] : new Dictionary<byte[], byte[]>();
+
                         /**
                          * (UINT32) Unknown (0)
                          * (UINT32) Count
@@ -50,13 +53,21 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          *     (STRING) Realm description
                          */
 
-                        Buffer = new byte[8];
+                        int count = 8;
+                        foreach (var pair in realms) count += pair.Key.Length + pair.Value.Length + 6;
+                        Buffer = new byte[count];
 
                         using var m = new MemoryStream(Buffer);
                         using var w = new BinaryWriter(m);
 
                         w.Write((UInt32)0);
-                        w.Write((UInt32)0);
+                        w.Write((UInt32)realms.Count);
+                        foreach (var pair in realms)
+                        {
+                            w.Write((UInt32)1);
+                            w.WriteByteString(pair.Key);
+                            w.WriteByteString(pair.Value);
+                        }
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));

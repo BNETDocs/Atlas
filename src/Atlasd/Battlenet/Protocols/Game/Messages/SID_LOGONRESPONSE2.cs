@@ -10,7 +10,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
     class SID_LOGONRESPONSE2 : Message
     {
-        protected enum Statuses : UInt32
+        public enum Statuses : UInt32
         {
             Success = 0,
             AccountNotFound = 1,

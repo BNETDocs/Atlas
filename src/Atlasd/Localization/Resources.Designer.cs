@@ -88,7 +88,7 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sent spoofed SID_AUTH_CHECK result to {user}..
+        ///   Looks up a localized string similar to Sent spoofed {message} result to {user}..
         /// </summary>
         public static string AdminBotFuckeryCommand {
             get {
@@ -97,7 +97,7 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid parameters for SID_AUTH_CHECK..
+        ///   Looks up a localized string similar to Invalid parameters for {message}..
         /// </summary>
         public static string AdminBotFuckeryCommandInvalid {
             get {

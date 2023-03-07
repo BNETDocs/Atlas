@@ -9,7 +9,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
     class SID_LOGONRESPONSE : Message
     {
-        protected enum Statuses : UInt32
+        public enum Statuses : UInt32
         {
             Failure = 0,
             Success = 1,

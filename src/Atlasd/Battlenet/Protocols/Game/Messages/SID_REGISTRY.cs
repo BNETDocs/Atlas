@@ -48,6 +48,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var cookie = r.ReadUInt32();
                         var value = r.ReadByteString();
 
+                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Requested registry cookie [0x{cookie:X8}] value [{Encoding.UTF8.GetString(value)}]");
                         return true;
                     }
                 case MessageDirection.ServerToClient:
@@ -67,6 +68,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         w.Write((string)keyPath);
                         w.Write((string)keyName);
 
+                        Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Requesting registry cookie [0x{cookie}:X8] hive [0x{hiveKeyId:X8}] key path [{keyPath}] name [{keyName}]");
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
