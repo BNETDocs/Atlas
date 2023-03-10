@@ -63,7 +63,7 @@ namespace Atlasd.Daemon
                 var json = State.RootElement;
                 for (var i = 0; i < keyPath.Length; i++)
                 {
-                    json.TryGetProperty(keyPath[i], out json);
+                    if (!json.TryGetProperty(keyPath[i], out json)) break;
                 }
                 return json.EnumerateArray();
             }
@@ -82,7 +82,7 @@ namespace Atlasd.Daemon
                 var json = State.RootElement;
                 for (var i = 0; i < keyPath.Length; i++)
                 {
-                    json.TryGetProperty(keyPath[i], out json);
+                    if (!json.TryGetProperty(keyPath[i], out json)) return defaultValue;
                 }
                 return json.GetBoolean();
             }
@@ -101,7 +101,7 @@ namespace Atlasd.Daemon
                 var json = State.RootElement;
                 for (var i = 0; i < keyPath.Length; i++)
                 {
-                    json.TryGetProperty(keyPath[i], out json);
+                    if (!json.TryGetProperty(keyPath[i], out json)) return defaultValue;
                 }
                 return json.GetByte();
             }
@@ -120,7 +120,7 @@ namespace Atlasd.Daemon
                 var json = State.RootElement;
                 for (var i = 0; i < keyPath.Length; i++)
                 {
-                    json.TryGetProperty(keyPath[i], out json);
+                    if (!json.TryGetProperty(keyPath[i], out json)) return defaultValue;
                 }
                 return json.GetInt16();
             }
@@ -139,7 +139,7 @@ namespace Atlasd.Daemon
                 var json = State.RootElement;
                 for (var i = 0; i < keyPath.Length; i++)
                 {
-                    json.TryGetProperty(keyPath[i], out json);
+                    if (!json.TryGetProperty(keyPath[i], out json)) return defaultValue;
                 }
                 return json.GetInt32();
             }
@@ -158,7 +158,7 @@ namespace Atlasd.Daemon
                 var json = State.RootElement;
                 for (var i = 0; i < keyPath.Length; i++)
                 {
-                    json.TryGetProperty(keyPath[i], out json);
+                    if (!json.TryGetProperty(keyPath[i], out json)) return defaultValue;
                 }
                 return json.GetInt64();
             }
@@ -177,7 +177,7 @@ namespace Atlasd.Daemon
                 var json = State.RootElement;
                 for (var i = 0; i < keyPath.Length; i++)
                 {
-                    json.TryGetProperty(keyPath[i], out json);
+                    if (!json.TryGetProperty(keyPath[i], out json)) return defaultValue;
                 }
                 return json.GetSByte();
             }
@@ -196,7 +196,7 @@ namespace Atlasd.Daemon
                 var json = State.RootElement;
                 for (var i = 0; i < keyPath.Length; i++)
                 {
-                    json.TryGetProperty(keyPath[i], out json);
+                    if (!json.TryGetProperty(keyPath[i], out json)) return defaultValue;
                 }
                 return json.GetString();
             }
@@ -215,7 +215,7 @@ namespace Atlasd.Daemon
                 var json = State.RootElement;
                 for (var i = 0; i < keyPath.Length; i++)
                 {
-                    json.TryGetProperty(keyPath[i], out json);
+                    if (!json.TryGetProperty(keyPath[i], out json)) return defaultValue;
                 }
                 return json.GetUInt16();
             }
@@ -234,7 +234,7 @@ namespace Atlasd.Daemon
                 var json = State.RootElement;
                 for (var i = 0; i < keyPath.Length; i++)
                 {
-                    json.TryGetProperty(keyPath[i], out json);
+                    if (!json.TryGetProperty(keyPath[i], out json)) return defaultValue;
                 }
                 return json.GetUInt32();
             }
