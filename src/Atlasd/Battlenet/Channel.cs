@@ -439,14 +439,39 @@ namespace Atlasd.Battlenet
             return s;
         }
 
+        public bool IsModerated()
+        {
+            return ActiveFlags.HasFlag(Flags.Moderated);
+        }
+
         public bool IsPrivate()
         {
             return !ActiveFlags.HasFlag(Flags.Public);
         }
 
+        public bool IsProductSpecific()
+        {
+            return ActiveFlags.HasFlag(Flags.ProductSpecific);
+        }
+
         public bool IsPublic()
         {
             return ActiveFlags.HasFlag(Flags.Public);
+        }
+
+        public bool IsRestricted()
+        {
+            return ActiveFlags.HasFlag(Flags.Restricted);
+        }
+
+        public bool IsSilent()
+        {
+            return ActiveFlags.HasFlag(Flags.Silent);
+        }
+
+        public bool IsTechSupport()
+        {
+            return ActiveFlags.HasFlag(Flags.TechSupport);
         }
 
         public void KickUser(GameState source, string target, string reason)
