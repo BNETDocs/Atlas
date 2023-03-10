@@ -48,6 +48,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\vendor\MBNCSUtil\src\MBNCSUtil.csproj" />
   </ItemGroup>
 

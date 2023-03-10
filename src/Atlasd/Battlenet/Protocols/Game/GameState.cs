@@ -169,6 +169,33 @@ namespace Atlasd.Battlenet.Protocols.Game
             IsDisposing = false;
         }
 
+        public void GenerateLocaleFromGeoIP()
+        {
+            var file = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "GeoIP2-City.mmdb"));
+            // This creates the DatabaseReader object, which should be reused across
+            // lookups.
+            using (var reader = new MaxMind.GeoIP2.DatabaseReader(file))
+            {
+                // Replace "City" with the appropriate method for your database, e.g.,
+                // "Country".
+                var city = reader.City((Client.RemoteEndPoint as IPEndPoint).Address.ToString());
+
+                Console.WriteLine(city.Country.IsoCode); // 'US'
+                Console.WriteLine(city.Country.Name); // 'United States'
+                Console.WriteLine(city.Country.Names["zh-CN"]); // '美国'
+
+                Console.WriteLine(city.MostSpecificSubdivision.Name); // 'Minnesota'
+                Console.WriteLine(city.MostSpecificSubdivision.IsoCode); // 'MN'
+
+                Console.WriteLine(city.City.Name); // 'Minneapolis'
+
+                Console.WriteLine(city.Postal.Code); // '55455'
+
+                Console.WriteLine(city.Location.Latitude); // 44.9733
+                Console.WriteLine(city.Location.Longitude); // -93.2323
+            }
+        }
+
         public byte[] GenerateStatstring()
         {
             byte[] statstring = null;
