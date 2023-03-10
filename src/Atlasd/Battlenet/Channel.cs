@@ -684,8 +684,8 @@ namespace Atlasd.Battlenet
                     }
 
                     // Channel topic:
-                    var topic = RenderTopic(user);
-                    foreach (var line in topic.Split("\n"))
+                    string[] topic = RenderTopic(user).Replace("\r\n", "\n").Replace("\r", "\n").Split("\n");
+                    foreach (var line in topic)
                     {
                         args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line);
                         msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
@@ -740,8 +740,8 @@ namespace Atlasd.Battlenet
             {
                 foreach (var user in Users)
                 {
-                    var lines = RenderTopic(user).Split(Battlenet.Common.NewLine);
-                    foreach (var line in lines) new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line).WriteTo(user.Client);
+                    string[] topic = RenderTopic(user).Replace("\r\n", "\n").Replace("\r", "\n").Split("\n");
+                    foreach (var line in topic) new ChatEvent(ChatEvent.EventIds.EID_INFO, ActiveFlags, 0, Name, line).WriteTo(user.Client);
                 }
             }
         }
