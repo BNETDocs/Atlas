@@ -5,6 +5,7 @@ using Atlasd.Localization;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Text;
 
@@ -613,6 +614,25 @@ namespace Atlasd.Battlenet
                     if (heirExists && !DesignatedHeirs.Remove(user, out _))
                     {
                         Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Channel, $"Failed to remove designated heir [{heir.OnlineName}] from channel [{this.Name}]");
+                    }
+                }
+
+                // If autoOp is enabled and channel is not public, does not start with "clan " or "op ", then promote next user by oldest entry to channel operator.
+                var autoOp = Settings.GetBoolean(new string[] { "channel", "auto_op" }, false);
+                if (autoOp && !(IsPublic() || Name.StartsWith("clan ", true, CultureInfo.InvariantCulture) || Name.StartsWith("op ", true, CultureInfo.InvariantCulture)))
+                {
+                    bool hasOperator = false;
+                    lock (Users)
+                    {
+                        foreach (var subuser in Users)
+                        {
+                            if (subuser.HasAdmin(includeChannelOp: true))
+                            {
+                                hasOperator = true;
+                                break;
+                            }
+                        }
+                        if (!hasOperator && Count > 0) UpdateUser(Users[0], Users[0].ChannelFlags | Account.Flags.ChannelOp);
                     }
                 }
             }
