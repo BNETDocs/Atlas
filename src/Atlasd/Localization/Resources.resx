@@ -422,6 +422,28 @@ Displays the current {realm} Time ({realmTimezone}).</value>
   <data name="ServerStatistics" xml:space="preserve">
     <value>There are currently {gameUsers} users playing {gameAds} games of {game}, and {totalUsers} users playing {totalGameAds} games on {realm}.</value>
   </data>
+  <data name="StatsCommand" xml:space="preserve">
+    <value>{user}'s record:</value>
+  </data>
+  <data name="StatsCommandInvalid" xml:space="preserve">
+    <value>You must supply a user name and a valid program id.
+Valid program ids are:
+STAR - StarCraft
+SEXP - StarCraft Broodwar
+W2BN - WarCraft II Battle.net Edittion
+WAR3 - WarCraft III
+W3XP - WarCraft III The Frozen Throne
+Example: /stats joe STAR</value>
+  </data>
+  <data name="StatsCommandIronMan" xml:space="preserve">
+    <value>IronMan games: {ironManWins}-{ironManLosses}-{ironManDraws}</value>
+  </data>
+  <data name="StatsCommandLadder" xml:space="preserve">
+    <value>Ladder games: {ladderWins}-{ladderLosses}-{ladderDraws}</value>
+  </data>
+  <data name="StatsCommandNormal" xml:space="preserve">
+    <value>Normal games: {normalWins}-{normalLosses}-{normalDraws}</value>
+  </data>
   <data name="TheVoid" xml:space="preserve">
     <value>The Void</value>
   </data>

@@ -888,6 +888,58 @@ namespace Atlasd.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {user}'s record:.
+        /// </summary>
+        public static string StatsCommand {
+            get {
+                return ResourceManager.GetString("StatsCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must supply a user name and a valid program id.
+        ///Valid program ids are:
+        ///STAR - StarCraft
+        ///SEXP - StarCraft Broodwar
+        ///W2BN - WarCraft II Battle.net Edittion
+        ///WAR3 - WarCraft III
+        ///W3XP - WarCraft III The Frozen Throne
+        ///Example: /stats joe STAR.
+        /// </summary>
+        public static string StatsCommandInvalid {
+            get {
+                return ResourceManager.GetString("StatsCommandInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IronMan games: {ironManWins}-{ironManLosses}-{ironManDraws}.
+        /// </summary>
+        public static string StatsCommandIronMan {
+            get {
+                return ResourceManager.GetString("StatsCommandIronMan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ladder games: {ladderWins}-{ladderLosses}-{ladderDraws}.
+        /// </summary>
+        public static string StatsCommandLadder {
+            get {
+                return ResourceManager.GetString("StatsCommandLadder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Normal games: {normalWins}-{normalLosses}-{normalDraws}.
+        /// </summary>
+        public static string StatsCommandNormal {
+            get {
+                return ResourceManager.GetString("StatsCommandNormal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Void.
         /// </summary>
         public static string TheVoid {

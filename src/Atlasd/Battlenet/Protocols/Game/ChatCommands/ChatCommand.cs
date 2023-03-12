@@ -86,6 +86,8 @@ namespace Atlasd.Battlenet.Protocols.Game
                 case "rejoin":
                 case "rj":
                     return new ReJoinCommand(_raw, args);
+                case "stats":
+                    return new StatsCommand(_raw, args);
                 case "time":
                     return new TimeCommand(_raw, args);
                 case "unban":
