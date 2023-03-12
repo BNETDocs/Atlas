@@ -86,6 +86,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                 case "rejoin":
                 case "rj":
                     return new ReJoinCommand(_raw, args);
+                case "astat": // Used by Starcraft
                 case "stats":
                     return new StatsCommand(_raw, args);
                 case "time":
