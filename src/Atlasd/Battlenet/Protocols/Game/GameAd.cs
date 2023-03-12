@@ -56,8 +56,9 @@ namespace Atlasd.Battlenet.Protocols.Game
         public UInt32 GamePort { get; private set; }
         public GameTypes GameType { get; private set; }
         public UInt32 GameVersion { get; private set; }
-        public byte[] Name { get; private set; }
         public LocaleInfo Locale { get; private set; }
+        public byte[] Name { get; private set; }
+        public GameState Owner { get => Clients != null && Clients.Count > 0 ? Clients[0] : null; }
         public byte[] Password { get; private set; }
         public Product.ProductCode Product { get; private set; }
         public byte[] Statstring { get; private set; }
@@ -98,13 +99,6 @@ namespace Atlasd.Battlenet.Protocols.Game
         {
             bool removed = false;
             lock (Clients) removed = Clients.Remove(client);
-            if (Clients.Count == 0)
-            {
-                if (!Battlenet.Common.ActiveGameAds.TryRemove(Name, out _))
-                {
-                    Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.GameAd, $"Failed to remove game ad [{Encoding.ASCII.GetString(Name)}] from active game ad cache");
-                }
-            }
             return removed;
         }
 

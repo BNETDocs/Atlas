@@ -58,21 +58,27 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         var gameAds = new List<GameAd>();
 
-                        foreach (var _pair in Battlenet.Common.ActiveGameAds)
+                        lock (Battlenet.Common.ActiveGameAds)
                         {
-                            var _ad = _pair.Value;
-
-                            if (_ad.Clients.Count == 0) continue;
-                            if (_ad.Product != context.Client.GameState.Product) continue;
-
-                            if (viewingFilter == 0xFFFF || viewingFilter == 0x30)
+                            foreach (var gameAd in Battlenet.Common.ActiveGameAds)
                             {
-                                if (gameType != 0 && gameType != (ushort)_ad.GameType) continue;
-                                if (subGameType != 0 && subGameType != _ad.SubGameType) continue;
-                            }
-                            else if (viewingFilter == 0xFF80) { }
+                                if (gameAd.Clients.Count == 0)
+                                {
+                                    Battlenet.Common.ActiveGameAds.Remove(gameAd);
+                                    continue;
+                                }
 
-                            gameAds.Add(_ad);
+                                if (gameAd.Product != context.Client.GameState.Product) continue;
+
+                                if (viewingFilter == 0xFFFF || viewingFilter == 0x30)
+                                {
+                                    if (gameType != 0 && gameType != (ushort)gameAd.GameType) continue;
+                                    if (subGameType != 0 && subGameType != gameAd.SubGameType) continue;
+                                }
+                                else if (viewingFilter == 0xFF80) { }
+
+                                gameAds.Add(gameAd);
+                            }
                         }
 
                         return new SID_GETADVLISTEX().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, dynamic>(){

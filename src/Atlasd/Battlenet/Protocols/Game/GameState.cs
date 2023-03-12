@@ -156,7 +156,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             }
 
             // Remove this GameAd
-            StopGameAd(true);
+            if (GameAd != null && GameAd.RemoveClient(this)) GameAd = null;
         }
 
         public void Dispose() /* part of IDisposable */
@@ -384,12 +384,6 @@ namespace Atlasd.Battlenet.Protocols.Game
                 Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_Game, Client.RemoteEndPoint, $"Error setting client locale to [{localeId}], using default");
             }
             */
-        }
-
-        public void StopGameAd(bool leavingGame)
-        {
-            if (GameAd == null) return;
-            if (leavingGame && GameAd.RemoveClient(this)) GameAd = null;
         }
     }
 }

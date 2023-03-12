@@ -2,6 +2,8 @@
 using Atlasd.Daemon;
 using System;
 using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -35,16 +37,24 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
             var productId = r.ReadUInt32();
             var productVersion = r.ReadUInt32();
-            var gameName = r.ReadString();
-            var gamePassword = r.ReadString();
+            var gameName = r.ReadByteString();
+            var gamePassword = r.ReadByteString();
 
-            try
+            if (context.Client.GameState.ActiveChannel != null)
+                context.Client.GameState.ActiveChannel.RemoveUser(context.Client.GameState);
+
+            lock (Battlenet.Common.ActiveGameAds)
             {
-                lock (context.Client.GameState.ActiveChannel)
-                    context.Client.GameState.ActiveChannel.RemoveUser(context.Client.GameState);
+                foreach (var gameAd in Battlenet.Common.ActiveGameAds)
+                {
+                    if (gameAd.Name.SequenceEqual(gameName))
+                    {
+                        if (gameAd.HasClient(context.Client.GameState) || gameAd.AddClient(context.Client.GameState))
+                            context.Client.GameState.GameAd = gameAd;
+                        break;
+                    }
+                }
             }
-            catch (ArgumentNullException) { }
-            catch (NullReferenceException) { }
 
             return true;
         }

@@ -42,7 +42,7 @@ namespace Atlasd.Battlenet
         public static ConcurrentDictionary<string, Channel> ActiveChannels;
         public static ConcurrentDictionary<byte[], Clan> ActiveClans;
         public static ConcurrentDictionary<Socket, ClientState> ActiveClientStates;
-        public static ConcurrentDictionary<byte[], GameAd> ActiveGameAds;
+        public static List<GameAd> ActiveGameAds;
         public static ConcurrentDictionary<string, GameState> ActiveGameStates;
         public static IPAddress DefaultAddress { get; private set; }
         public static int DefaultPort { get; private set; }
@@ -102,7 +102,7 @@ namespace Atlasd.Battlenet
             ActiveChannels = new ConcurrentDictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClans = new ConcurrentDictionary<byte[], Clan>();
             ActiveClientStates = new ConcurrentDictionary<Socket, ClientState>();
-            ActiveGameAds = new ConcurrentDictionary<byte[], GameAd>();
+            ActiveGameAds = new List<GameAd>();
             ActiveGameStates = new ConcurrentDictionary<string, GameState>(StringComparer.OrdinalIgnoreCase);
 
             InitializeAds();
