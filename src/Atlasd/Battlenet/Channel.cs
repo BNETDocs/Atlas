@@ -568,7 +568,7 @@ namespace Atlasd.Battlenet
             // If the user is not in the Users list, then we give up here
             if (!removed)
             {
-                if (Count == 0 && !ActiveFlags.HasFlag(Flags.Public)) Close();
+                if (Count == 0 && IsPrivate()) Close();
                 return removed;
             }
 
