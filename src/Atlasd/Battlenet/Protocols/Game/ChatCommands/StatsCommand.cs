@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
@@ -21,7 +22,8 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
 
             if (Arguments.Count < 1)
             {
-                new ChatEvent(ChatEvent.EventIds.EID_ERROR, gs.ChannelFlags, gs.Client.RemoteIPAddress, gs.Ping, gs.OnlineName, Resources.StatsCommandInvalid).WriteTo(gs.Client);
+                foreach (var line in Resources.StatsCommandInvalid.Split(Battlenet.Common.NewLine))
+                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, gs.ChannelFlags, gs.Client.RemoteIPAddress, gs.Ping, gs.OnlineName, line).WriteTo(gs.Client);
                 return;
             }
 
@@ -31,21 +33,25 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             RawBuffer = RawBuffer[(Encoding.UTF8.GetByteCount(targetStr) + (Arguments.Count > 0 ? 1 : 0))..];
 
             Product.ProductCode code = Product.ProductCode.None;
+            string codeStr = string.Empty;
+
             if (Arguments.Count == 0)
             {
                 code = gs.Product;
             }
-            else if (Arguments.Count > 0)
+            else
             {
-                var codeStr = Arguments[0];
+                codeStr = Arguments[0];
                 Arguments.RemoveAt(0);
                 // Calculates and removes (codeStr+' ') from (raw) which prints into (newRaw):
                 RawBuffer = RawBuffer[(Encoding.UTF8.GetByteCount(codeStr) + (Arguments.Count > 0 ? 1 : 0))..];
 
-                while (codeStr.Length < 4) codeStr += 0x00;
+                while (codeStr.Length < 4) codeStr += (char)0x00;
                 code = Product.FromBytes(Encoding.UTF8.GetBytes(codeStr[0..Math.Min(4, codeStr.Length)]), true);
             }
+            codeStr = Encoding.UTF8.GetString(BitConverter.GetBytes((uint)code).Reverse().ToArray());
 
+            // Verify product code is a record-keeping type
             bool valid = code switch
             {
                 Product.ProductCode.StarcraftOriginal => true,
@@ -55,10 +61,10 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
                 Product.ProductCode.WarcraftIIIFrozenThrone => true,
                 _ => false,
             };
-
             if (!valid)
             {
-                new ChatEvent(ChatEvent.EventIds.EID_ERROR, gs.ChannelFlags, gs.Client.RemoteIPAddress, gs.Ping, gs.OnlineName, Resources.StatsCommandInvalid).WriteTo(gs.Client);
+                foreach (var line in Resources.StatsCommandInvalid.Split(Battlenet.Common.NewLine))
+                    new ChatEvent(ChatEvent.EventIds.EID_ERROR, gs.ChannelFlags, gs.Client.RemoteIPAddress, gs.Ping, gs.OnlineName, line).WriteTo(gs.Client);
                 return;
             }
 
@@ -67,16 +73,31 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             buffer += Battlenet.Common.NewLine + Resources.StatsCommandLadder;
             if (code == Product.ProductCode.WarcraftIIBNE) buffer += Battlenet.Common.NewLine + Resources.StatsCommandIronMan;
 
-            buffer = buffer.Replace("{ironManDraws}", "0", true, CultureInfo.InvariantCulture);
-            buffer = buffer.Replace("{ironManLosses}", "0", true, CultureInfo.InvariantCulture);
-            buffer = buffer.Replace("{ironManWins}", "0", true, CultureInfo.InvariantCulture);
-            buffer = buffer.Replace("{ladderDraws}", "0", true, CultureInfo.InvariantCulture);
-            buffer = buffer.Replace("{ladderLosses}", "0", true, CultureInfo.InvariantCulture);
-            buffer = buffer.Replace("{ladderWins}", "0", true, CultureInfo.InvariantCulture);
-            buffer = buffer.Replace("{normalDraws}", "0", true, CultureInfo.InvariantCulture);
-            buffer = buffer.Replace("{normalLosses}", "0", true, CultureInfo.InvariantCulture);
-            buffer = buffer.Replace("{normalWins}", "0", true, CultureInfo.InvariantCulture);
+            int normal = 0;
+            int ladder = 1;
+            int ironMan = 3;
+
+            int normalWins = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{normal}\\wins", 0);
+            int normalLosses = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{normal}\\losses", 0);
+            int normalDraws = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{normal}\\disconnects", 0);
+            int ladderWins = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{ladder}\\wins", 0);
+            int ladderLosses = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{ladder}\\losses", 0);
+            int ladderDraws = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{ladder}\\disconnects", 0);
+            int ironManWins = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{ironMan}\\wins", 0);
+            int ironManLosses = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{ironMan}\\losses", 0);
+            int ironManDraws = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{ironMan}\\disconnects", 0);
+
+            buffer = buffer.Replace("{ironManDraws}", $"{ironManDraws}", true, CultureInfo.InvariantCulture);
+            buffer = buffer.Replace("{ironManLosses}", $"{ironManLosses}", true, CultureInfo.InvariantCulture);
+            buffer = buffer.Replace("{ironManWins}", $"{ironManWins}", true, CultureInfo.InvariantCulture);
+            buffer = buffer.Replace("{ladderDraws}", $"{ladderDraws}", true, CultureInfo.InvariantCulture);
+            buffer = buffer.Replace("{ladderLosses}", $"{ladderLosses}", true, CultureInfo.InvariantCulture);
+            buffer = buffer.Replace("{ladderWins}", $"{ladderWins}", true, CultureInfo.InvariantCulture);
+            buffer = buffer.Replace("{normalDraws}", $"{normalDraws}", true, CultureInfo.InvariantCulture);
+            buffer = buffer.Replace("{normalLosses}", $"{normalLosses}", true, CultureInfo.InvariantCulture);
+            buffer = buffer.Replace("{normalWins}", $"{normalWins}", true, CultureInfo.InvariantCulture);
             buffer = buffer.Replace("{user}", targetStr, true, CultureInfo.InvariantCulture);
+            buffer = buffer.Replace("{userName}", targetStr, true, CultureInfo.InvariantCulture);
 
             foreach (var line in buffer.Split(Battlenet.Common.NewLine))
                 new ChatEvent(ChatEvent.EventIds.EID_INFO, gs.ChannelFlags, gs.Client.RemoteIPAddress, gs.Ping, gs.OnlineName, line).WriteTo(gs.Client);

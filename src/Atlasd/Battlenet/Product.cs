@@ -37,10 +37,28 @@ namespace Atlasd.Battlenet
 
             if (validityCheck)
             {
-                var codeStr = Encoding.ASCII.GetString(product);
+                var codeStr = Encoding.UTF8.GetString(product);
                 if (!IsValid(code)) code = (ProductCode)BitConverter.ToUInt32(product.Reverse().ToArray());
-                if (!IsValid(code)) code = (ProductCode)BitConverter.ToUInt32(Encoding.ASCII.GetBytes(codeStr.ToUpperInvariant()));
-                if (!IsValid(code)) code = (ProductCode)BitConverter.ToUInt32(Encoding.ASCII.GetBytes(codeStr.ToUpperInvariant().Reverse().ToArray()));
+                if (!IsValid(code)) code = (ProductCode)BitConverter.ToUInt32(Encoding.UTF8.GetBytes(codeStr.ToUpperInvariant()));
+                if (!IsValid(code)) code = (ProductCode)BitConverter.ToUInt32(Encoding.UTF8.GetBytes(codeStr.ToUpperInvariant().Reverse().ToArray()));
+                if (!IsValid(code)) code = ProductCode.None;
+            }
+
+            return code;
+        }
+
+        public static ProductCode FromString(string product, bool validityCheck)
+        {
+            if (product.Length != 4)
+                throw new ArgumentException($"Cannot convert string to product, expected 4 characters, got {product.Length}");
+
+            ProductCode code = (ProductCode)BitConverter.ToUInt32(Encoding.UTF8.GetBytes(product)[0..4]);
+
+            if (validityCheck)
+            {
+                if (!IsValid(code)) code = (ProductCode)BitConverter.ToUInt32(Encoding.UTF8.GetBytes(product.Reverse().ToString())[0..4]);
+                if (!IsValid(code)) code = (ProductCode)BitConverter.ToUInt32(Encoding.UTF8.GetBytes(product.ToUpperInvariant())[0..4]);
+                if (!IsValid(code)) code = (ProductCode)BitConverter.ToUInt32(Encoding.UTF8.GetBytes(product.ToUpperInvariant().Reverse().ToString())[0..4]);
                 if (!IsValid(code)) code = ProductCode.None;
             }
 
