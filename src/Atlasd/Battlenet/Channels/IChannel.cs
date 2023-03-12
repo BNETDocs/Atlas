@@ -38,6 +38,8 @@ namespace Atlasd.Battlenet.Channels
         public byte[] GetName();
         public byte[] GetTopic(bool format) => GetTopic(format, null);
         public byte[] GetTopic(bool format, GameState target);
+        public bool IsBannedIP(System.Net.IPAddress value);
+        public bool IsBannedName(byte[] value);
         public bool IsChat();
         public bool IsGlobal();
         public bool IsModerated();

@@ -1,5 +1,6 @@
 using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Daemon;
+using Atlasd.Localization;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace Atlasd.Battlenet.Channels
         protected IList<byte[]> BannedNames;
         protected ConcurrentBag<KeyValuePair<GameState, ChatEvent>> ChatEventQueue;
         private bool Closed;
+        private readonly object IsClosing = new object();
         protected IDictionary<GameState, GameState> DesignatedHeirs;
         protected IChannel.FlagIds Flags;
         protected int MemberMaxCount;
@@ -34,6 +36,7 @@ namespace Atlasd.Battlenet.Channels
             BannedIPs = new List<IPAddress>();
             BannedNames = new List<byte[]>();
             ChatEventQueue = new ConcurrentBag<KeyValuePair<GameState, ChatEvent>>();
+            Closed = false;
             DesignatedHeirs = new Dictionary<GameState, GameState>();
             SetFlags(flags);
             SetMemberMaxCount(Channel.DefaultMaxMemberCount());
@@ -44,12 +47,55 @@ namespace Atlasd.Battlenet.Channels
 
         public bool Accept(GameState target, bool ignoreLimits = false, bool extendedErrors = false)
         {
-            return false;
+            if (Closed) return false;
+
+            var nameStr = Encoding.UTF8.GetString(Name);
+            var targetUsername = Encoding.UTF8.GetBytes(target.Username);
+
+            if (!target.HasAdmin(includeChannelOp: false))
+            {
+                if (GetMemberCount() >= GetMemberMaxCount())
+                {
+                    if (extendedErrors)
+                        QueueChatEvent(target, new ChatEvent(ChatEvent.EventIds.EID_CHANNELFULL, (uint)GetFlags(), 0, string.Empty, GetName()));
+                    else
+                        QueueChatEventError(target, Resources.ChannelIsFull);
+                    return false;
+                }
+
+                if (IsRestricted())
+                {
+                    if (extendedErrors)
+                        QueueChatEvent(target, new ChatEvent(ChatEvent.EventIds.EID_CHANNELRESTRICTED, (uint)GetFlags(), 0, string.Empty, GetName()));
+                    else
+                        QueueChatEventError(target, Resources.ChannelIsRestricted);
+                    return false;
+                }
+
+                if (IsBannedIP(target.Client.RemoteIPAddress) || IsBannedName(targetUsername))
+                {
+                    if (extendedErrors)
+                        QueueChatEvent(target, new ChatEvent(ChatEvent.EventIds.EID_CHANNELRESTRICTED, (uint)GetFlags(), 0, string.Empty, GetName()));
+                    else
+                        QueueChatEventError(target, Resources.YouAreBannedFromThatChannel);
+                    return false;
+                }
+
+                if (nameStr.StartsWith("clan ", true, CultureInfo.InvariantCulture)) return false;
+            }
+
+            return false; // TODO
         }
 
         public bool AddBan(GameState source, GameState target, byte[] reason)
         {
-            if (!source.HasAdmin(true)) return false;
+            if (Closed) return false;
+
+            if (!source.HasAdmin(includeChannelOp: true))
+            {
+                QueueChatEventError(source, Resources.YouAreNotAChannelOperator);
+                return false;
+            }
 
             var sourceUsername = Encoding.UTF8.GetBytes(source.Username);
             var targetUsername = Encoding.UTF8.GetBytes(target.Username);
@@ -65,39 +111,58 @@ namespace Atlasd.Battlenet.Channels
             return true;*/
         }
 
+        /**
+         * <remarks>Closes the channel and removes it from the server. Any remaining members are disbanded into The Void.</remarks>
+         */
         public void Close()
         {
-            if (Closed) return;
-            try
+            lock (IsClosing)
             {
-                AcceptNewMembers = false;
-                MemberMaxCount = 0;
-                Channel.RemoveChannel(this);
-                Disband();
+                if (Closed) return;
+                try
+                {
+                    AcceptNewMembers = false;
+                    MemberMaxCount = 0;
+                    Channel.RemoveChannel(this);
+                    Disband();
 
-                lock (BannedIPs) BannedIPs.Clear();
-                lock (BannedNames) BannedNames.Clear();
-                lock (ChatEventQueue) ChatEventQueue.Clear();
-                lock (DesignatedHeirs) DesignatedHeirs.Clear();
-            }
-            finally
-            {
-                Closed = true;
+                    lock (BannedIPs) BannedIPs.Clear();
+                    lock (BannedNames) BannedNames.Clear();
+                    ChatEventQueue.Clear();
+                    lock (DesignatedHeirs) DesignatedHeirs.Clear();
+                }
+                finally
+                {
+                    Closed = true;
+                }
             }
         }
 
+        /**
+         * <remarks>Sets a channel member's designated heir.</remarks>
+         * <param name="designator">The user which when leaving will give up their channel operator.</param>
+         * <param name="heir">The user which will become channel operator when the designator gives up theirs.</param>
+         */
         public bool Designate(GameState designator, GameState heir)
         {
+            if (Closed) return false;
             lock (DesignatedHeirs) DesignatedHeirs[designator] = heir;
             return true;
         }
 
+        /**
+         * <remarks>Disbands the channel members to The Void.</remarks>
+         */
         public bool Disband()
         {
             if (!Channel.FindChannel(TheVoidBytes, true, out IChannel theVoid)) return false;
             return DisbandInto(theVoid);
         }
 
+        /**
+         * <remarks>Disbands the channel members to a specific channel.</remarks>
+         * <param name="destination">The destination channel to disband this channel's members into.</param>
+         */
         public bool DisbandInto(IChannel destination)
         {
             lock (Members)
@@ -128,7 +193,7 @@ namespace Atlasd.Battlenet.Channels
                 foreach (var member in Members)
                 {
                     string memberUsername = member.Username;
-                    if (member.HasAdmin(true)) memberUsername = $"[{memberUsername.ToUpperInvariant()}]";
+                    if (member.HasAdmin(includeChannelOp: true)) memberUsername = $"[{memberUsername.ToUpperInvariant()}]";
                     buffer += count++ % 2 == 0 ? memberUsername : $", {memberUsername},{Battlenet.Common.NewLine}";
                 }
             }
@@ -165,6 +230,16 @@ namespace Atlasd.Battlenet.Channels
             return Encoding.UTF8.GetBytes(t);
         }
 
+        public bool IsBannedIP(IPAddress value)
+        {
+            return false; // TODO
+        }
+
+        public bool IsBannedName(byte[] value)
+        {
+            return false; // TODO
+        }
+
         public bool IsChat() => Flags.HasFlag(IChannel.FlagIds.Chat);
         public bool IsGlobal() => Flags.HasFlag(IChannel.FlagIds.Global);
         public bool IsModerated() => Flags.HasFlag(IChannel.FlagIds.Moderated);
@@ -179,7 +254,13 @@ namespace Atlasd.Battlenet.Channels
 
         public bool Kick(GameState source, GameState target, byte[] reason)
         {
-            if (!source.HasAdmin(true)) return false;
+            if (Closed) return false;
+
+            if (!source.HasAdmin(includeChannelOp: true))
+            {
+                QueueChatEventError(source, Resources.YouAreNotAChannelOperator);
+                return false;
+            }
 
             return false; // TODO
         }
@@ -213,37 +294,56 @@ namespace Atlasd.Battlenet.Channels
 
         public bool QueueChatEvent(GameState owner, ChatEvent chatEvent)
         {
-            lock (ChatEventQueue) ChatEventQueue.Add(new KeyValuePair<GameState, ChatEvent>(owner, chatEvent));
+            if (Closed || ChatEventQueue == null) return false;
+            ChatEventQueue.Add(new KeyValuePair<GameState, ChatEvent>(owner, chatEvent));
             return true;
         }
 
+        protected bool QueueChatEventError(GameState owner, byte[] message) => QueueChatEvent(owner, new ChatEvent(ChatEvent.EventIds.EID_ERROR, owner.ChannelFlags, owner.Ping, owner.Username, message));
+
+        protected bool QueueChatEventError(GameState owner, string message) => QueueChatEventError(owner, Encoding.UTF8.GetBytes(message));
+
+        protected bool QueueChatEventInfo(GameState owner, byte[] message) => QueueChatEvent(owner, new ChatEvent(ChatEvent.EventIds.EID_INFO, owner.ChannelFlags, owner.Ping, owner.Username, message));
+
+        protected bool QueueChatEventInfo(GameState owner, string message) => QueueChatEventInfo(owner, Encoding.UTF8.GetBytes(message));
+
         public bool Remove(GameState target)
         {
+            if (Closed) return false;
             if (Members.Count == 0 && IsPrivate()) Close();
             return false; // TODO
         }
 
         public bool RemoveBan(GameState source, GameState target)
         {
-            if (!source.HasAdmin(true)) return false;
+            if (Closed) return false;
+
+            if (!source.HasAdmin(includeChannelOp: true))
+            {
+                QueueChatEventError(source, Resources.YouAreNotAChannelOperator);
+                return false;
+            }
 
             return false; // TODO
         }
 
         public bool SetAcceptNewMembers(bool value)
         {
+            if (Closed) return false;
             AcceptNewMembers = value;
             return true;
         }
 
         public bool SetFlags(IChannel.FlagIds newFlags)
         {
+            if (Closed) return false;
             Flags = newFlags;
             return Members.Count == 0 ? true : Sync();
         }
 
         public bool SetMemberMaxCount(int maxCount)
         {
+            if (Closed) return false;
             if (maxCount < -1) throw new ArgumentException("Integer must be -1 (no max limit), 0 or higher.");
             MemberMaxCount = maxCount;
             return true;
@@ -251,6 +351,7 @@ namespace Atlasd.Battlenet.Channels
 
         public bool SetName(byte[] newName)
         {
+            if (Closed) return false;
             if (newName.Length == 0) throw new ArgumentException("Name must be non-empty");
             Name = newName;
             return Members.Count == 0 ? true : Sync();
@@ -258,17 +359,20 @@ namespace Atlasd.Battlenet.Channels
 
         public bool SetTopic(byte[] newTopic)
         {
+            if (Closed) return false;
             Topic = newTopic;
             return true;
         }
 
         public bool Sync()
         {
+            if (Closed) return false;
             return false; // TODO
         }
 
         public bool UpdateMember(GameState target, Account.Flags flags, Int32 ping, byte[] statstring)
         {
+            if (Closed) return false;
             return false; // TODO
         }
     }
