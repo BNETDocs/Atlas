@@ -60,11 +60,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         lock (Battlenet.Common.ActiveGameAds)
                         {
+                            IList<GameAd> toDelete = new List<GameAd>();
                             foreach (var gameAd in Battlenet.Common.ActiveGameAds)
                             {
                                 if (gameAd.Clients.Count == 0)
                                 {
-                                    Battlenet.Common.ActiveGameAds.Remove(gameAd);
+                                    toDelete.Add(gameAd);
                                     continue;
                                 }
 
@@ -78,6 +79,11 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                                 else if (viewingFilter == 0xFF80) { }
 
                                 gameAds.Add(gameAd);
+                            }
+                            while (toDelete.Count > 0)
+                            {
+                                Battlenet.Common.ActiveGameAds.Remove(toDelete[0]);
+                                toDelete.RemoveAt(0);
                             }
                         }
 
