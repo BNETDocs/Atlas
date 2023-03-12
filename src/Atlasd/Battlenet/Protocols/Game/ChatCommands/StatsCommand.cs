@@ -19,6 +19,7 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
         public override void Invoke(ChatCommandContext context)
         {
             var gs = context.GameState;
+            var account = gs.ActiveAccount;
 
             if (Arguments.Count < 1)
             {
@@ -77,15 +78,15 @@ namespace Atlasd.Battlenet.Protocols.Game.ChatCommands
             int ladder = 1;
             int ironMan = 3;
 
-            int normalWins = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{normal}\\wins", 0);
-            int normalLosses = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{normal}\\losses", 0);
-            int normalDraws = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{normal}\\disconnects", 0);
-            int ladderWins = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{ladder}\\wins", 0);
-            int ladderLosses = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{ladder}\\losses", 0);
-            int ladderDraws = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{ladder}\\disconnects", 0);
-            int ironManWins = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{ironMan}\\wins", 0);
-            int ironManLosses = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{ironMan}\\losses", 0);
-            int ironManDraws = context.GameState.ActiveAccount.Get($"record\\{codeStr}\\{ironMan}\\disconnects", 0);
+            int normalWins = account.Get($"record\\{codeStr}\\{normal}\\wins", 0);
+            int normalLosses = account.Get($"record\\{codeStr}\\{normal}\\losses", 0);
+            int normalDraws = account.Get($"record\\{codeStr}\\{normal}\\disconnects", 0);
+            int ladderWins = account.Get($"record\\{codeStr}\\{ladder}\\wins", 0);
+            int ladderLosses = account.Get($"record\\{codeStr}\\{ladder}\\losses", 0);
+            int ladderDraws = account.Get($"record\\{codeStr}\\{ladder}\\disconnects", 0);
+            int ironManWins = account.Get($"record\\{codeStr}\\{ironMan}\\wins", 0);
+            int ironManLosses = account.Get($"record\\{codeStr}\\{ironMan}\\losses", 0);
+            int ironManDraws = account.Get($"record\\{codeStr}\\{ironMan}\\disconnects", 0);
 
             buffer = buffer.Replace("{ironManDraws}", $"{ironManDraws}", true, CultureInfo.InvariantCulture);
             buffer = buffer.Replace("{ironManLosses}", $"{ironManLosses}", true, CultureInfo.InvariantCulture);
