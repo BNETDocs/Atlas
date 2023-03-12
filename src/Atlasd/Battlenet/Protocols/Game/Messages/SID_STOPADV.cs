@@ -38,13 +38,15 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (gs.GameAd == null)
                 return true; // No game advertisement to stop. No action to do.
 
-            if (gs != gs.GameAd.Owner)
-            {
-                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"{MessageName(Id)} was received but they are not the owner of the game advertisement");
-                return true;
-            }
+            bool gameAdOwner = gs.GameAd != null && gs.GameAd.Owner == gs;
 
-            Battlenet.Common.ActiveGameAds.Remove(gs.GameAd);
+            if (gs.GameAd != null && gs.GameAd.RemoveClient(gs)) gs.GameAd = null;
+
+            if (!gameAdOwner)
+                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"{MessageName(Id)} was received but they are not the owner of the game advertisement");
+            else
+                Battlenet.Common.ActiveGameAds.Remove(gs.GameAd);
+
             return true;
         }
     }

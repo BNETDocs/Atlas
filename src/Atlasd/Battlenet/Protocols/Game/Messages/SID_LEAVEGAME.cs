@@ -32,8 +32,17 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be 0 bytes, got {Buffer.Length}");
 
             GameState gs = context.Client.GameState;
-            if (gs.GameAd != null && gs.GameAd.RemoveClient(gs)) gs.GameAd = null;
 
+            if (gs == null)
+                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} was received without an active GameState");
+
+            if (gs.GameAd == null)
+                return true; // No game advertisement to stop. No action to do.
+
+            bool gameAdOwner = gs.GameAd != null && gs.GameAd.Owner == gs;
+            if (gameAdOwner && gs.GameAd.Clients.Count == 1) Battlenet.Common.ActiveGameAds.Remove(gs.GameAd);
+
+            if (gs.GameAd != null && gs.GameAd.RemoveClient(gs)) gs.GameAd = null;
             return true;
         }
     }
