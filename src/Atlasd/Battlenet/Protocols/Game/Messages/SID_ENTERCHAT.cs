@@ -24,6 +24,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
         public override bool Invoke(MessageContext context)
         {
+            if (context == null || context.Client == null || !context.Client.Connected) return false;
             var gameState = context.Client.GameState;
 
             switch (context.Direction)
@@ -33,14 +34,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
                         if (Buffer.Length < 2)
-                        {
                             throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} buffer must be at least 2 bytes");
-                        }
 
                         if (gameState.ActiveAccount == null || string.IsNullOrEmpty(gameState.OnlineName))
-                        {
                             throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} received before logon");
-                        }
 
                         /**
                          * (STRING) Username
@@ -49,7 +46,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         using var m = new MemoryStream(Buffer);
                         using var r = new BinaryReader(m);
-
                         var username = r.ReadByteString(); // Defunct
                         var statstring = r.ReadByteString();
 
@@ -59,14 +55,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         if (statstring.Length != 0 && (statstring.Length < 4 || statstring.Length > 128))
                             throw new GameProtocolViolationException(context.Client, $"Client sent invalid statstring size in {MessageName(Id)}");
 
-                        if (statstring.Length < 4)
-                        {
-                            statstring = new byte[4];
-                        }
+                        if (statstring.Length < 4) statstring = new byte[4];
 
                         using var _m = new MemoryStream(statstring);
                         using var _w = new BinaryWriter(_m);
-
                         _w.BaseStream.Position = 0;
                         _w.Write(productId); // ensure first 4 bytes of statstring always matches their agreed upon productId
 
@@ -106,6 +98,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                             var newPing = gameState.Ping;
                             if (Product.IsChat(gameState.Product)) newPing = 0;
+
+                            if (gameState.GameAd != null)
+                            {
+                                var gameAd = gameState.GameAd;
+                                if (gameAd.RemoveClient(gameState)) gameState.GameAd = null;
+                                if (gameAd.Clients.Count == 0) lock (Battlenet.Common.ActiveGameAds) Battlenet.Common.ActiveGameAds.Remove(gameAd);
+                            }
 
                             if (gameState.ActiveChannel == null)
                             {

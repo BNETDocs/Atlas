@@ -39,9 +39,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                 return true; // No game advertisement to stop. No action to do.
 
             bool gameAdOwner = gs.GameAd != null && gs.GameAd.Owner == gs;
-
-            if (gs.GameAd != null && gs.GameAd.RemoveClient(gs)) gs.GameAd = null;
-
             if (!gameAdOwner)
                 Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"{MessageName(Id)} was received but they are not the owner of the game advertisement");
             else
