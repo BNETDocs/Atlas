@@ -946,6 +946,12 @@ namespace Atlasd.Battlenet
                         continue;
                     }
 
+                    if (ChatEvent.EventIdIsChatMessage(chatEvent.EventId) && RenderChannelFlags(owner, user).HasFlag(Account.Flags.Squelched))
+                    {
+                        // "user" has decided to squelch messages from "owner"
+                        continue;
+                    }
+
                     msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
                     user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
                 }
@@ -972,9 +978,16 @@ namespace Atlasd.Battlenet
                         continue;
                     }
 
-                    var e = new ChatEvent(emote ? ChatEvent.EventIds.EID_EMOTE : ChatEvent.EventIds.EID_TALK, RenderChannelFlags(user, owner), owner.Ping, RenderOnlineName(user, owner), message);
+                    var flags = RenderChannelFlags(user, owner);
+                    if (flags.HasFlag(Account.Flags.Squelched))
+                    {
+                        // "user" has decided to squelch messages from "owner"
+                        continue;
+                    }
 
-                    msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, dynamic>() {{ "chatEvent", e }}));
+                    var chatEvent = new ChatEvent(emote ? ChatEvent.EventIds.EID_EMOTE : ChatEvent.EventIds.EID_TALK, flags, owner.Ping, RenderOnlineName(user, owner), message);
+
+                    msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, new Dictionary<string, dynamic>() {{ "chatEvent", chatEvent }}));
                     user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
                 }
             }
