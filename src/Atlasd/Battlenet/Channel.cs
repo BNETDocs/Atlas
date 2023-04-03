@@ -124,7 +124,7 @@ namespace Atlasd.Battlenet
                 Users.Add(user);
 
                 // Tell this user they entered the channel:
-                new ChatEvent(ChatEvent.EventIds.EID_CHANNELJOIN, ActiveFlags, 0, "", Name).WriteTo(user.Client);
+                new ChatEvent(ChatEvent.EventIds.EID_CHANNELJOIN, ActiveFlags, 0, user.Client.GameState.OnlineName, Name).WriteTo(user.Client);
 
                 if (!ActiveFlags.HasFlag(Flags.Silent))
                 {
@@ -707,7 +707,7 @@ namespace Atlasd.Battlenet
                 foreach (var user in Users)
                 {
                     // Tell users they re-entered the channel:
-                    args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_CHANNELJOIN, ActiveFlags, 0, "", Name);
+                    args["chatEvent"] = new ChatEvent(ChatEvent.EventIds.EID_CHANNELJOIN, ActiveFlags, 0, user.Client.GameState.OnlineName, Name);
                     msg.Invoke(new MessageContext(user.Client, Protocols.MessageDirection.ServerToClient, args));
                     user.Client.Send(msg.ToByteArray(user.Client.ProtocolType));
 
