@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Net;
 using System.Text;
 
 namespace Atlasd.Helpers
@@ -16,6 +18,14 @@ namespace Atlasd.Helpers
             }
 
             return byteArray;
+        }
+
+        public static byte[] GetBytes(this IPAddress value)
+        {
+            byte[] ipBytes = value.GetAddressBytes();
+            int ipInt = BitConverter.ToInt32(ipBytes, 0);
+            int networkOrderInt = IPAddress.NetworkToHostOrder(ipInt);
+            return BitConverter.GetBytes(networkOrderInt).Reverse().ToArray();
         }
 
         public static string AsString(this byte[] array)

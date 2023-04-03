@@ -104,12 +104,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 #endif
 
                             IPAddress ipAddress = IPAddress.Parse(ipString);
-                            byte[] ipBytes = ipAddress.GetAddressBytes();
-                            int ipInt = BitConverter.ToInt32(ipBytes, 0);
-                            int networkOrderInt = IPAddress.NetworkToHostOrder(ipInt);
-                            byte[] bytes = BitConverter.GetBytes(networkOrderInt).Reverse().ToArray();
 
-                            w.Write(bytes);
+                            w.Write(ipAddress.GetBytes());
 
                             Settings.State.RootElement.TryGetProperty("battlenet", out var battlenetJson);
                             battlenetJson.TryGetProperty("realm_listener", out var listenerJson);
@@ -118,6 +114,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                             portJson.TryGetUInt16(out var port);
 
+                            // strange protocol design
                             ushort hostOrderPort = port;
                             UInt32 networkOrderPort = (UInt32)IPAddress.HostToNetworkOrder((short)hostOrderPort);
 
