@@ -140,8 +140,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             w.Write(chunk2);
                             w.WriteByteString(Encoding.UTF8.GetBytes(""));
 
-                            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
-
                             // to allow associating game and realm connections after MCP_STARTUP
                             Battlenet.Common.RealmClientStates.TryAdd(cookie, context.Client);
                         }
@@ -154,6 +152,8 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                             w.Write((UInt32)Statuses.RealmUnavailable);
                         }
+
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
