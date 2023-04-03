@@ -29,8 +29,6 @@ namespace Atlasd.Battlenet
         public IPAddress RemoteIPAddress { get; private set; }
         public Socket Socket { get; set; }
 
-        public UInt32 RealmCookie { get; set; }
-
         protected byte[] ReceiveBuffer = new byte[0];
         protected byte[] SendBuffer = new byte[0];
 
