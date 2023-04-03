@@ -38,7 +38,7 @@ namespace Atlasd.Battlenet.Protocols.MCP.Messages
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_MCP, realmState.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({3 + Buffer.Length} bytes)");
 
                         if (Buffer.Length < 65)
-                            throw new GameProtocolViolationException(realmState.ClientState, $"{MessageName(Id)} must be at least 65 bytes, got {Buffer.Length}");
+                            throw new RealmProtocolException(realmState.ClientState, $"{MessageName(Id)} must be at least 65 bytes, got {Buffer.Length}");
 
                         using var m = new MemoryStream(Buffer);
                         using var r = new BinaryReader(m);
@@ -55,7 +55,7 @@ namespace Atlasd.Battlenet.Protocols.MCP.Messages
                             realmState.ClientState = clientState;
 
                             if (!Product.IsDiabloII(clientState.GameState.Product))
-                                throw new GameProtocolViolationException(realmState.ClientState, $"{MessageName(Id)} must be sent from D2DV or D2XP");
+                                throw new RealmProtocolException(realmState.ClientState, $"{MessageName(Id)} must be sent from D2DV or D2XP");
 
                             Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_MCP, realmState.RemoteEndPoint, $"Realm cookie [0x{cookie:X4}] found and associated");
                             return new MCP_STARTUP().Invoke(new MessageContext(realmState, MessageDirection.ServerToClient, new Dictionary<string, object> { { "status", Statuses.Success } }));

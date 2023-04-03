@@ -34,10 +34,10 @@ namespace Atlasd.Battlenet.Protocols.MCP.Messages
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_MCP, realmState.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({3 + Buffer.Length} bytes)");
 
                         if (!Product.IsDiabloII(gameState.Product))
-                            throw new GameProtocolViolationException(realmState.ClientState, $"{MessageName(Id)} must be sent from D2DV or D2XP");
+                            throw new RealmProtocolException(realmState.ClientState, $"{MessageName(Id)} must be sent from D2DV or D2XP");
 
                         if (Buffer.Length != 0)
-                            throw new GameProtocolViolationException(realmState.ClientState, $"{MessageName(Id)} must be 0 bytes, got {Buffer.Length}");
+                            throw new RealmProtocolException(realmState.ClientState, $"{MessageName(Id)} must be 0 bytes, got {Buffer.Length}");
 
                         return new MCP_MOTD().Invoke(new MessageContext(realmState, MessageDirection.ServerToClient));
                     }
