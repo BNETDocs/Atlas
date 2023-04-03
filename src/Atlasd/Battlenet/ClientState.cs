@@ -575,6 +575,7 @@ namespace Atlasd.Battlenet
             {
                 var partial = new byte[][]
                 {
+                    "Olympus".ToBytes(),
                     new byte[] { 0x2C }, //comma
                     RealmState.ActiveCharacter.Name.ToBytes(),
                     new byte[] { 0x2C }, //comma
