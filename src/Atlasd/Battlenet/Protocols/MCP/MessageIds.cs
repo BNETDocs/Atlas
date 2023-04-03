@@ -1,7 +1,8 @@
 ﻿namespace Atlasd.Battlenet.Protocols.MCP
 {
-    enum Messages : byte
+    enum MessageIds : byte
     {
+        MCP_NULL = 0x00,
         MCP_STARTUP = 0x01,
         MCP_CHARCREATE = 0x02,
         MCP_CREATEGAME = 0x03,
@@ -13,7 +14,7 @@
         MCP_REQUESTLADDERDATA = 0x11,
         MCP_MOTD = 0x12,
         MCP_CANCELGAMECREATE = 0x13,
-        MCP_CREATEQUEUE = 0x14,
+        MCP_CREATEQUEUE = 0x14, // not on bnetdocs
         MCP_CHARRANK = 0x16,
         MCP_CHARLIST = 0x17,
         MCP_CHARUPGRADE = 0x18,

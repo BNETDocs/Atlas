@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Atlasd.Helpers;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -26,6 +27,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
         public override bool Invoke(MessageContext context)
         {
             if (context == null || context.Client == null || !context.Client.Connected) return false;
+            var realmState = context.Client.RealmState;
             var gameState = context.Client.GameState;
 
             switch (context.Direction)
@@ -68,7 +70,24 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         if (Product.IsDiabloII(gameState.Product))
                         {
-                            statstring = Product.ToByteArray(gameState.Product);
+                            // for some reason, the client sends SID_ENTERCHAT with no MCP_CHARLOGON, right after MCP_CHARCREATE
+                            // i'm not certain this is the correct design, but it works for now
+                            var providedStatstring = statstring.AsString();
+                            var tokens = providedStatstring.Split(",");
+                            var realm = tokens[0];
+                            var name = tokens[1];
+                            
+                            if (realm.Length > 0 && realmState != null)
+                            {
+                                var character = Battlenet.Common.Realm.GetCharacter(accountName, name);
+                                if (character != null)
+                                {
+                                    realmState.ActiveCharacter = character;
+                                    gameState.CharacterName = character.Name.ToBytes();
+                                }
+                            }
+
+                            statstring = context.Client.GenerateDiabloIIStatstring();
                         }
 
                         // Do not use client-provided statstring if config.battlenet.emulation.statstring_updates is not enabled for this product.

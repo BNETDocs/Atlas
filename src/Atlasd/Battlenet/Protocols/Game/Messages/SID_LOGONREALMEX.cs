@@ -4,6 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Text;
+using Atlasd.Helpers;
+using Atlasd.Utilities;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
 {
@@ -62,8 +66,6 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     }
                 case MessageDirection.ServerToClient:
                     {
-                        var clientToken = (UInt32)context.Arguments["clientToken"];
-
                         /**
                          * [Note this format is slightly different from BNETDocs reference as of 2023-02-18]
                          * (UINT32)     MCP Cookie (Client Token)
@@ -75,15 +77,87 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                          * (STRING)     Battle.net unique name (* as of D2 1.14d, this is empty)
                          */
 
-                        Buffer = new byte[8]; // MCP Cookie + MCP Status only; Atlas does not have realm/MCP servers implemented yet.
+                        if (((byte[])context.Arguments["realmTitle"]).AsString() == "Olympus")
+                        {
+                            Buffer = new byte[18 * 4 + 1];
 
-                        using var m = new MemoryStream(Buffer);
-                        using var w = new BinaryWriter(m);
+                            using var m = new MemoryStream(Buffer);
+                            using var w = new BinaryWriter(m);
 
-                        w.Write((UInt32)clientToken);
-                        w.Write((UInt32)Statuses.RealmUnavailable); // Atlas does not have realm/MCP servers implemented yet.
+                            var cookie = (UInt32)(new Random().Next(int.MinValue, int.MaxValue));
 
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
+                            w.Write((UInt32)cookie);
+                            w.Write((UInt32)0x00000000); // status
+
+                            var chunk1 = new UInt32[]
+                            {
+                                0x33316163,
+                                0x65303830
+                            }.GetBytes();
+
+                            w.Write(chunk1);
+
+#if DEBUG
+                            string ipString = "127.0.0.1";
+#else
+                            string ipString = NetworkUtilities.GetPublicAddress();
+#endif
+
+                            IPAddress ipAddress = IPAddress.Parse(ipString);
+                            byte[] ipBytes = ipAddress.GetAddressBytes();
+                            int ipInt = BitConverter.ToInt32(ipBytes, 0);
+                            int networkOrderInt = IPAddress.NetworkToHostOrder(ipInt);
+                            byte[] bytes = BitConverter.GetBytes(networkOrderInt).Reverse().ToArray();
+
+                            w.Write(bytes);
+
+                            Settings.State.RootElement.TryGetProperty("battlenet", out var battlenetJson);
+                            battlenetJson.TryGetProperty("realm_listener", out var listenerJson);
+                            listenerJson.TryGetProperty("interface", out var interfaceJson);
+                            listenerJson.TryGetProperty("port", out var portJson);
+
+                            portJson.TryGetUInt16(out var port);
+
+                            ushort hostOrderPort = port;
+                            UInt32 networkOrderPort = (UInt32)IPAddress.HostToNetworkOrder((short)hostOrderPort);
+
+                            w.Write(networkOrderPort);
+
+                            // this could use some love
+                            var chunk2 = new UInt32[]
+                            {
+                                0x66663162,
+                                0x34613566,
+                                0x64326639,
+                                0x63336330,
+                                0x38326135,
+                                0x39663937,
+                                0x62653134,
+                                0x36313861,
+                                0x36353032,
+                                0x31353066,
+                                0x00000000,
+                                0x00000000
+                            }.GetBytes();
+
+                            w.Write(chunk2);
+                            w.WriteByteString(Encoding.UTF8.GetBytes(""));
+
+                            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
+
+                            // to allow associating game and realm connections after MCP_STARTUP
+                            Battlenet.Common.RealmClientStates.TryAdd(cookie, context.Client);
+                        }
+                        else
+                        {
+                            Buffer = new byte[4];
+
+                            using var m = new MemoryStream(Buffer);
+                            using var w = new BinaryWriter(m);
+
+                            w.Write((UInt32)Statuses.RealmUnavailable);
+                        }
+
                         context.Client.Send(ToByteArray(context.Client.ProtocolType));
                         return true;
                     }

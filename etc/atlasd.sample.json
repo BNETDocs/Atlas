@@ -96,47 +96,52 @@
       "locales": null
     }
   ],
-  "battlenet": {
-    "emulation": {
-      "auto_refresh_pings": false,
-      "chat_gateway": {
-        "auto_account_create": true,
-        "receive_ping_messages": true
-      },
-      "enable_ip_address_in_chatevents": false,
-      "grant_sudo_to_spoofed_admins": true,
-      "mask_admins_in_broadcasts": false,
-      "mask_admins_in_ban_message": true,
-      "mask_admins_in_kick_message": true,
-      "required_game_key_count": {
-        "D2DV": 1,
-        "D2XP": 2,
-        "JSTR": 0,
-        "SEXP": 0,
-        "STAR": 0,
-        "W2BN": 1,
-        "W3XP": 2,
-        "WAR3": 1
-      },
-      "statstring_updates": {
-        "D2DV": true,
-        "D2XP": true,
-        "DRTL": true,
-        "DSHR": true,
-        "W3XP": true,
-        "WAR3": true
-      }
+    "battlenet": {
+        "emulation": {
+            "auto_refresh_pings": false,
+            "chat_gateway": {
+                "auto_account_create": true,
+                "receive_ping_messages": true
+            },
+            "enable_ip_address_in_chatevents": false,
+            "grant_sudo_to_spoofed_admins": true,
+            "mask_admins_in_broadcasts": false,
+            "mask_admins_in_ban_message": true,
+            "mask_admins_in_kick_message": true,
+            "required_game_key_count": {
+                "D2DV": 1,
+                "D2XP": 2,
+                "JSTR": 0,
+                "SEXP": 0,
+                "STAR": 0,
+                "W2BN": 1,
+                "W3XP": 2,
+                "WAR3": 1
+            },
+            "statstring_updates": {
+                "D2DV": true,
+                "D2XP": true,
+                "DRTL": true,
+                "DSHR": true,
+                "W3XP": true,
+                "WAR3": true
+            }
+        },
+        "listener": {
+            "interface": "0.0.0.0",
+            "port": 6112,
+            "tcp_nodelay": true
+        },
+        "realm_listener": {
+            "interface": "0.0.0.0",
+            "port": 6113,
+            "tcp_nodelay": true
+        },
+        "realm": {
+            "host": "Anonymous",
+            "name": "Olympus"
+        }
     },
-    "listener": {
-      "interface": "0.0.0.0",
-      "port": 6112,
-      "tcp_nodelay": true
-    },
-    "realm": {
-      "host": "Anonymous",
-      "name": "Atlas"
-    }
-  },
   "bnftp": {
     "root": "G:\\Projects\\Visual Studio\\Atlas\\var\\bnftp"
   },

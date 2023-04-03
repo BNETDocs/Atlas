@@ -56,6 +56,7 @@ namespace Atlasd
             Battlenet.Common.Initialize();
             Battlenet.Common.UdpListener.Start();
             Battlenet.Common.Listener.Start();
+            Battlenet.Common.RealmListener.Start();
             Common.HttpListener.Start();
 
             while (!Exit)
