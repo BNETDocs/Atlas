@@ -13,10 +13,10 @@ namespace Atlasd.Battlenet.Protocols.MCP.Messages
     {
         public enum Statuses : UInt32
         {
-            Success = 0x00,
-            NotFound = 0x46,
-            Failed = 0x7A,
-            Expired = 0x7B,
+            Success     = 0x00,
+            NotFound    = 0x46,
+            Failed      = 0x7A,
+            Expired     = 0x7B,
         };
 
         // set gamestate char name
