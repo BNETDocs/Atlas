@@ -10,12 +10,6 @@ namespace Atlasd.Battlenet.Protocols.MCP.Messages
 {
     class MCP_CHARLIST2 : Message
     {
-        public enum Statuses : UInt32
-        {
-            Success = 1,
-            Unavailable = 2,
-        };
-
         public MCP_CHARLIST2()
         {
             Id = (byte)MessageIds.MCP_CHARLIST2;

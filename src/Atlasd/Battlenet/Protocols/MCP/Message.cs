@@ -36,6 +36,7 @@ namespace Atlasd.Battlenet.Protocols.MCP
 
                 MessageIds.MCP_MOTD         => new MCP_MOTD(buffer),
 
+                MessageIds.MCP_CHARLIST     => new MCP_CHARLIST(buffer),
                 MessageIds.MCP_CHARLIST2    => new MCP_CHARLIST2(buffer),
                 /*
                 MessageIds.MCP_ => new MCP_(buffer),
