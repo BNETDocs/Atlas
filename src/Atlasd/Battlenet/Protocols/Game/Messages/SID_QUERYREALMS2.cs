@@ -42,7 +42,12 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     }
                 case MessageDirection.ServerToClient:
                     {
-                        Dictionary<byte[], byte[]> realms = context.Arguments.ContainsKey("realms") ? (Dictionary<byte[], byte[]>)context.Arguments["realms"] : new Dictionary<byte[], byte[]>();
+                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
+
+                        Dictionary<byte[], byte[]> realms =
+                            context.Arguments == null || !context.Arguments.ContainsKey("realms") ?
+                            new Dictionary<byte[], byte[]>() :
+                            (Dictionary<byte[], byte[]>)context.Arguments["realms"];
 
                         /**
                          * (UINT32) Unknown (0)

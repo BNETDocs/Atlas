@@ -3,6 +3,7 @@ using Atlasd.Daemon;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Atlasd.Battlenet.Protocols.Game.Messages
@@ -51,16 +52,9 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         var productId = (UInt32)gameState.Product;
 
-                        // Statstring length is either 0 bytes or 4-128 bytes, not including the null-terminator.
-                        if (statstring.Length != 0 && (statstring.Length < 4 || statstring.Length > 128))
+                        // Statstring has a maximum length of 128 bytes
+                        if (statstring.Length > 128)
                             throw new GameProtocolViolationException(context.Client, $"Client sent invalid statstring size in {MessageName(Id)}");
-
-                        if (statstring.Length < 4) statstring = new byte[4];
-
-                        using var _m = new MemoryStream(statstring);
-                        using var _w = new BinaryWriter(_m);
-                        _w.BaseStream.Position = 0;
-                        _w.Write(productId); // ensure first 4 bytes of statstring always matches their agreed upon productId
 
                         return new SID_ENTERCHAT().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient,
                             new Dictionary<string, dynamic>(){{ "username", username }, { "statstring", statstring }})
@@ -72,9 +66,14 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         var statstring = context.Arguments.ContainsKey("statstring") ? (byte[])context.Arguments["statstring"] : gameState.Statstring;
                         var accountName = gameState.Username;
 
+                        if (Product.IsDiabloII(gameState.Product))
+                        {
+                            statstring = Product.ToByteArray(gameState.Product);
+                        }
+
                         // Do not use client-provided statstring if config.battlenet.emulation.statstring_updates is not enabled for this product.
                         // Blizzard servers allowed statstring updates for Diablo, Diablo II (changing characters), Warcraft III (changing icons), and Shareware variants.
-                        if (!GameState.CanStatstringUpdate(gameState.Product)) statstring = gameState.GenerateStatstring();
+                        if (!GameState.CanStatstringUpdate(gameState.Product) || statstring.Length == 0) statstring = gameState.GenerateStatstring();
 
                         /**
                          * (STRING) Unique name
