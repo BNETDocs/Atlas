@@ -42,7 +42,7 @@ namespace Atlasd.Battlenet.Protocols.MCP.Models
 
         public Statstring(CharacterTypes type, CharacterFlags flags, LadderTypes ladder)
         {
-            Unknown_1           = 0x8F;
+            Unknown_1           = 0x84;
             Unknown_2           = 0x80;
             Head                = 0xFF;
             Torso               = 0xFF;

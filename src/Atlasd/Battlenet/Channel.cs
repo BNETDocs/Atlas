@@ -799,7 +799,8 @@ namespace Atlasd.Battlenet
             {
                 foreach (var user in Users)
                 {
-                    new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, RenderChannelFlags(client, user), user.Ping, RenderOnlineName(client, user), user.Statstring).WriteTo(client.Client);
+                    //NOTE: statstrings are not sent on EID_USERUPDATE, doing so causes a rendering bug with Diablo II hardcore characters gaining ops
+                    new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, RenderChannelFlags(client, user), user.Ping, RenderOnlineName(client, user), "").WriteTo(client.Client);
                 }
             }
         }
@@ -919,7 +920,8 @@ namespace Atlasd.Battlenet
             {
                 foreach (var user in Users)
                 {
-                    new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, RenderChannelFlags(user, client), client.Ping, RenderOnlineName(user, client), client.Statstring).WriteTo(user.Client);
+                    //NOTE: statstrings are not sent on EID_USERUPDATE, doing so causes a rendering bug with Diablo II hardcore characters gaining ops
+                    new ChatEvent(ChatEvent.EventIds.EID_USERUPDATE, RenderChannelFlags(user, client), client.Ping, RenderOnlineName(user, client), "").WriteTo(user.Client);
                 }
             }
 

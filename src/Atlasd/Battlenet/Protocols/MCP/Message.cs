@@ -31,6 +31,8 @@ namespace Atlasd.Battlenet.Protocols.MCP
                 MessageIds.MCP_STARTUP      => new MCP_STARTUP(buffer),
                 MessageIds.MCP_CHARCREATE   => new MCP_CHARCREATE(buffer),
                 MessageIds.MCP_CHARLOGON    => new MCP_CHARLOGON(buffer),
+                MessageIds.MCP_CHARDELETE   => new MCP_CHARDELETE(buffer),
+                MessageIds.MCP_CHARUPGRADE  => new MCP_CHARUPGRADE(buffer),
 
                 MessageIds.MCP_MOTD         => new MCP_MOTD(buffer),
 

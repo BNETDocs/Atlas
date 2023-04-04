@@ -35,6 +35,12 @@ namespace Atlasd.Battlenet.Protocols.MCP.Models
             return character;
         }
 
+        public void DeleteCharacter(string username, string name)
+        {
+            var characters = GetCharacters(username.ToLower());
+            characters.TryRemove(name.ToLower(), out var ignore);
+        }
+
         private ConcurrentDictionary<string, Character> getCharacters(string username)
         {
             ConcurrentDictionary<string, Character> characters;

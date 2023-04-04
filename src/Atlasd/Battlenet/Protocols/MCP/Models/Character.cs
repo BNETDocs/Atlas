@@ -8,7 +8,7 @@ namespace Atlasd.Battlenet.Protocols.MCP.Models
     {
         public string Name { get; private set; }
         public CharacterTypes Type { get; private set; }
-        public CharacterFlags Flags { get; private set; }
+        public CharacterFlags Flags { get; set; }
         public LadderTypes Ladder { get; private set; }
         public Statstring Statstring { get; private set; }
 

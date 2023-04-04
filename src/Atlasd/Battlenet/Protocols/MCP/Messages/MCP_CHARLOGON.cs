@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Atlasd.Battlenet.Exceptions;
+using Atlasd.Battlenet.Protocols.MCP.Models;
 using Atlasd.Daemon;
 using Atlasd.Helpers;
+using static Atlasd.Battlenet.Product;
 
 namespace Atlasd.Battlenet.Protocols.MCP.Messages
 {
@@ -59,12 +61,19 @@ namespace Atlasd.Battlenet.Protocols.MCP.Messages
                         Statuses status;
                         if (character != null)
                         {
-                            status = Statuses.Success;
+                            if ((character.Flags & CharacterFlags.Expansion) == CharacterFlags.Expansion && gameState.Product == ProductCode.DiabloII)
+                            {
+                                status = Statuses.Failed;
+                            }
+                            else
+                            {
+                                status = Statuses.Success;
 
-                            realmState.ActiveCharacter = character;
-                            realmState.ClientState.GameState.CharacterName = character.Name.ToBytes();
-                            var statstring = realmState.ClientState.GenerateDiabloIIStatstring();
-                            gameState.Statstring = statstring;
+                                realmState.ActiveCharacter = character;
+                                realmState.ClientState.GameState.CharacterName = character.Name.ToBytes();
+                                var statstring = realmState.ClientState.GenerateDiabloIIStatstring();
+                                gameState.Statstring = statstring;
+                            }
                         }
                         else
                         {

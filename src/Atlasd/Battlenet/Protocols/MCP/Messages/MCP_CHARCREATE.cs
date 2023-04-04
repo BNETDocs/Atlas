@@ -58,6 +58,12 @@ namespace Atlasd.Battlenet.Protocols.MCP.Messages
                         var flags   = (CharacterFlags)(r.ReadUInt16());
                         var name    = r.ReadByteString().AsString();
 
+                        // it appears that a new 0x80 flag is set for hardcore characters on bnet proper
+                        //if ((flags & CharacterFlags.Hardcore) == CharacterFlags.Hardcore)
+                        //{
+                        //    flags = (CharacterFlags)((byte)flags | (byte)0x80);
+                        //}
+
                         if (name.Length < 2)
                         {
                             return new MCP_CHARCREATE().Invoke(new MessageContext(realmState, MessageDirection.ServerToClient, new Dictionary<string, object> { { "status", Statuses.Invalid } }));
