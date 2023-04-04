@@ -673,7 +673,7 @@ namespace Atlasd.Battlenet
                 targetName = $"{Encoding.UTF8.GetString(target.CharacterName)}*{targetName}";
             }
 
-            // Add Warcraft II internal identifier:
+            // Add Warcraft III internal identifier:
             if (context == target && Product.IsWarcraftIII(context.Product))
             {
                 targetName = $"w#{targetName}";
