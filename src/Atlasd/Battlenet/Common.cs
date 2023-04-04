@@ -1,5 +1,6 @@
 ﻿using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Battlenet.Protocols.Game.Messages;
+using Atlasd.Battlenet.Protocols.MCP.Models;
 using Atlasd.Battlenet.Protocols.Udp;
 using Atlasd.Daemon;
 using Atlasd.Localization;
@@ -42,13 +43,17 @@ namespace Atlasd.Battlenet
         public static ConcurrentDictionary<string, Channel> ActiveChannels;
         public static ConcurrentDictionary<byte[], Clan> ActiveClans;
         public static ConcurrentDictionary<Socket, ClientState> ActiveClientStates;
+        public static ConcurrentDictionary<UInt32, ClientState> RealmClientStates;
         public static List<GameAd> ActiveGameAds;
         public static ConcurrentDictionary<string, GameState> ActiveGameStates;
+        public static Realm Realm;
         public static IPAddress DefaultAddress { get; private set; }
         public static int DefaultPort { get; private set; }
         public static ServerSocket Listener { get; private set; }
+        public static RealmSocket RealmListener { get; private set; }
         public static IPAddress ListenerAddress { get; private set; }
         public static IPEndPoint ListenerEndPoint { get; private set; }
+        public static IPEndPoint RealmListenerEndPoint { get; private set; }
         public static int ListenerPort { get; private set; }
         public static Timer NullTimer { get; private set; }
         public static Timer PingTimer { get; private set; }
@@ -102,14 +107,17 @@ namespace Atlasd.Battlenet
             ActiveChannels = new ConcurrentDictionary<string, Channel>(StringComparer.OrdinalIgnoreCase);
             ActiveClans = new ConcurrentDictionary<byte[], Clan>();
             ActiveClientStates = new ConcurrentDictionary<Socket, ClientState>();
+            RealmClientStates = new ConcurrentDictionary<UInt32, ClientState>();
             ActiveGameAds = new List<GameAd>();
             ActiveGameStates = new ConcurrentDictionary<string, GameState>(StringComparer.OrdinalIgnoreCase);
+            Realm = new Realm();
 
             InitializeAds();
 
             DefaultAddress = IPAddress.Any;
             DefaultPort = 6112;
             InitializeListener();
+            InitializeRealmListener();
 
             NullTimer = new Timer(ProcessNullTimer, ActiveGameStates, 100, 100);
             PingTimer = new Timer(ProcessPingTimer, ActiveGameStates, 100, 100);
@@ -201,7 +209,35 @@ namespace Atlasd.Battlenet
             UdpListener = new UdpListener(ListenerEndPoint);
             Listener = new ServerSocket(ListenerEndPoint);
         }
-        
+
+        private static void InitializeRealmListener()
+        {
+            Settings.State.RootElement.TryGetProperty("battlenet", out var battlenetJson);
+            battlenetJson.TryGetProperty("realm_listener", out var listenerJson);
+            listenerJson.TryGetProperty("interface", out var interfaceJson);
+            listenerJson.TryGetProperty("port", out var portJson);
+
+            var listenerAddressStr = interfaceJson.GetString();
+            if (!IPAddress.TryParse(listenerAddressStr, out IPAddress listenerAddress))
+            {
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, $"Unable to parse IP address from [battlenet.realm_listener.interface] with value [{listenerAddressStr}]; using any");
+                listenerAddress = DefaultAddress;
+            }
+            ListenerAddress = listenerAddress;
+
+            portJson.TryGetInt32(out var port);
+            ListenerPort = port;
+
+            if (!IPEndPoint.TryParse($"{ListenerAddress}:{ListenerPort}", out IPEndPoint listenerEndPoint))
+            {
+                Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Server, $"Unable to parse endpoint with value [{ListenerAddress}:{ListenerPort}]");
+                return;
+            }
+            ListenerEndPoint = listenerEndPoint;
+
+            RealmListener = new RealmSocket(ListenerEndPoint);
+        }
+
         public static uint GetActiveClientCountByProduct(Product.ProductCode productCode)
         {
             var count = (uint)0;
