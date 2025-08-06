@@ -85,6 +85,7 @@ namespace Atlasd.Daemon
             if (level > CurrentLogLevel) return;
 
             Console.Out.WriteLine($"[{DateTime.Now}] [{LogLevelToString(level)}] [{LogTypeToString(type).Replace("_", "] [")}] {buffer}");
+            Console.Out.Flush();
         }
 
         public static void WriteLine(LogLevel level, LogType type, EndPoint endp, string buffer)

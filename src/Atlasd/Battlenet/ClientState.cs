@@ -3,6 +3,7 @@ using Atlasd.Battlenet.Protocols.BNFTP;
 using Atlasd.Battlenet.Protocols.Game;
 using Atlasd.Battlenet.Protocols.Game.Messages;
 using Atlasd.Daemon;
+using Atlasd.Helpers;
 using Atlasd.Localization;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace Atlasd.Battlenet
         public bool IsClosing { get; private set; } = false;
 
         public GameState GameState { get; private set; }
+        public RealmState RealmState { get; set; }
         public ProtocolType ProtocolType { get; private set; }
         public EndPoint RemoteEndPoint { get; private set; }
         public IPAddress RemoteIPAddress { get; private set; }
@@ -562,6 +564,28 @@ namespace Atlasd.Battlenet
             }
 
             SocketIOCompleted(sender, e);
+        }
+
+        // exists at this level because state split across two component objects
+        public byte[] GenerateDiabloIIStatstring()
+        {
+            var statstring = Product.ToByteArray(GameState.Product);
+
+            if (RealmState.ActiveCharacter != null)
+            {
+                var partial = new byte[][]
+                {
+                    "Olympus".ToBytes(),
+                    new byte[] { 0x2C }, //comma
+                    RealmState.ActiveCharacter.Name.ToBytes(),
+                    new byte[] { 0x2C }, //comma
+                    RealmState.ActiveCharacter.Statstring.ToBytes()
+                }.SelectMany(x => x).ToArray();
+
+                statstring = statstring.Concat(partial).ToArray();
+            }
+
+            return statstring;
         }
     }
 }
