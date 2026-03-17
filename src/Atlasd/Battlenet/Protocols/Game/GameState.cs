@@ -125,42 +125,41 @@ namespace Atlasd.Battlenet.Protocols.Game
 
         public void Close()
         {
-            // Remove this GameState from ActiveChannel
-            var channel = ActiveChannel;
-            if (channel != null)
+            lock (this)
             {
-                channel.RemoveUser(this); // will change this.ActiveChannel to null.
+                // Remove this GameState from ActiveChannel
+                if (ActiveChannel != null)
+                {
+                    ActiveChannel.RemoveUser(this); // will change this.ActiveChannel to null.
+                }
+
+                // Notify clan members
+                if (ActiveClan != null)
+                {
+                    ActiveClan.WriteStatusChange(this, false); // offline
+                }
+
+                // Update keys of ActiveAccount
+                if (ActiveAccount != null)
+                {
+                    ActiveAccount.Set(Account.LastLogoffKey, DateTime.Now);
+
+                    var timeLogged = (UInt32)ActiveAccount.Get(Account.TimeLoggedKey);
+                    var diff = DateTime.Now - ConnectedTimestamp;
+                    timeLogged += (UInt32)Math.Round(diff.TotalSeconds);
+                    ActiveAccount.Set(Account.TimeLoggedKey, timeLogged);
+                }
+
+                // Remove this OnlineName from ActiveAccounts and ActiveGameStates
+                if (!string.IsNullOrEmpty(OnlineName))
+                {
+                    Battlenet.Common.ActiveAccounts.TryRemove(OnlineName, out _);
+                    Battlenet.Common.ActiveGameStates.TryRemove(OnlineName, out _);
+                }
+
+                // Remove this GameAd
+                if (GameAd != null && GameAd.RemoveClient(this)) GameAd = null;
             }
-
-            // Notify clan members
-            var clan = ActiveClan;
-            if (clan != null)
-            {
-                clan.WriteStatusChange(this, false); // offline
-            }
-
-            // Update keys of ActiveAccount
-            var account = ActiveAccount;
-            if (account != null)
-            {
-                account.Set(Account.LastLogoffKey, DateTime.Now);
-
-                var timeLogged = (UInt32)account.Get(Account.TimeLoggedKey);
-                var diff = DateTime.Now - ConnectedTimestamp;
-                timeLogged += (UInt32)Math.Round(diff.TotalSeconds);
-                account.Set(Account.TimeLoggedKey, timeLogged);
-            }
-
-            // Remove this OnlineName from ActiveAccounts and ActiveGameStates
-            if (!string.IsNullOrEmpty(OnlineName))
-            {
-                Battlenet.Common.ActiveAccounts.TryRemove(OnlineName, out _);
-                Battlenet.Common.ActiveGameStates.TryRemove(OnlineName, out _);
-            }
-
-            // Remove this GameAd
-            var gameAd = GameAd;
-            if (gameAd != null && gameAd.RemoveClient(this)) GameAd = null;
         }
 
         public void Dispose() /* part of IDisposable */
