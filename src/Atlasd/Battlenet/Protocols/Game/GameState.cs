@@ -19,7 +19,7 @@ namespace Atlasd.Battlenet.Protocols.Game
             NLS = 2,
         };
 
-        private bool IsDisposing = false;
+        private volatile bool IsDisposing = false;
 
         public ClientState Client { get; protected set; }
 
@@ -126,26 +126,29 @@ namespace Atlasd.Battlenet.Protocols.Game
         public void Close()
         {
             // Remove this GameState from ActiveChannel
-            if (ActiveChannel != null)
+            var channel = ActiveChannel;
+            if (channel != null)
             {
-                ActiveChannel.RemoveUser(this); // will change this.ActiveChannel to null.
+                channel.RemoveUser(this); // will change this.ActiveChannel to null.
             }
 
             // Notify clan members
-            if (ActiveClan != null)
+            var clan = ActiveClan;
+            if (clan != null)
             {
-                ActiveClan.WriteStatusChange(this, false); // offline
+                clan.WriteStatusChange(this, false); // offline
             }
 
             // Update keys of ActiveAccount
-            if (ActiveAccount != null)
+            var account = ActiveAccount;
+            if (account != null)
             {
-                ActiveAccount.Set(Account.LastLogoffKey, DateTime.Now);
+                account.Set(Account.LastLogoffKey, DateTime.Now);
 
-                var timeLogged = (UInt32)ActiveAccount.Get(Account.TimeLoggedKey);
+                var timeLogged = (UInt32)account.Get(Account.TimeLoggedKey);
                 var diff = DateTime.Now - ConnectedTimestamp;
                 timeLogged += (UInt32)Math.Round(diff.TotalSeconds);
-                ActiveAccount.Set(Account.TimeLoggedKey, timeLogged);
+                account.Set(Account.TimeLoggedKey, timeLogged);
             }
 
             // Remove this OnlineName from ActiveAccounts and ActiveGameStates
@@ -156,7 +159,8 @@ namespace Atlasd.Battlenet.Protocols.Game
             }
 
             // Remove this GameAd
-            if (GameAd != null && GameAd.RemoveClient(this)) GameAd = null;
+            var gameAd = GameAd;
+            if (gameAd != null && gameAd.RemoveClient(this)) GameAd = null;
         }
 
         public void Dispose() /* part of IDisposable */
