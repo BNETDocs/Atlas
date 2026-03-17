@@ -102,7 +102,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                             {
                                 var gameAd = gameState.GameAd;
                                 if (gameAd.RemoveClient(gameState)) gameState.GameAd = null;
-                                if (gameAd.Clients.Count == 0) lock (Battlenet.Common.ActiveGameAds) Battlenet.Common.ActiveGameAds.Remove(gameAd);
+                                if (gameAd.Clients.Count == 0) lock (Battlenet.Common.ActiveGameAdsLock) Battlenet.Common.ActiveGameAds.Remove(gameAd);
                             }
 
                             if (gameState.ActiveChannel == null)

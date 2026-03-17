@@ -52,7 +52,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (gameState.ActiveChannel != null)
                 gameState.ActiveChannel.RemoveUser(gameState);
 
-            lock (Battlenet.Common.ActiveGameAds)
+            lock (Battlenet.Common.ActiveGameAdsLock)
             {
                 foreach (var gameAd in Battlenet.Common.ActiveGameAds)
                 {
