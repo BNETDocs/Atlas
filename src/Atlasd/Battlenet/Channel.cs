@@ -285,7 +285,10 @@ namespace Atlasd.Battlenet
 
         public void Designate(GameState designator, GameState heir)
         {
-            DesignatedHeirs[designator] = heir;
+            lock (DesignatedHeirs)
+            {
+                DesignatedHeirs[designator] = heir;
+            }
         }
 
         public bool DisbandInto(Channel destination)

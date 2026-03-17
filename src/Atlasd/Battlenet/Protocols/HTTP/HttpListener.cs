@@ -64,7 +64,6 @@ namespace Atlasd.Battlenet.Protocols.Http
             {
                 ExclusiveAddressUse = true,
                 NoDelay = Daemon.Common.TcpNoDelay,
-                UseOnlyOverlappedIO = true,
             };
             Socket.Bind(LocalEndPoint);
             Socket.Listen(-1);

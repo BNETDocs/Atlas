@@ -43,6 +43,7 @@ namespace Atlasd.Battlenet
         public static ConcurrentDictionary<byte[], Clan> ActiveClans;
         public static ConcurrentDictionary<Socket, ClientState> ActiveClientStates;
         public static List<GameAd> ActiveGameAds;
+        public static readonly object ActiveGameAdsLock = new object();
         public static ConcurrentDictionary<string, GameState> ActiveGameStates;
         public static IPAddress DefaultAddress { get; private set; }
         public static int DefaultPort { get; private set; }
