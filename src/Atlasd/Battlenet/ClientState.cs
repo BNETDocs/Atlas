@@ -139,8 +139,20 @@ namespace Atlasd.Battlenet
 
             while (BattlenetGameFrame.Messages.TryDequeue(out var msg))
             {
-                if (!msg.Invoke(context))
+                try
                 {
+                    if (!msg.Invoke(context))
+                    {
+                        Disconnect();
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var hexDump = msg.Buffer != null ? BitConverter.ToString(msg.Buffer) : "(null)";
+                    Logging.WriteLine(Logging.LogLevel.Error, Logging.LogType.Client, RemoteEndPoint,
+                        $"Exception processing {Message.MessageName(msg.Id)} (0x{msg.Id:X2}, {msg.Buffer?.Length ?? 0} bytes): " +
+                        $"{ex.GetType().Name}: {ex.Message}; packet dump: {hexDump}");
                     Disconnect();
                     return;
                 }
