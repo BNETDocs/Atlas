@@ -83,6 +83,8 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_NEWS_INFO => new SID_NEWS_INFO(buffer),
                 MessageIds.SID_AUTH_INFO => new SID_AUTH_INFO(buffer),
                 MessageIds.SID_AUTH_CHECK => new SID_AUTH_CHECK(buffer),
+                MessageIds.SID_AUTH_ACCOUNTLOGON => new SID_AUTH_ACCOUNTLOGON(buffer),
+                MessageIds.SID_AUTH_ACCOUNTLOGONPROOF => new SID_AUTH_ACCOUNTLOGONPROOF(buffer),
                 MessageIds.SID_SETEMAIL => new SID_SETEMAIL(buffer),
                 MessageIds.SID_FRIENDSLIST => new SID_FRIENDSLIST(buffer),
                 MessageIds.SID_FRIENDSUPDATE => new SID_FRIENDSUPDATE(buffer),
