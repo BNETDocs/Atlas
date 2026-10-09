@@ -66,3 +66,4 @@
 # systemd cannot be trusted with CRLF unit files; keep LF on every platform.
 ###############################################################################
 etc/atlasd.service text eol=lf
+src/make-matchmaking.sh text eol=lf
