@@ -61,3 +61,8 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+###############################################################################
+# systemd cannot be trusted with CRLF unit files; keep LF on every platform.
+###############################################################################
+etc/atlasd.service text eol=lf

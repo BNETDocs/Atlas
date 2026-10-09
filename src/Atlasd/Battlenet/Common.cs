@@ -112,8 +112,8 @@ namespace Atlasd.Battlenet
             DefaultPort = 6112;
             InitializeListener();
 
-            NullTimer = new Timer(ProcessNullTimer, ActiveGameStates, 100, 100);
-            PingTimer = new Timer(ProcessPingTimer, ActiveGameStates, 100, 100);
+            NullTimer = new Timer(ProcessNullTimer, ActiveGameStates, 1000, 1000);
+            PingTimer = new Timer(ProcessPingTimer, ActiveGameStates, 1000, 1000);
 
             ScheduledShutdown = new ShutdownEvent(null, true, DateTime.MinValue, null);
 

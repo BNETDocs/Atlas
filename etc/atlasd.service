@@ -1,0 +1,41 @@
+# systemd unit for atlasd.
+#
+# Install:
+#   sudo cp etc/atlasd.service /etc/systemd/system/atlasd.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now atlasd
+#
+# Adjust User, WorkingDirectory, and the -c config path below to match the host.
+#
+# Each start pulls the latest code and rebuilds, mirroring the old
+# `while true; do git pull && ... dotnet run; done` loop. A failed pull is
+# ignored so the last good checkout still runs; a failed build prevents the
+# start and systemd retries after RestartSec.
+
+[Unit]
+Description=Atlas Classic Battle.net server (atlasd)
+Documentation=https://github.com/BNETDocs/Atlas
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=exec
+User=carl
+WorkingDirectory=/home/carl/repos/Atlas/src/Atlasd
+Environment=DOTNET_CLI_TELEMETRY_OPTOUT=1
+Environment=DOTNET_NOLOGO=1
+
+ExecStartPre=-/usr/bin/git pull --ff-only
+ExecStartPre=-/usr/bin/git submodule update --init --recursive
+ExecStartPre=/usr/bin/dotnet build --configuration Release
+ExecStart=/usr/bin/dotnet bin/Release/netcoreapp3.1/atlasd.dll -c /home/carl/repos/Atlas/etc/atlasd.json
+
+# Restart after crashes and after /admin shutdown, like the old loop did.
+Restart=always
+RestartSec=10
+TimeoutStartSec=10min
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

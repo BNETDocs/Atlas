@@ -60,8 +60,7 @@ namespace Atlasd
 
             while (!Exit)
             {
-                await Task.Delay(1);
-                await Task.Yield();
+                await Task.Delay(250);
             }
 
             return ExitCode;

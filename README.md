@@ -55,6 +55,19 @@ For Fedora or other Red Hat based systems:
 3. Launch atlasd.
 4. If you find yourself wishing to change additional settings after atlasd has started, you may either restart atlasd, or send `/admin reload` as a command through a bot.
 
+### Run as a systemd service (Linux)
+
+A unit file is provided at `etc/atlasd.service`. On each start it pulls the latest code, rebuilds in Release mode, and runs atlasd; it restarts automatically after crashes and after `/admin shutdown`.
+
+1. Edit `User`, `WorkingDirectory`, and the `-c` config path in the unit to match your host.
+2. Install and start it:
+   ```
+   sudo cp etc/atlasd.service /etc/systemd/system/atlasd.service
+   sudo systemctl daemon-reload
+   sudo systemctl enable --now atlasd
+   ```
+3. Follow the logs with `journalctl -u atlasd -f`.
+
 ## License
 
 Atlas is free software distributed under the [MIT License](./LICENSE.txt). It is not officially affiliated with or endorsed by Blizzard Entertainment, its subsidiaries, or business partners. Battle.net, Diablo, StarCraft, and WarCraft are registered trademarks of Blizzard Entertainment in the United States. This software is provided as-is in the hopes that it is useful without warranty of any kind.
