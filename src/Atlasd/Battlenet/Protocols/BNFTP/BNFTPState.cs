@@ -27,16 +27,47 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
         public UInt32 ClientToken = 0;
         public GameKey GameKey = null;
 
+        private bool AwaitingVersion2Request = false;
+
         public BNFTPState(ClientState client)
         {
             Client = client;
             ServerToken = (uint)new Random().Next(0, 0x7FFFFFFF);
         }
 
-        public void Receive(byte[] buffer)
+        public int Receive(byte[] buffer)
         {
             using var m = new MemoryStream(buffer);
             using var r = new BinaryReader(m);
+
+            if (AwaitingVersion2Request)
+            {
+                /**
+                 * ## VERSION 2    <-- ##
+                 * ## Client -> Server ##
+                 *
+                 * (TYPE)     (FIELD)                    (DESCRIPTION)
+                 * UINT32     Starting position          Facilitates resuming
+                 * FILETIME   Local filetime
+                 * UINT32     Client Token
+                 * UINT32     Key Length
+                 * UINT32     Key's product value
+                 * UINT32     Key's public value
+                 * UINT32     Unknown (Always 0)
+                 * UINT32 [5] CD key hash
+                 * STRING     Filename
+                 */
+
+                FileStartPosition = r.ReadUInt32();
+                FileTime = r.ReadUInt64();
+                ClientToken = r.ReadUInt32();
+                r.ReadBytes(16);
+                r.ReadBytes(20);
+                FileName = Encoding.UTF8.GetString(r.ReadByteString());
+
+                ServeFile();
+                return (int)m.Position;
+            }
 
             /**
              * ## VERSION 1    <-- ##
@@ -76,82 +107,8 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
                         FileTime = r.ReadUInt64();
                         FileName = Encoding.UTF8.GetString(r.ReadByteString());
 
-                        /**
-                         * ## VERSION 1    --> ##
-                         * ## Server -> Client ##
-                         *
-                         * (TYPE)     (FIELD)                    (DESCRIPTION)
-                         * UINT16     Header Length              Does not include the file length
-                         * UINT16     Type
-                         * UINT32     File size
-                         * UINT32     Ad Banner ID               0 unless downloading an ad banner
-                         * UINT32     Ad Banner File Extension   0 unless downloading an ad banner
-                         * FILETIME   Filetime
-                         * STRING     Filename
-                         * VOID       File data
-                        */
-
-                        var file = new BNFTP.File(FileName);
-                        if (file == null)
-                        {
-                            Client.Disconnect();
-                        }
-
-                        BinaryReader stream = null;
-
-                        bool uploaded = false;
-                        try
-                        {
-                            if (!file.OpenStream())
-                            {
-                                Client.Disconnect();
-                                break;
-                            }
-
-                            stream = new BinaryReader(file.StreamReader.BaseStream);
-                            stream.BaseStream.Position = Math.Min(stream.BaseStream.Length, FileStartPosition);
-
-                            var fileLength = (int)(stream.BaseStream.Length - stream.BaseStream.Position);
-                            HeaderLength = (UInt16)(25 + Encoding.UTF8.GetByteCount(FileName));
-                            var outBuf = new byte[HeaderLength];
-                            using var wm = new MemoryStream(outBuf);
-                            using var w = new BinaryWriter(wm);
-
-                            w.Write((UInt16)HeaderLength);
-                            w.Write((UInt16)0); // "Type" ???
-                            w.Write((UInt32)fileLength);
-                            w.Write((UInt32)AdId);
-                            w.Write((UInt32)AdFileExtension);
-                            w.Write((UInt64)new FileInfo(file.Path).LastWriteTimeUtc.ToFileTimeUtc());
-                            w.Write((string)FileName);
-
-                            Write(outBuf);
-                            Write(stream.ReadBytes(fileLength));
-
-                            uploaded = true;
-                        }
-                        catch (Exception ex)
-                        {
-                            if (!(ex is IOException || ex is FileNotFoundException || ex is UnauthorizedAccessException || ex is PathTooLongException)) throw;
-
-                            Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_BNFTP, Client.RemoteEndPoint, $"{ex.GetType().Name} error encountered for requested file [{FileName}]" + (string.IsNullOrEmpty(ex.Message) ? "" : $"; message: {ex.Message}"));
-                        }
-                        finally
-                        {
-                            if (uploaded)
-                            {
-                                Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_BNFTP, Client.RemoteEndPoint, $"Uploaded file [{FileName}] ({file.Length} bytes)");
-                            }
-
-                            if (stream != null)
-                            {
-                                stream.Close();
-                            }
-
-                            Client.Disconnect();
-                        }
-
-                        break;
+                        ServeFile();
+                        return (int)m.Position;
                     }
                 case 0x0200:
                     {
@@ -164,18 +121,12 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
                          * UINT32     Product ID                 See Product Identification
                          * UINT32     Ad Banner ID               0 unless downloading an ad banner
                          * UINT32     Ad Banner File Extension   0 unless downloading an ad banner
-                         * UINT32     File start position        For resuming an incomplete download
-                         * FILETIME   Filetime
-                         * STRING     Filename
                          */
 
                         PlatformId = (Platform.PlatformCode)r.ReadUInt32();
                         ProductId = (Product.ProductCode)r.ReadUInt32();
                         AdId = r.ReadUInt32();
                         AdFileExtension = r.ReadUInt32();
-                        FileStartPosition = r.ReadUInt32();
-                        FileTime = r.ReadUInt64();
-                        FileName = Encoding.UTF8.GetString(r.ReadByteString());
 
                         /**
                          * ## VERSION 2    --> ##
@@ -185,44 +136,94 @@ namespace Atlasd.Battlenet.Protocols.BNFTP
                          * UINT32     Server Token
                          */
 
-                        /**
-                         * ## VERSION 2    <-- ##
-                         * ## Client -> Server ##
-                         *
-                         * (TYPE)     (FIELD)                    (DESCRIPTION)
-                         * UINT32     Starting position          Facilitates resuming
-                         * FILETIME   Local filetime
-                         * UINT32     Client Token
-                         * UINT32     Key Length
-                         * UINT32     Key's product value
-                         * UINT32     Key's public value
-                         * UINT32     Unknown (Always 0)
-                         * UINT32 [5] CD key hash
-                         * STRING     Filename
-                         */
-
-                        /**
-                         * ## VERSION 2    --> ##
-                         * ## Server -> Client ##
-                         *
-                         * (TYPE)     (FIELD)                    (DESCRIPTION)
-                         * UINT16     Header Length              Does not include the file length
-                         * UINT32     File size
-                         * UINT32     Ad Banner ID               0 unless downloading an ad banner
-                         * UINT32     Ad Banner File Extension   0 unless downloading an ad banner
-                         * FILETIME   Filetime
-                         * STRING     Filename
-                         * VOID       File data
-                        */
-
-                        break;
+                        AwaitingVersion2Request = true;
+                        Write(BitConverter.GetBytes(ServerToken));
+                        return (int)m.Position;
                     }
                 default:
                     {
                         Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_BNFTP, $"Received unknown BNFTP protocol version [0x{ProtocolVersion:X4}]");
                         Client.Disconnect("Unknown BNFTP protocol version");
-                        break;
+                        return buffer.Length;
                     }
+            }
+        }
+
+        private void ServeFile()
+        {
+            /**
+             * ## VERSION 1 and 2    --> ##
+             * ## Server -> Client       ##
+             *
+             * (TYPE)     (FIELD)                    (DESCRIPTION)
+             * UINT16     Header Length              Does not include the file length
+             * UINT16     Type
+             * UINT32     File size
+             * UINT32     Ad Banner ID               0 unless downloading an ad banner
+             * UINT32     Ad Banner File Extension   0 unless downloading an ad banner
+             * FILETIME   Filetime
+             * STRING     Filename
+             * VOID       File data
+             */
+
+            var file = new BNFTP.File(FileName);
+            if (file == null)
+            {
+                Client.Disconnect();
+            }
+
+            BinaryReader stream = null;
+
+            bool uploaded = false;
+            try
+            {
+                if (!file.OpenStream())
+                {
+                    Client.Disconnect();
+                    return;
+                }
+
+                stream = new BinaryReader(file.StreamReader.BaseStream);
+                stream.BaseStream.Position = Math.Min(stream.BaseStream.Length, FileStartPosition);
+
+                var fileLength = (int)(stream.BaseStream.Length - stream.BaseStream.Position);
+                HeaderLength = (UInt16)(25 + Encoding.UTF8.GetByteCount(FileName));
+                var outBuf = new byte[HeaderLength];
+                using var wm = new MemoryStream(outBuf);
+                using var w = new BinaryWriter(wm);
+
+                w.Write((UInt16)HeaderLength);
+                w.Write((UInt16)0); // "Type" ???
+                w.Write((UInt32)fileLength);
+                w.Write((UInt32)AdId);
+                w.Write((UInt32)AdFileExtension);
+                w.Write((UInt64)new FileInfo(file.Path).LastWriteTimeUtc.ToFileTimeUtc());
+                w.Write((string)FileName);
+
+                Write(outBuf);
+                Write(stream.ReadBytes(fileLength));
+
+                uploaded = true;
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is IOException || ex is FileNotFoundException || ex is UnauthorizedAccessException || ex is PathTooLongException)) throw;
+
+                Logging.WriteLine(Logging.LogLevel.Warning, Logging.LogType.Client_BNFTP, Client.RemoteEndPoint, $"{ex.GetType().Name} error encountered for requested file [{FileName}]" + (string.IsNullOrEmpty(ex.Message) ? "" : $"; message: {ex.Message}"));
+            }
+            finally
+            {
+                if (uploaded)
+                {
+                    Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_BNFTP, Client.RemoteEndPoint, $"Uploaded file [{FileName}] ({file.Length} bytes)");
+                }
+
+                if (stream != null)
+                {
+                    stream.Close();
+                }
+
+                Client.Disconnect();
             }
         }
 
