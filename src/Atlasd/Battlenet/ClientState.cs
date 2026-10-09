@@ -280,7 +280,8 @@ namespace Atlasd.Battlenet
             lock (_receiveLock)
             {
                 if (ReceiveBuffer.Length == 0) return;
-                BNFTPState.Receive(ReceiveBuffer);
+                var consumed = BNFTPState.Receive(ReceiveBuffer);
+                ReceiveBuffer = ReceiveBuffer[Math.Min(consumed, ReceiveBuffer.Length)..];
             }
         }
 

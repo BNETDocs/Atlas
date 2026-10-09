@@ -108,6 +108,9 @@
       "mask_admins_in_broadcasts": false,
       "mask_admins_in_ban_message": true,
       "mask_admins_in_kick_message": true,
+      "name_only_logon": {
+        "W3DM": true
+      },
       "required_game_key_count": {
         "D2DV": 1,
         "D2XP": 2,
@@ -117,6 +120,11 @@
         "W2BN": 1,
         "W3XP": 2,
         "WAR3": 1
+      },
+      "server_signature": {
+        "modulus": "",
+        "private_exponent": "",
+        "address": ""
       },
       "statstring_updates": {
         "D2DV": true,

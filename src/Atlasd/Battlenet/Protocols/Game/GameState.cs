@@ -56,6 +56,7 @@ namespace Atlasd.Battlenet.Protocols.Game
         public UInt32 PingToken;
         public UInt32 ProtocolId;
         public UInt32 ServerToken;
+        public UInt32 GameSearchCookie;
         public bool SpawnKey;
         public byte[] Statstring;
         public Int32 TimezoneBias;
