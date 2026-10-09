@@ -60,9 +60,20 @@ namespace Atlasd.Battlenet
                 return;
             }
 
-            lock (source)
+            // Enforce consistent lock ordering to prevent ABBA deadlock.
+            // Always lock the object with the lower RuntimeHelpers hash first.
+            var first = source;
+            var second = target;
+            if (System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(source) >
+                System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(target))
             {
-                lock (target)
+                first = target;
+                second = source;
+            }
+
+            lock (first)
+            {
+                lock (second)
                 {
                     var admin = source.HasAdmin();
                     var mutual = false;

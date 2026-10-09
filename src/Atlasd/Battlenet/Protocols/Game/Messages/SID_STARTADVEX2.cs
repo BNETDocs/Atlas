@@ -69,7 +69,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         Statuses status = Statuses.Failed;
                         GameAd gameAd = null;
 
-                        lock (Battlenet.Common.ActiveGameAds)
+                        lock (Battlenet.Common.ActiveGameAdsLock)
                         {
                             foreach (GameAd _ad in Battlenet.Common.ActiveGameAds)
                             {

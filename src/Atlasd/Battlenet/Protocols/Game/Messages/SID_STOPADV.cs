@@ -42,7 +42,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             if (!gameAdOwner)
                 Logging.WriteLine(Logging.LogLevel.Info, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"{MessageName(Id)} was received but they are not the owner of the game advertisement");
             else
-                Battlenet.Common.ActiveGameAds.Remove(gs.GameAd);
+                lock (Battlenet.Common.ActiveGameAdsLock) Battlenet.Common.ActiveGameAds.Remove(gs.GameAd);
 
             return true;
         }

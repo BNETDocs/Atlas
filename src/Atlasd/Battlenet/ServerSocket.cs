@@ -82,7 +82,6 @@ namespace Atlasd.Battlenet
             {
                 ExclusiveAddressUse = true,
                 NoDelay = Daemon.Common.TcpNoDelay,
-                UseOnlyOverlappedIO = true,
             };
         }
 

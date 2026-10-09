@@ -17,7 +17,7 @@ namespace Atlasd.Battlenet
             {
                 long lastPosition = BaseStream.Position;
 
-                while (BaseStream.CanRead)
+                while (BaseStream.Position < BaseStream.Length)
                 {
                     if (ReadByte() == 0)
                     {
@@ -27,6 +27,7 @@ namespace Atlasd.Battlenet
                     }
                 }
 
+                BaseStream.Position = lastPosition;
                 return -1;
             }
         }
@@ -35,7 +36,13 @@ namespace Atlasd.Battlenet
         {
             lock (_lock)
             {
-                var size = GetNextNull() - BaseStream.Position;
+                var nullPos = GetNextNull();
+                if (nullPos < 0)
+                {
+                    throw new EndOfStreamException(
+                        $"Truncated string field at stream position {BaseStream.Position}: missing null terminator");
+                }
+                var size = nullPos - BaseStream.Position;
                 return ReadBytes((int)size)[..^1];
             }
         }
@@ -46,7 +53,7 @@ namespace Atlasd.Battlenet
             {
                 string str = "";
                 char chr;
-                while ((int)(chr = ReadChar()) != 0)
+                while (BaseStream.Position < BaseStream.Length && (int)(chr = ReadChar()) != 0)
                     str += chr;
                 return str;
             }

@@ -58,7 +58,7 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
 
                         var gameAds = new List<GameAd>();
 
-                        lock (Battlenet.Common.ActiveGameAds)
+                        lock (Battlenet.Common.ActiveGameAdsLock)
                         {
                             IList<GameAd> toDelete = new List<GameAd>();
                             foreach (var gameAd in Battlenet.Common.ActiveGameAds)
