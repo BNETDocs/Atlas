@@ -1,5 +1,4 @@
-﻿using Atlasd.Battlenet.Exceptions;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 
 namespace Atlasd.Battlenet
@@ -40,7 +39,7 @@ namespace Atlasd.Battlenet
                 var nullPos = GetNextNull();
                 if (nullPos < 0)
                 {
-                    throw new GameProtocolViolationException(null,
+                    throw new EndOfStreamException(
                         $"Truncated string field at stream position {BaseStream.Position}: missing null terminator");
                 }
                 var size = nullPos - BaseStream.Position;
