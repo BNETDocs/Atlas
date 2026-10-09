@@ -79,6 +79,7 @@ namespace Atlasd.Battlenet.Protocols.Game
                 MessageIds.SID_QUERYREALMS2 => new SID_QUERYREALMS2(buffer),
                 MessageIds.SID_QUERYADURL => new SID_QUERYADURL(buffer),
                 MessageIds.SID_WARCRAFTGENERAL => new SID_WARCRAFTGENERAL(buffer),
+                MessageIds.SID_NETGAMEPORT => new SID_NETGAMEPORT(buffer),
                 MessageIds.SID_NEWS_INFO => new SID_NEWS_INFO(buffer),
                 MessageIds.SID_AUTH_INFO => new SID_AUTH_INFO(buffer),
                 MessageIds.SID_AUTH_CHECK => new SID_AUTH_CHECK(buffer),
