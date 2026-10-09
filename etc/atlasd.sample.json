@@ -132,6 +132,11 @@
       "port": 6112,
       "tcp_nodelay": true
     },
+    "realm_listener": {
+      "interface": "0.0.0.0",
+      "port": 6113,
+      "tcp_nodelay": true
+    },
     "realm": {
       "host": "Anonymous",
       "name": "Atlas"

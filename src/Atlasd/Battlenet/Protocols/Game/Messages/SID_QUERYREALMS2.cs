@@ -42,12 +42,13 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                     }
                 case MessageDirection.ServerToClient:
                     {
-                        Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
-
-                        Dictionary<byte[], byte[]> realms =
-                            context.Arguments == null || !context.Arguments.ContainsKey("realms") ?
-                            new Dictionary<byte[], byte[]>() :
-                            (Dictionary<byte[], byte[]>)context.Arguments["realms"];
+                        Dictionary<byte[], byte[]> realms = new Dictionary<byte[], byte[]>
+                        {
+                            {
+                                Encoding.UTF8.GetBytes("Olympus"),
+                                Encoding.UTF8.GetBytes("Diablo II Realm Server")
+                            }
+                        };
 
                         /**
                          * (UINT32) Unknown (0)
