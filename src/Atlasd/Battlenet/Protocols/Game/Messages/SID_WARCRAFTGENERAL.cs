@@ -32,8 +32,30 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             Buffer = buffer;
         }
 
+        private static bool Reply(MessageContext context, byte subcommand, UInt32? status)
+        {
+            var buffer = new byte[status.HasValue ? 9 : 5];
+            using (var m = new MemoryStream(buffer))
+            using (var w = new BinaryWriter(m))
+            {
+                w.Write(subcommand);
+                w.Write(context.Client.GameState.GameSearchCookie);
+                if (status.HasValue) w.Write(status.Value);
+            }
+
+            return new SID_WARCRAFTGENERAL().Invoke(new MessageContext(context.Client, MessageDirection.ServerToClient, new Dictionary<string, object> {{ "buffer", buffer }}));
+        }
+
         public override bool Invoke(MessageContext context)
         {
+            if (context.Direction == MessageDirection.ServerToClient)
+            {
+                Buffer = (byte[])context.Arguments["buffer"];
+                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} subcommand {Buffer[0]:X2} ({4 + Buffer.Length} bytes)");
+                context.Client.Send(ToByteArray(context.Client.ProtocolType));
+                return true;
+            }
+
             Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
 
             if (context.Client.GameState == null || !Product.IsWarcraftIII(context.Client.GameState.Product))
@@ -45,11 +67,40 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
             byte subcommand;
             using (var m = new MemoryStream(Buffer))
             using (var r = new BinaryReader(m))
+            {
                 subcommand = r.ReadByte();
 
-            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} received subcommand {subcommand:X2}");
+                Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} received subcommand {subcommand:X2}");
 
-            // TODO: Compare subcommand variable with SubCommands enum and do procedures, for now just ignore
+                switch ((SubCommands)subcommand)
+                {
+                    case SubCommands.WID_GAMESEARCH:
+                        {
+                            /**
+                             * Warcraft III demo layout:
+                             *   (UINT8) Subcommand
+                             *  (UINT32) Cookie
+                             *  (UINT32) Unknown
+                             *   (UINT8) Unknown
+                             *   (UINT8) Unknown
+                             *  (UINT32) Unknown
+                             *   (UINT8) Length of the remaining data (8)
+                             *  (UINT32) Tick count
+                             *  (UINT32) Race
+                             */
+
+                            if (Buffer.Length < 16)
+                                throw new GameProtocolViolationException(context.Client, $"{MessageName(Id)} game search buffer must be at least 16 bytes");
+
+                            context.Client.GameState.GameSearchCookie = r.ReadUInt32();
+                            Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"Game search requested (cookie 0x{context.Client.GameState.GameSearchCookie:X8}): {BitConverter.ToString(Buffer)}");
+
+                            return Reply(context, subcommand, 0);
+                        }
+                    case SubCommands.WID_CANCELSEARCH:
+                        return Reply(context, subcommand, null);
+                }
+            }
 
             return true;
         }
