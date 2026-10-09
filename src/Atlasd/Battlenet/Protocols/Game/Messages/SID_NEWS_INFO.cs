@@ -69,10 +69,10 @@ namespace Atlasd.Battlenet.Protocols.Game.Messages
                         using var w = new BinaryWriter(m);
 
                         w.Write((byte)1);
-                        w.Write((UInt32)(lastLogon.ToFileTimeUtc() >> 32));
-                        w.Write((UInt32)(newsTimestamp.ToFileTimeUtc() >> 32));
-                        w.Write((UInt32)(newsTimestamp.ToFileTimeUtc() >> 32));
-                        w.Write((UInt32)(newsTimestamp.ToFileTimeUtc() >> 32));
+                        w.Write((UInt32)new DateTimeOffset(lastLogon).ToUnixTimeSeconds());
+                        w.Write((UInt32)new DateTimeOffset(newsTimestamp).ToUnixTimeSeconds());
+                        w.Write((UInt32)new DateTimeOffset(newsTimestamp).ToUnixTimeSeconds());
+                        w.Write((UInt32)new DateTimeOffset(newsTimestamp).ToUnixTimeSeconds());
                         w.Write((string)newsGreeting);
 
                         Logging.WriteLine(Logging.LogLevel.Debug, Logging.LogType.Client_Game, context.Client.RemoteEndPoint, $"[{Common.DirectionToString(context.Direction)}] {MessageName(Id)} ({4 + Buffer.Length} bytes)");
